@@ -25,7 +25,7 @@ public class User implements Serializable {
   @GeneratedValue
   private Long id;
 
-  @Column(nullable = false)
+  @Column(nullable = true, unique = false)
   private String name;
 
   @Column(nullable = false, unique = true)
@@ -36,6 +36,9 @@ public class User implements Serializable {
 
   @Column(nullable = false)
   private UserStatus status;
+
+  @Column(nullable = false, unique = false)
+  private String password;
 
   public Long getId() {
     return id;
@@ -75,5 +78,13 @@ public class User implements Serializable {
 
   public void setStatus(UserStatus status) {
     this.status = status;
+  }
+
+  public String getPassword() {
+    return password;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
   }
 }
