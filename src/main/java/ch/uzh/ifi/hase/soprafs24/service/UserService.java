@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -52,15 +53,29 @@ public class UserService {
     return newUser;
   }
 
-  //Authentication for login
-  public User authentication(String username, String password){
+  // Authentication for login
+  public User authentication(String username, String password) {
     User user = userRepository.findByUsername(username);
-    if (user != null && user.getPassword().equals(password)){
+    if (user != null && user.getPassword().equals(password)) {
       user.setStatus(UserStatus.ONLINE);
       return user;
     } else {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Username or password is incorrect");
     }
+  }
+
+  // this function handles the user status
+  public User updateUserStatus(Long id, UserStatus status) {
+    Optional<User> result = userRepository.findById(id);
+
+    if (!result.isPresent()) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with this id could not be found.");
+    }
+
+    User user = result.get();
+    user.setStatus(status);
+    return userRepository.save(user);
+
   }
 
   /**
@@ -75,20 +90,23 @@ public class UserService {
    */
   private void checkIfUserExists(User userToBeCreated) {
     User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
-    //User userByName = userRepository.findByName(userToBeCreated.getName());
+    // User userByName = userRepository.findByName(userToBeCreated.getName());
 
-  //   String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
-  //   if (userByUsername != null && userByName != null) {
-  //     throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-  //         String.format(baseErrorMessage, "username and the name", "are"));
-  //   } else if (userByUsername != null) {
-  //     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "username", "is"));
-  //   } else if (userByName != null) {
-  //     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "name", "is"));
-  //   }
-  // }
-  String baseErrorMessage = "The %s provided is not unique. Therefore, the user could not be created!";
-  if (userByUsername != null) {
+    // String baseErrorMessage = "The %s provided %s not unique. Therefore, the user
+    // could not be created!";
+    // if (userByUsername != null && userByName != null) {
+    // throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+    // String.format(baseErrorMessage, "username and the name", "are"));
+    // } else if (userByUsername != null) {
+    // throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+    // String.format(baseErrorMessage, "username", "is"));
+    // } else if (userByName != null) {
+    // throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+    // String.format(baseErrorMessage, "name", "is"));
+    // }
+    // }
+    String baseErrorMessage = "The %s provided is not unique. Therefore, the user could not be created!";
+    if (userByUsername != null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "username"));
     }
   }

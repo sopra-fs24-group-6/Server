@@ -3,9 +3,11 @@ package ch.uzh.ifi.hase.soprafs24.controller;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPutDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -63,5 +65,15 @@ public class UserController {
     User authenticationUser = userService.authentication(userInput.getUsername(), userInput.getPassword());
 
     return DTOMapper.INSTANCE.convertEntityToUserGetDTO(authenticationUser);
+  }
+
+  @PutMapping("logout/{id}")
+  public ResponseEntity<User> updateUserStatus(@PathVariable Long id, @RequestBody UserPutDTO UserPutDTO) {
+    try {
+      User updatedUser = userService.updateUserStatus(id, UserPutDTO.getStatus());
+      return ResponseEntity.ok(updatedUser);
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
   }
 }
