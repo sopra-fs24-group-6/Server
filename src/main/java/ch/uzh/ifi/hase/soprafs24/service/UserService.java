@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.Date;
 
 /**
  * User Service
@@ -39,9 +40,15 @@ public class UserService {
     return this.userRepository.findAll();
   }
 
+  public User getUserProfile(Long id) {
+    checkIfUserIdExists(id);
+    return this.userRepository.findUserById(id);
+  }
+
   public User createUser(User newUser) {
     newUser.setToken(UUID.randomUUID().toString());
     newUser.setStatus(UserStatus.ONLINE);
+    newUser.setCreationDate(new Date());
     checkIfUserExists(newUser);
     // saves the given entity but data is only persisted in the database once
     // flush() is called
@@ -87,9 +94,17 @@ public class UserService {
   //     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "name", "is"));
   //   }
   // }
-  String baseErrorMessage = "The %s provided is not unique. Therefore, the user could not be created!";
-  if (userByUsername != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "username"));
+    String baseErrorMessage = "The %s provided is not unique. Therefore, the user could not be created!";
+    if (userByUsername != null) {
+        throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username"));
     }
   }
+
+  private void checkIfUserIdExists(Long userId) {
+    User userById = userRepository.findUserById(userId);
+    if (userById == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Id not found: "+userId);
+    }
+  }
+
 }

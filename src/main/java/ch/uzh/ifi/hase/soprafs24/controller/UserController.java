@@ -42,6 +42,15 @@ public class UserController {
     return userGetDTOs;
   }
 
+  @GetMapping("/users/{userId}")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public UserGetDTO getUserProfile(@PathVariable("userId") Long userId) {
+    // fetch user in the internal representation
+    User user = userService.getUserProfile(userId);
+    return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
+  }
+
   @PostMapping("/users")
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
