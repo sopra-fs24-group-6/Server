@@ -1,16 +1,17 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
+import java.util.Date;
 
 public class UserEditDTO {
 
     private String username;
 
-    private String birthday;
+    private Date birthday;
 
-    public String getBirthday() {
+    public Date getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(String birthday) {
+    public void setBirthday(Date birthday) {
         this.birthday = birthday;
     }
 
