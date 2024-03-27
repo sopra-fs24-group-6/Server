@@ -60,6 +60,23 @@ public class UserService {
     return newUser;
   }
 
+    public User Edit(Long id,User user) {
+        Optional<User> userOptional = this.userRepository.findById(id);
+        String NotFoundMessage = "User with id:%s is not Found. Have you registered yet?";
+        String ConflictUserName = "Username: %s has been used, please choose another username";
+        if (!userOptional.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format(NotFoundMessage , id));
+        } else {
+            User userByUsername = userRepository.findByUsername(user.getUsername());
+            if (userByUsername != null) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(ConflictUserName , user.getUsername()));
+            }
+            userOptional.get().setBirthday(user.getBirthday());
+            userOptional.get().setUsername(user.getUsername());
+            return userOptional.get();
+        }
+    }
+
   // Authentication for login
   public User authentication(String username, String password) {
     User user = userRepository.findByUsername(username);

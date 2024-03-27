@@ -4,6 +4,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPutDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.UserEditDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -43,6 +44,15 @@ public class UserController {
     }
     return userGetDTOs;
   }
+
+    @PutMapping("/users/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseBody
+    public UserGetDTO Edit_user(@PathVariable Long id, @RequestBody UserEditDTO userEditDTO) {
+        User userinput = DTOMapper.INSTANCE.convertUserEditDTOtoEntity(userEditDTO);
+        User user = userService.Edit(id , userinput);
+        return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
+    }
 
   @GetMapping("/users/{userId}")
   @ResponseStatus(HttpStatus.OK)
