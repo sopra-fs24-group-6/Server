@@ -60,22 +60,22 @@ public class UserService {
     return newUser;
   }
 
-    public User Edit(Long id,User user) {
-        Optional<User> userOptional = this.userRepository.findById(id);
-        String NotFoundMessage = "User with id:%s is not Found. Have you registered yet?";
-        String ConflictUserName = "Username: %s has been used, please choose another username";
-        if (!userOptional.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format(NotFoundMessage , id));
-        } else {
-            User userByUsername = userRepository.findByUsername(user.getUsername());
-            if (userByUsername != null) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(ConflictUserName , user.getUsername()));
-            }
-            userOptional.get().setBirthday(user.getBirthday());
-            userOptional.get().setUsername(user.getUsername());
-            return userOptional.get();
-        }
-    }
+  public User Edit(Long id,User user) {
+      Optional<User> userOptional = this.userRepository.findById(id);
+      String NotFoundMessage = "User with id:%s is not Found. Have you registered yet?";
+      String ConflictUserName = "Username: %s has been used, please choose another username";
+      if (!userOptional.isPresent()) {
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format(NotFoundMessage , id));
+      } else {
+          User userByUsername = userRepository.findByUsername(user.getUsername());
+          if (userByUsername != null) {
+              throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(ConflictUserName , user.getUsername()));
+          }
+          userOptional.get().setBirthday(user.getBirthday());
+          userOptional.get().setUsername(user.getUsername());
+          return userOptional.get();
+      }
+  }
 
   // Authentication for login
   public User authentication(String username, String password) {
@@ -114,21 +114,6 @@ public class UserService {
    */
   private void checkIfUserExists(User userToBeCreated) {
     User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
-    // User userByName = userRepository.findByName(userToBeCreated.getName());
-
-    // String baseErrorMessage = "The %s provided %s not unique. Therefore, the user
-    // could not be created!";
-    // if (userByUsername != null && userByName != null) {
-    // throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-    // String.format(baseErrorMessage, "username and the name", "are"));
-    // } else if (userByUsername != null) {
-    // throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-    // String.format(baseErrorMessage, "username", "is"));
-    // } else if (userByName != null) {
-    // throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-    // String.format(baseErrorMessage, "name", "is"));
-    // }
-    // }
     String baseErrorMessage = "The %s provided is not unique. Therefore, the user could not be created!";
     if (userByUsername != null) {
       throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username"));

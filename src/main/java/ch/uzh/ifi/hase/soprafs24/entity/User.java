@@ -47,6 +47,11 @@ public class User implements Serializable {
   @Column(nullable = true)
   private Date birthday;
 
+  @OneToOne
+  @JoinColumn(name = "player_id")
+  private Player player;
+
+
   public Long getId() {
     return id;
   }
@@ -102,4 +107,12 @@ public class User implements Serializable {
   public Date getBirthday() { return birthday; }
 
   public void setBirthday(Date birthday) { this.birthday = birthday; }
+
+  public Player getPlayer() {
+    return player;
+  }
+
+  public void setPlayer(Player player) {
+    this.player = player;
+  }
 }
