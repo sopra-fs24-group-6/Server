@@ -12,8 +12,7 @@ public class UserGetDTO {
   private UserStatus status;
   private String password;
   private Date creation_date;
-
-  private Date birthday;
+  private Date birthDate;
 
   public Long getId() {
     return id;
@@ -59,7 +58,7 @@ public class UserGetDTO {
 
   public void setCreationDate(Date creation_date) { this.creation_date = creation_date; }
 
-  public Date getBirthday() { return birthday; }
+  public Date getBirthDate() { return birthDate; }
 
-  public void setBirthday(Date birthday) { this.birthday = birthday; }
+  public void setBirthDate(Date birthDate) { this.birthDate = birthDate; }
 }
