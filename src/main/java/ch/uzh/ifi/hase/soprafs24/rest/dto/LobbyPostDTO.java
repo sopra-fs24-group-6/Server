@@ -1,24 +1,34 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
-import ch.uzh.ifi.hase.soprafs24.constant.LobbyType;
+import java.util.List;
 
 
 public class LobbyPostDTO {
 
-  private String name;
+  private Long lobbyAdmin;
 
-  private LobbyType type;
+  private String name;
 
   private String password;
 
-  private Integer numPlayers;
+  private Integer playerLimit;
 
-  private String themeName;
+  private List<String> themes;
 
-  private Integer gameDuration;
+  private Integer roundTimer;
 
-  private Long hostUserId;
+  private Integer clueTimer;
 
+  private Integer discussionTimer;
+
+
+  public Long getLobbyAdmin() {
+    return lobbyAdmin;
+  }
+
+  public void setLobbyAdmin(Long lobbyAdmin) {
+    this.lobbyAdmin = lobbyAdmin;
+  }
 
   public String getName() {
     return name;
@@ -26,14 +36,6 @@ public class LobbyPostDTO {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public LobbyType getType() {
-    return type;
-  }
-
-  public void setType(LobbyType type) {
-    this.type = type;
   }
 
   public String getPassword() {
@@ -44,35 +46,43 @@ public class LobbyPostDTO {
     this.password = password;
   }
 
-  public Integer getNumPlayers() {
-    return numPlayers;
+  public Integer getPlayerLimit() {
+    return playerLimit;
   }
 
-  public void setNumPlayers(Integer numPlayers) {
-    this.numPlayers = numPlayers;
+  public void setPlayerLimit(Integer playerLimit) {
+    this.playerLimit = playerLimit;
   }
 
-  public String getThemeName() {
-    return themeName;
+  public List<String> getThemes() {
+    return themes;
   }
 
-  public void setThemeName(String themeName) {
-    this.themeName = themeName;
+  public void setThemes(List<String> themes) {
+    this.themes = themes;
   }
 
-  public Integer getGameDuration() {
-    return gameDuration;
+  public Integer getRoundTimer() {
+    return roundTimer;
   }
 
-  public void setGameDuration(Integer gameDuration) {
-    this.gameDuration = gameDuration;
+  public void setRoundTimer(Integer roundTimer) {
+    this.roundTimer = roundTimer;
   }
 
-  public Long getHostUserId() {
-    return hostUserId;
+  public Integer getClueTimer() {
+    return clueTimer;
   }
 
-  public void setHostUserId(Long hostUserId) {
-    this.hostUserId = hostUserId;
+  public void setClueTimer(Integer clueTimer) {
+    this.clueTimer = clueTimer;
+  }
+
+  public Integer getDiscussionTimer() {
+    return discussionTimer;
+  }
+
+  public void setDiscussionTimer(Integer discussionTimer) {
+    this.discussionTimer = discussionTimer;
   }
 }

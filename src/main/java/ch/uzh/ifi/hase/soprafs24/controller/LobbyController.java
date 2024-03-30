@@ -24,7 +24,7 @@ public class LobbyController {
   @PostMapping("/lobbies")
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public LobbyGetDTO createUser(@RequestBody LobbyPostDTO lobbyPostDTO) {
+  public LobbyGetDTO createLobby(@RequestBody LobbyPostDTO lobbyPostDTO) {
     // convert API user to internal representation
     Lobby lobbyInput = LobbyDTOMapper.INSTANCE.convertLobbyPostDTOtoEntity(lobbyPostDTO);
     // create lobby
@@ -54,6 +54,40 @@ public class LobbyController {
     // fetch lobby in the internal representation
     Lobby lobby = lobbyService.getLobbyById(lobbyId);
     return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby);
+  }
+
+  @PutMapping("/lobbies/{lobbyId}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void updateLobby(@PathVariable("lobbyId") Long lobbyId, @RequestBody LobbyPostDTO lobbyPostDTO) {
+    // convert API user to internal representation
+    Lobby lobbyInput = LobbyDTOMapper.INSTANCE.convertLobbyPostDTOtoEntity(lobbyPostDTO);
+    // update lobby
+    lobbyService.updateLobby(lobbyId, lobbyInput);
+  }
+
+  @PostMapping("/lobbies/{lobbyId}/players")
+  @ResponseStatus(HttpStatus.CREATED)
+  @ResponseBody
+  public LobbyGetDTO joinLobby(@PathVariable("lobbyId") Long lobbyId, @RequestBody Long userId) {
+    // add player to lobby
+    Lobby updatedLobby = lobbyService.addPlayerToLobby(lobbyId, userId);
+    return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(updatedLobby);
+  }
+
+  @PostMapping("/lobbies/{lobbyId}/authentication")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public void authenticateLobby(@PathVariable("lobbyId") Long lobbyId, @RequestBody String password) {
+    // authenticate lobby with password
+    lobbyService.authenticateLobby(lobbyId, password);
+  }
+
+  @GetMapping("/themes")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<String> getAllThemes() {
+    // fetch all available themes
+    return lobbyService.getThemes();
   }
 
 }

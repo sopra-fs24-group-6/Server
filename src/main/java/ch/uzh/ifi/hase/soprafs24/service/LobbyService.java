@@ -1,9 +1,14 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.constant.LobbyStatus;
+import ch.uzh.ifi.hase.soprafs24.constant.LobbyType;
+import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
-import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.entity.Theme;
+import ch.uzh.ifi.hase.soprafs24.entity.Player;
+import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.PlayerRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.ThemeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -23,11 +29,18 @@ public class LobbyService {
 
   private final Logger log = LoggerFactory.getLogger(LobbyService.class);
 
+  private final UserRepository userRepository;
+  private final PlayerRepository playerRepository;
   private final LobbyRepository lobbyRepository;
   private final ThemeRepository themeRepository;
 
   @Autowired
-  public LobbyService(@Qualifier("lobbyRepository") LobbyRepository lobbyRepository, ThemeRepository themeRepository) {
+  public LobbyService(UserRepository userRepository,
+                      PlayerRepository playerRepository,
+                      @Qualifier("lobbyRepository") LobbyRepository lobbyRepository,
+                      ThemeRepository themeRepository) {
+    this.userRepository = userRepository;
+    this.playerRepository = playerRepository;
     this.lobbyRepository = lobbyRepository;
     this.themeRepository = themeRepository;
   }
@@ -37,28 +50,34 @@ public class LobbyService {
     return this.lobbyRepository.findAll();
   }
 
-  public Lobby getLobbyById(Long lobbyId) {
-    return lobbyRepository.findById(lobbyId)
-      .orElseThrow(() -> new ResponseStatusException(
-        HttpStatus.NOT_FOUND, "Lobby with id " + lobbyId + " could not be found."));
-  }
+  public Lobby getLobbyById(Long lobbyId) { return findLobbyById(lobbyId); }
 
   public Lobby createLobby(Lobby newLobby) {
+    // check if input name already exists
+    // if so, then trow exception
+    checkIfLobbyNameExists(newLobby.getName());
+
+    // set lobby type
+    // if password is set, then PRIVATE, else PUBLIC
+    LobbyType type = determineLobbyType(newLobby.getPassword());
+    newLobby.setType(type);
+
+    // set status
     newLobby.setStatus(LobbyStatus.WAITING);
 
-    // set theme by name
+    // set themes by names
     // if name not found, then throw exception
-    String inputThemeName = newLobby.getTheme().getName();
-    Theme theme = themeRepository.findByName(inputThemeName)
-      .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Theme not found with name: " + inputThemeName));
-    newLobby.setTheme(theme);
+    List<Theme> themes = findThemesByNames(newLobby.getThemeNames());
+    newLobby.setThemes(themes);
 
-    // check if input name already exists
-    // if exists, then throw exception
-    String inputLobbyName = newLobby.getName();
-    lobbyRepository.findByName(inputLobbyName).ifPresent(existingLobby -> {
-      throw new ResponseStatusException(HttpStatus.CONFLICT, "Lobby with name: " + inputLobbyName + " already exists.");
-    });
+    // create host player
+    // if userId not found, then throw exception
+    User hostUser = findUserById(newLobby.getHost().getUserId());
+    Player hostPlayer = createPlayerFromUser(hostUser, true);
+
+    // add host to lobby
+    newLobby.setHost(hostPlayer);
+    newLobby.addPlayer(hostPlayer);
 
     // saves the given entity but data is only persisted in the database once
     // flush() is called
@@ -67,6 +86,155 @@ public class LobbyService {
 
     log.debug("Created Information for User: {}", newLobby);
     return newLobby;
+  }
+
+  public void updateLobby (Long lobbyId, Lobby newLobby) {
+    // find lobby by id
+    // if not found, then throw exception
+    Lobby targetLobby = findLobbyById(lobbyId);
+
+    // update properties
+    targetLobby.setName(newLobby.getName());
+    targetLobby.setPassword(newLobby.getPassword());
+    targetLobby.setRoundTimer(newLobby.getRoundTimer());
+    targetLobby.setClueTimer(newLobby.getClueTimer());
+    targetLobby.setDiscussionTimer(newLobby.getDiscussionTimer());
+
+    // update playerLimit
+    // if new playerLimit < current playerCount, then throw except
+    if (newLobby.getPlayerLimit() >= targetLobby.getPlayerCount()) {
+      targetLobby.setPlayerLimit(newLobby.getPlayerLimit());
+    } else {
+      throw new ResponseStatusException(
+        HttpStatus.CONFLICT, "Player limit should be less than current player counts");
+    }
+
+    // update themes
+    List<Theme> newThemes = findThemesByNames(newLobby.getThemeNames());
+    targetLobby.setThemes(newThemes);
+  }
+
+
+  public Lobby addPlayerToLobby(Long lobbyId, Long userId){
+    // find lobby by id
+    // if not found, then throw exception
+    Lobby lobby = findLobbyById(lobbyId);
+
+    // find user by id
+    // if not found, then throw exception
+    User user = findUserById(userId);
+
+    // create new player
+    Player newPlayer = createPlayerFromUser(user, false);
+
+    // add player if current count < limit
+    // if lobby is full, then throw exception
+    if (lobby.getPlayerCount() < lobby.getPlayerLimit()) {
+      lobby.addPlayer(newPlayer);
+    } else {
+      throw new ResponseStatusException(
+        HttpStatus.CONFLICT, "Lobby with id " + lobbyId + " is full.");
+    }
+
+    // save changes
+    lobby = lobbyRepository.save(lobby);
+    lobbyRepository.flush();
+
+    return lobby;
+  }
+
+  public void authenticateLobby (Long lobbyId, String password) {
+    // find lobby by id
+    // if not found, then throw exception
+    Lobby lobby = findLobbyById(lobbyId);
+
+    // check password
+    // if incorrect password, then throw exception
+    if (!lobby.getPassword().equals(password)) {
+      throw new ResponseStatusException(
+        HttpStatus.UNAUTHORIZED, "Incorrect password for lobby with id " + lobbyId + ".");
+    }
+  }
+
+  public Lobby startGame (Long lobbyId) {
+    // find lobby by id
+    // if not found, then throw exception
+    Lobby lobby = findLobbyById(lobbyId);
+
+    // change status to IN_PROGRESS
+    lobby.setStatus(LobbyStatus.IN_PROGRESS);
+
+    return lobby;
+  }
+
+  public List<String> getThemes () {
+    List<Theme> themes = themeRepository.findAll();
+    List<String> themeNames = new ArrayList<>();
+    for (Theme theme: themes) {
+      themeNames.add(theme.getName());
+    }
+    return themeNames;
+  }
+
+
+  /**
+   * Helper Methods
+   */
+  public void checkIfLobbyNameExists (String lobbyName) {
+    lobbyRepository.findByName(lobbyName).ifPresent(existingLobby -> {
+      throw new ResponseStatusException(
+        HttpStatus.CONFLICT, "Lobby with name: " + lobbyName + " already exists.");
+    });
+  }
+
+  public Lobby findLobbyById (Long lobbyId) {
+    return lobbyRepository.findById(lobbyId)
+      .orElseThrow(() -> new ResponseStatusException(
+        HttpStatus.NOT_FOUND, "Lobby with id " + lobbyId + " could not be found."));
+  }
+
+  public User findUserById (Long userId) {
+    return userRepository.findById(userId)
+      .orElseThrow(() -> new ResponseStatusException(
+        HttpStatus.NOT_FOUND, "User with id " + userId + " could not be found."));
+  }
+
+  public LobbyType determineLobbyType (String password) {
+    return password != null ? LobbyType.PRIVATE : LobbyType.PUBLIC;
+  }
+
+  public List<Theme> findThemesByNames(List<String> themeNames) {
+    List<Theme> themes = new ArrayList<>();
+    for (String themeName : themeNames) {
+      Theme theme = themeRepository.findByName(themeName)
+        .orElseThrow(() -> new ResponseStatusException(
+          HttpStatus.NOT_FOUND, "Theme not found with name: " + themeName));
+      themes.add(theme);
+    }
+    return themes;
+  }
+
+  public Player createPlayerFromUser (User user, Boolean isHost) {
+    // check if user already join lobby/game
+    // if not, then create new player
+    // else, throw exception
+    if (user.getPlayer() != null) {
+      throw new ResponseStatusException(
+        HttpStatus.CONFLICT, "User with id " + user.getId() + " already joins another lobby.");
+    } else {
+      // create new player
+      Player newPlayer = new Player();
+      newPlayer.setUserId(user.getId());
+      newPlayer.setUsername(user.getUsername());
+      newPlayer.setHost(isHost);
+      newPlayer = playerRepository.save(newPlayer);
+      playerRepository.flush();
+
+      // update user
+      user.setPlayer(newPlayer);
+
+      return newPlayer;
+    }
   }
 
 }

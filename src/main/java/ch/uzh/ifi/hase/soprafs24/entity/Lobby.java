@@ -5,8 +5,8 @@ import ch.uzh.ifi.hase.soprafs24.constant.LobbyStatus;
 
 import java.io.Serializable;
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -30,32 +30,63 @@ public class Lobby implements Serializable {
   private String password;
 
   @OneToMany(mappedBy = "lobby")
-  private Set<Player> players = new HashSet<Player>();
+  private List<Player> players = new ArrayList<>();
 
   @Column(nullable = false)
-  private Integer numPlayers;
+  private Integer playerLimit;
 
-  @ManyToOne
-  @JoinColumn(name = "theme_id", nullable = false)
-  private Theme theme;
+  @Column(nullable = false)
+  private Integer playerCount = 0;
+
+  @ManyToMany
+  @JoinTable(
+    name = "LOBBY_THEME",
+    joinColumns = @JoinColumn(name = "lobby_id"),
+    inverseJoinColumns = @JoinColumn(name = "theme_id")
+  )
+  private List<Theme> themes = new ArrayList<>();
 
   @Column()
-  private Integer gameDuration;
+  private Integer roundTimer;
 
-  @Column(nullable = false)
-  private Long hostUserId;
+  @Column()
+  private Integer clueTimer;
+
+  @Column()
+  private Integer discussionTimer;
+
+  @OneToOne
+  @JoinColumn(name = "host_id", nullable = false)
+  private Player host;
 
 
+  /*
+  Additional methods
+  */
   public void addPlayer(Player player) {
     players.add(player);
     player.setLobby(this);
+    playerCount += 1;
   }
 
   public void removePlayer(Player player) {
     players.remove(player);
     player.setLobby(null);
+    playerCount -= 1;
   }
 
+  public List<String> getThemeNames() {
+    List<String> themeNames = new ArrayList<>();
+    for (Theme theme : themes) {
+      themeNames.add(theme.getName());
+    }
+    return themeNames;
+  }
+
+
+  /*
+  Basic getter and setter
+  */
   public Long getId() {
     return id;
   }
@@ -96,43 +127,67 @@ public class Lobby implements Serializable {
     this.password = password;
   }
 
-  public Set<Player> getPlayers() {
+  public List<Player> getPlayers() {
     return players;
   }
 
-  public void setPlayers(Set<Player> players) {
+  public void setPlayers(List<Player> players) {
     this.players = players;
   }
 
-  public Integer getNumPlayers() {
-    return numPlayers;
+  public Integer getPlayerLimit() {
+    return playerLimit;
   }
 
-  public void setNumPlayers(Integer numPlayers) {
-    this.numPlayers = numPlayers;
+  public void setPlayerLimit(Integer playerLimit) {
+    this.playerLimit = playerLimit;
   }
 
-  public Theme getTheme() {
-    return theme;
+  public Integer getPlayerCount() {
+    return playerCount;
   }
 
-  public void setTheme(Theme theme) {
-    this.theme = theme;
+  public void setPlayerCount(Integer playerCount) {
+    this.playerCount = playerCount;
   }
 
-  public Integer getGameDuration() {
-    return gameDuration;
+  public List<Theme> getThemes() {
+    return themes;
   }
 
-  public void setGameDuration(Integer gameDuration) {
-    this.gameDuration = gameDuration;
+  public void setThemes(List<Theme> themes) {
+    this.themes = themes;
   }
 
-  public Long getHostUserId() {
-    return hostUserId;
+  public Integer getRoundTimer() {
+    return roundTimer;
   }
 
-  public void setHostUserId(Long hostUserId) {
-    this.hostUserId = hostUserId;
+  public void setRoundTimer(Integer roundTimer) {
+    this.roundTimer = roundTimer;
+  }
+
+  public Integer getClueTimer() {
+    return clueTimer;
+  }
+
+  public void setClueTimer(Integer clueTimer) {
+    this.clueTimer = clueTimer;
+  }
+
+  public Integer getDiscussionTimer() {
+    return discussionTimer;
+  }
+
+  public void setDiscussionTimer(Integer discussionTimer) {
+    this.discussionTimer = discussionTimer;
+  }
+
+  public Player getHost() {
+    return host;
+  }
+
+  public void setHost(Player host) {
+    this.host = host;
   }
 }

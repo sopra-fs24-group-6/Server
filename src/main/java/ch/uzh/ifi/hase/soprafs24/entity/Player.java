@@ -14,13 +14,9 @@ public class Player implements Serializable {
   private static final long serialVersionUID = 1L;
 
   @Id
-  @GeneratedValue
-  private Long id;
-
-  @Column(nullable = false, unique = true)
   private Long userId;
 
-  @Column(nullable = false, unique = true)
+  @Column(nullable = false)
   private String username;
 
   @Column(nullable = true)
@@ -32,21 +28,13 @@ public class Player implements Serializable {
   @Column(nullable = true)
   private Language language;
 
-  @Column(nullable = true)
+  @Column(nullable = false)
   private Boolean isHost;
 
   @ManyToOne
   @JoinColumn(name = "lobby_id")
   private Lobby lobby;
 
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
 
   public Long getUserId() {
     return userId;

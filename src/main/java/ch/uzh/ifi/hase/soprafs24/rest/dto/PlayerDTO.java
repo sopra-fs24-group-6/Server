@@ -7,8 +7,6 @@ public class PlayerDTO {
 
   private String username;
 
-  private Boolean isHost;
-
 
   public Long getUserId() {
     return userId;
@@ -26,11 +24,4 @@ public class PlayerDTO {
     this.username = username;
   }
 
-  public Boolean getHost() {
-    return isHost;
-  }
-
-  public void setHost(Boolean host) {
-    isHost = host;
-  }
 }

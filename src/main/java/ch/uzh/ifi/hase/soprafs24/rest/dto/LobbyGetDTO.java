@@ -3,7 +3,7 @@ package ch.uzh.ifi.hase.soprafs24.rest.dto;
 import ch.uzh.ifi.hase.soprafs24.constant.LobbyStatus;
 import ch.uzh.ifi.hase.soprafs24.constant.LobbyType;
 
-import java.util.Set;
+import java.util.List;
 
 
 public class LobbyGetDTO {
@@ -12,19 +12,23 @@ public class LobbyGetDTO {
 
   private String name;
 
-  private LobbyType type;
+  private String lobbyAdmin;
 
-  private LobbyStatus status;
+  private List<String> players;
 
-  private Set<PlayerDTO> players;
+  private Integer playerLimit;
 
-  private Integer numPlayers;
+  private Integer playerCount;
 
-  private String themeName;
+  private List<String> themes;
 
-  private Integer gameDuration;
+  private Integer roundTimer;
 
-  private Long hostUserId;
+  private Integer clueTimer;
+
+  private Integer discussionTimer;
+
+  private String password;
 
 
   public Long getId() {
@@ -43,59 +47,75 @@ public class LobbyGetDTO {
     this.name = name;
   }
 
-  public LobbyType getType() {
-    return type;
+  public String getLobbyAdmin() {
+    return lobbyAdmin;
   }
 
-  public void setType(LobbyType type) {
-    this.type = type;
+  public void setLobbyAdmin(String lobbyAdmin) {
+    this.lobbyAdmin = lobbyAdmin;
   }
 
-  public LobbyStatus getStatus() {
-    return status;
-  }
-
-  public void setStatus(LobbyStatus status) {
-    this.status = status;
-  }
-
-  public Set<PlayerDTO> getPlayers() {
+  public List<String> getPlayers() {
     return players;
   }
 
-  public void setPlayers(Set<PlayerDTO> players) {
+  public void setPlayers(List<String> players) {
     this.players = players;
   }
 
-  public Integer getNumPlayers() {
-    return numPlayers;
+  public Integer getPlayerLimit() {
+    return playerLimit;
   }
 
-  public void setNumPlayers(Integer numPlayers) {
-    this.numPlayers = numPlayers;
+  public void setPlayerLimit(Integer playerLimit) {
+    this.playerLimit = playerLimit;
   }
 
-  public String getThemeName() {
-    return themeName;
+  public Integer getPlayerCount() {
+    return playerCount;
   }
 
-  public void setThemeName(String themeName) {
-    this.themeName = themeName;
+  public void setPlayerCount(Integer playerCount) {
+    this.playerCount = playerCount;
   }
 
-  public Integer getGameDuration() {
-    return gameDuration;
+  public List<String> getThemes() {
+    return themes;
   }
 
-  public void setGameDuration(Integer gameDuration) {
-    this.gameDuration = gameDuration;
+  public void setThemes(List<String> themes) {
+    this.themes = themes;
   }
 
-  public Long getHostUserId() {
-    return hostUserId;
+  public Integer getRoundTimer() {
+    return roundTimer;
   }
 
-  public void setHostUserId(Long hostUserId) {
-    this.hostUserId = hostUserId;
+  public void setRoundTimer(Integer roundTimer) {
+    this.roundTimer = roundTimer;
+  }
+
+  public Integer getClueTimer() {
+    return clueTimer;
+  }
+
+  public void setClueTimer(Integer clueTimer) {
+    this.clueTimer = clueTimer;
+  }
+
+  public Integer getDiscussionTimer() {
+    return discussionTimer;
+  }
+
+  public void setDiscussionTimer(Integer discussionTimer) {
+    this.discussionTimer = discussionTimer;
+  }
+
+  public String getPassword() {
+    return password;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
   }
 }
