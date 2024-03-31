@@ -15,6 +15,8 @@ public class LobbyPostDTO {
 
   private List<String> themes;
 
+  private Integer rounds;
+
   private Integer roundTimer;
 
   private Integer clueTimer;
@@ -60,6 +62,14 @@ public class LobbyPostDTO {
 
   public void setThemes(List<String> themes) {
     this.themes = themes;
+  }
+
+  public Integer getRounds() {
+    return rounds;
+  }
+
+  public void setRounds(Integer rounds) {
+    this.rounds = rounds;
   }
 
   public Integer getRoundTimer() {

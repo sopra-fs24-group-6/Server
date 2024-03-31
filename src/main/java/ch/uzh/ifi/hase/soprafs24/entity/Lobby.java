@@ -47,6 +47,9 @@ public class Lobby implements Serializable {
   private List<Theme> themes = new ArrayList<>();
 
   @Column()
+  private Integer rounds;
+
+  @Column()
   private Integer roundTimer;
 
   @Column()
@@ -156,6 +159,14 @@ public class Lobby implements Serializable {
 
   public void setThemes(List<Theme> themes) {
     this.themes = themes;
+  }
+
+  public Integer getRounds() {
+    return rounds;
+  }
+
+  public void setRounds(Integer rounds) {
+    this.rounds = rounds;
   }
 
   public Integer getRoundTimer() {
