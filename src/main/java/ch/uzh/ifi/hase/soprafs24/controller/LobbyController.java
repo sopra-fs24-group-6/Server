@@ -3,6 +3,8 @@ package ch.uzh.ifi.hase.soprafs24.controller;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyPostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.PasswordDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.UserIdDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.LobbyDTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import org.springframework.http.HttpStatus;
@@ -68,18 +70,26 @@ public class LobbyController {
   @PostMapping("/lobbies/{lobbyId}/players")
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public LobbyGetDTO joinLobby(@PathVariable("lobbyId") Long lobbyId, @RequestBody Long userId) {
+  public LobbyGetDTO joinLobby(@PathVariable("lobbyId") Long lobbyId, @RequestBody UserIdDTO userIdDTO) {
     // add player to lobby
-    Lobby updatedLobby = lobbyService.addPlayerToLobby(lobbyId, userId);
+    Lobby updatedLobby = lobbyService.addPlayerToLobby(lobbyId, userIdDTO.getUserId());
     return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(updatedLobby);
+  }
+
+  @DeleteMapping("/lobbies/{lobbyId}/players/{userId}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void kickPlayer(@PathVariable("lobbyId") Long lobbyId,
+                         @PathVariable("userId") Long targetUserId,
+                         @RequestBody UserIdDTO requesterIdDTO) {
+    lobbyService.kickPlayerFromLobby(lobbyId, targetUserId, requesterIdDTO.getUserId());
   }
 
   @PostMapping("/lobbies/{lobbyId}/authentication")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public void authenticateLobby(@PathVariable("lobbyId") Long lobbyId, @RequestBody String password) {
+  public void authenticateLobby(@PathVariable("lobbyId") Long lobbyId, @RequestBody PasswordDTO passwordDTO) {
     // authenticate lobby with password
-    lobbyService.authenticateLobby(lobbyId, password);
+    lobbyService.authenticateLobby(lobbyId, passwordDTO.getPassword());
   }
 
   @GetMapping("/themes")

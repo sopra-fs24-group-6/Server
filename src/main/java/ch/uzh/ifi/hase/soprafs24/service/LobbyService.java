@@ -143,6 +143,32 @@ public class LobbyService {
     return lobby;
   }
 
+  public void kickPlayerFromLobby(Long lobbyId, Long targetId, Long requesterId) {
+    // find lobby by id
+    // if not found, then throw exception
+    Lobby lobby = findLobbyById(lobbyId);
+
+    // check if target player is in lobby
+    Player targetPlayer = findUserById(targetId).getPlayer();
+    if (targetPlayer != null && targetPlayer.getLobby().getId().equals(lobbyId)) {
+      // check if requester is host player
+      if (lobby.getHost().getUserId().equals(requesterId)) {
+        // remove target player from lobby
+        lobby.removePlayer(targetPlayer);
+        // delete target player from database
+        playerRepository.delete(targetPlayer);
+        playerRepository.flush();
+      } else {
+        throw new ResponseStatusException(
+          HttpStatus.UNAUTHORIZED, "Kicking player is only allowed by the host.");
+      }
+    } else {
+      throw new ResponseStatusException(
+        HttpStatus.NOT_FOUND, "Target player with id" + targetId + " could not be found.");
+    }
+  }
+
+
   public void authenticateLobby (Long lobbyId, String password) {
     // find lobby by id
     // if not found, then throw exception
@@ -220,7 +246,7 @@ public class LobbyService {
     // else, throw exception
     if (user.getPlayer() != null) {
       throw new ResponseStatusException(
-        HttpStatus.CONFLICT, "User with id " + user.getId() + " already joins another lobby.");
+        HttpStatus.CONFLICT, "User with id " + user.getId() + " already joins a lobby.");
     } else {
       // create new player
       Player newPlayer = new Player();

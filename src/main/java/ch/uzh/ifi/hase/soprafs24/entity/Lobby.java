@@ -71,7 +71,6 @@ public class Lobby implements Serializable {
 
   public void removePlayer(Player player) {
     players.remove(player);
-    player.setLobby(null);
     playerCount -= 1;
   }
 

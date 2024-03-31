@@ -65,7 +65,7 @@ public interface LobbyDTOMapper {
   }
 
   // custom mapping for players
-  @Named("themesToNames")
+  @Named("playersToNames")
   static List<String> playersToNames(List<Player> players) {
     List<String> playerNames = new ArrayList<>();
     for (Player player : players) {

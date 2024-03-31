@@ -11,6 +11,7 @@ public class UserGetDTO {
   private UserStatus status;
   private Date creationDate;
   private Date birthDate;
+  private String token;
 
   public Long getId() {
     return id;
@@ -43,4 +44,12 @@ public class UserGetDTO {
   public Date getBirthDate() { return birthDate; }
 
   public void setBirthDate(Date birthDate) { this.birthDate = birthDate; }
+
+  public String getToken() {
+    return token;
+  }
+
+  public void setToken(String token) {
+    this.token = token;
+  }
 }

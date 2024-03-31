@@ -4,6 +4,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPutDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.UserIdDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.UserDTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -81,7 +82,7 @@ public class UserController {
 
   @PutMapping("/logout")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void logoutUser(@RequestBody Long userId) {
-    userService.logoutUser(userId);
+  public void logoutUser(@RequestBody UserIdDTO userIdDTO) {
+    userService.logoutUser(userIdDTO.getUserId());
   }
 }
