@@ -7,10 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import java.util.Date;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 public class UserRepositoryIntegrationTest {
@@ -25,7 +25,6 @@ public class UserRepositoryIntegrationTest {
   public void findByUsername_success() {
     // given
     User user = new User();
-    user.setName("Firstname Lastname");
     user.setUsername("firstname@lastname");
     user.setPassword("password");
     user.setStatus(UserStatus.OFFLINE);
@@ -36,14 +35,14 @@ public class UserRepositoryIntegrationTest {
     entityManager.flush();
 
     // when
-    User found = userRepository.findByUsername(user.getUsername());
+    Optional<User> found = userRepository.findByUsername(user.getUsername());
 
     // then
-    assertNotNull(found.getId());
-    assertEquals(found.getName(), user.getName());
-    assertEquals(found.getUsername(), user.getUsername());
-    assertEquals(found.getPassword(), user.getPassword());
-    assertEquals(found.getToken(), user.getToken());
-    assertEquals(found.getStatus(), user.getStatus());
+    assertTrue(found.isPresent());
+    assertNotNull(found.get().getId());
+    assertEquals(found.get().getUsername(), user.getUsername());
+    assertEquals(found.get().getPassword(), user.getPassword());
+    assertEquals(found.get().getToken(), user.getToken());
+    assertEquals(found.get().getStatus(), user.getStatus());
   }
 }

@@ -7,13 +7,10 @@ import java.util.Date;
 public class UserGetDTO {
 
   private Long id;
-  private String name;
   private String username;
   private UserStatus status;
-  private String password;
-  private Date creation_date;
-
-  private Date birthday;
+  private Date creationDate;
+  private Date birthDate;
 
   public Long getId() {
     return id;
@@ -21,14 +18,6 @@ public class UserGetDTO {
 
   public void setId(Long id) {
     this.id = id;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
   }
 
   public String getUsername() {
@@ -47,19 +36,11 @@ public class UserGetDTO {
     this.status = status;
   }
 
-  public String getPassword() {
-    return password;
-  }
+  public Date getCreationDate() { return creationDate; }
 
-  public void setPassword(String password) {
-    this.password = password;
-  }
+  public void setCreationDate(Date creationDate) { this.creationDate = creationDate; }
 
-  public Date getCreationDate() { return creation_date; }
+  public Date getBirthDate() { return birthDate; }
 
-  public void setCreationDate(Date creation_date) { this.creation_date = creation_date; }
-
-  public Date getBirthday() { return birthday; }
-
-  public void setBirthday(Date birthday) { this.birthday = birthday; }
+  public void setBirthDate(Date birthDate) { this.birthDate = birthDate; }
 }

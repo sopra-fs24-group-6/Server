@@ -4,11 +4,9 @@ import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPutDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserEditDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
+import ch.uzh.ifi.hase.soprafs24.rest.mapper.UserDTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -37,30 +35,27 @@ public class UserController {
     // fetch all users in the internal representation
     List<User> users = userService.getUsers();
     List<UserGetDTO> userGetDTOs = new ArrayList<>();
-
     // convert each user to the API representation
     for (User user : users) {
-      userGetDTOs.add(DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
+      userGetDTOs.add(UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
     }
     return userGetDTOs;
   }
 
-  @PutMapping("/users/{id}")
+  @PutMapping("/users/{userId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  @ResponseBody
-  public UserGetDTO Edit_user(@PathVariable Long id, @RequestBody UserEditDTO userEditDTO) {
-      User userinput = DTOMapper.INSTANCE.convertUserEditDTOtoEntity(userEditDTO);
-      User user = userService.Edit(id , userinput);
-      return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
+  public void updateUser(@PathVariable("userId") Long userId, @RequestBody UserPutDTO userPutDTO) {
+      User userInput = UserDTOMapper.INSTANCE.convertUserPutDTOtoEntity(userPutDTO);
+      userService.updateUser(userId, userInput);
   }
 
   @GetMapping("/users/{userId}")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public UserGetDTO getUserProfile(@PathVariable("userId") Long userId) {
+  public UserGetDTO getUser(@PathVariable("userId") Long userId) {
     // fetch user in the internal representation
-    User user = userService.getUserProfile(userId);
-    return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
+    User user = userService.getUser(userId);
+    return UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
   }
 
   @PostMapping("/users")
@@ -68,31 +63,25 @@ public class UserController {
   @ResponseBody
   public UserGetDTO createUser(@RequestBody UserPostDTO userPostDTO) {
     // convert API user to internal representation
-    User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
-
+    User userInput = UserDTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
     // create user
     User createdUser = userService.createUser(userInput);
     // convert internal representation of user back to API
-    return DTOMapper.INSTANCE.convertEntityToUserGetDTO(createdUser);
+    return UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(createdUser);
   }
 
-  @PostMapping("/authenticate")
+  @PostMapping("/login")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public UserGetDTO loginExistent(@RequestBody UserPostDTO userPostDTO) {
-    User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
-    User authenticationUser = userService.authentication(userInput.getUsername(), userInput.getPassword());
-
-    return DTOMapper.INSTANCE.convertEntityToUserGetDTO(authenticationUser);
+  public UserGetDTO loginUser(@RequestBody UserPostDTO userPostDTO) {
+    User userInput = UserDTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
+    User authenticatedUser = userService.loginUser(userInput);
+    return UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(authenticatedUser);
   }
 
-  @PutMapping("logout/{id}")
-  public ResponseEntity<User> updateUserStatus(@PathVariable Long id, @RequestBody UserPutDTO UserPutDTO) {
-    try {
-      User updatedUser = userService.updateUserStatus(id, UserPutDTO.getStatus());
-      return ResponseEntity.ok(updatedUser);
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    }
+  @PutMapping("/logout")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void logoutUser(@RequestBody Long userId) {
+    userService.logoutUser(userId);
   }
 }

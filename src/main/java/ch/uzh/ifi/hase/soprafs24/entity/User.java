@@ -23,11 +23,8 @@ public class User implements Serializable {
   private static final long serialVersionUID = 1L;
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
-  @Column(nullable = true, unique = false)
-  private String name;
 
   @Column(nullable = false, unique = true)
   private String username;
@@ -38,14 +35,14 @@ public class User implements Serializable {
   @Column(nullable = false)
   private UserStatus status;
 
-  @Column(nullable = false, unique = false)
+  @Column(nullable = false)
   private String password;
 
   @Column(nullable = false)
-  private Date creation_date;
+  private Date creationDate;
 
   @Column(nullable = true)
-  private Date birthday;
+  private Date birthDate;
 
   @OneToOne
   @JoinColumn(name = "player_id")
@@ -58,14 +55,6 @@ public class User implements Serializable {
 
   public void setId(Long id) {
     this.id = id;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
   }
 
   public String getUsername() {
@@ -100,13 +89,13 @@ public class User implements Serializable {
     this.password = password;
   }
 
-  public Date getCreationDate() { return creation_date; }
+  public Date getCreationDate() { return creationDate; }
 
-  public void setCreationDate(Date creation_date) { this.creation_date = creation_date; }
+  public void setCreationDate(Date creationDate) { this.creationDate = creationDate; }
 
-  public Date getBirthday() { return birthday; }
+  public Date getBirthDate() { return birthDate; }
 
-  public void setBirthday(Date birthday) { this.birthday = birthday; }
+  public void setBirthDate(Date birthDate) { this.birthDate = birthDate; }
 
   public Player getPlayer() {
     return player;

@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.Date;
 
@@ -41,16 +40,17 @@ public class UserService {
     return this.userRepository.findAll();
   }
 
-  public User getUserProfile(Long id) {
-    checkIfUserIdExists(id);
-    return this.userRepository.findUserById(id);
+  public User getUser(Long userId) {
+    return findUserById(userId);
   }
 
   public User createUser(User newUser) {
+    // set properties to newUser
     newUser.setToken(UUID.randomUUID().toString());
     newUser.setStatus(UserStatus.ONLINE);
     newUser.setCreationDate(new Date());
-    checkIfUserExists(newUser);
+    // check username conflict
+    checkIfUsernameExists(newUser.getUsername());
     // saves the given entity but data is only persisted in the database once
     // flush() is called
     newUser = userRepository.save(newUser);
@@ -60,71 +60,69 @@ public class UserService {
     return newUser;
   }
 
-  public User Edit(Long id,User user) {
-      Optional<User> userOptional = this.userRepository.findById(id);
-      String NotFoundMessage = "User with id:%s is not Found. Have you registered yet?";
-      String ConflictUserName = "Username: %s has been used, please choose another username";
-      if (!userOptional.isPresent()) {
-          throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format(NotFoundMessage , id));
-      } else {
-          User userByUsername = userRepository.findByUsername(user.getUsername());
-          if (userByUsername != null) {
-              throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(ConflictUserName , user.getUsername()));
-          }
-          userOptional.get().setBirthday(user.getBirthday());
-          userOptional.get().setUsername(user.getUsername());
-          return userOptional.get();
-      }
+  public void updateUser(Long userId, User userInput) {
+    // find user by userId
+    User userToBeUpdated = findUserById(userId);
+    // check username conflict
+    checkIfUsernameExists(userInput.getUsername());
+    // update user properties
+    userToBeUpdated.setUsername(userInput.getUsername());
+    userToBeUpdated.setBirthDate(userInput.getBirthDate());
+    // save to database
+    userToBeUpdated = userRepository.save(userToBeUpdated);
+    userRepository.flush();
   }
 
   // Authentication for login
-  public User authentication(String username, String password) {
-    User user = userRepository.findByUsername(username);
-    if (user != null && user.getPassword().equals(password)) {
-      user.setStatus(UserStatus.ONLINE);
-      return user;
+  public User loginUser(User userInput) {
+    // find user by username
+    User userByUsername = findUserByUsername(userInput.getUsername());
+    // check if correct password
+    if (userByUsername.getPassword().equals(userInput.getPassword())) {
+      // update user status
+      userByUsername.setStatus(UserStatus.ONLINE);
+      userByUsername = userRepository.save(userByUsername);
+      userRepository.flush();
+      return userByUsername;
     } else {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Username or password is incorrect");
     }
   }
 
   // this function handles the user status
-  public User updateUserStatus(Long id, UserStatus status) {
-    Optional<User> result = userRepository.findById(id);
+  public User logoutUser(Long userId) {
+    // find user by userId
+    // if not found, throw exception
+    User userById = findUserById(userId);
+    // update status and save
+    userById.setStatus(UserStatus.OFFLINE);
+    userById = userRepository.save(userById);
+    userRepository.flush();
 
-    if (!result.isPresent()) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with this id could not be found.");
-    }
-
-    User user = result.get();
-    user.setStatus(status);
-    return userRepository.save(user);
+    return userById;
 
   }
 
   /**
-   * This is a helper method that will check the uniqueness criteria of the
-   * username and the name
-   * defined in the User entity. The method will do nothing if the input is unique
-   * and throw an error otherwise.
-   *
-   * @param userToBeCreated
-   * @throws org.springframework.web.server.ResponseStatusException
-   * @see User
+   * Helper methods
    */
-  private void checkIfUserExists(User userToBeCreated) {
-    User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
-    String baseErrorMessage = "The %s provided is not unique. Therefore, the user could not be created!";
-    if (userByUsername != null) {
-      throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username"));
-    }
+  public void checkIfUsernameExists (String username) {
+    userRepository.findByUsername(username).ifPresent(existingUsername -> {
+      throw new ResponseStatusException(
+        HttpStatus.CONFLICT, "User with username " + username + " already exists.");
+    });
   }
 
-  private void checkIfUserIdExists(Long userId) {
-    User userById = userRepository.findUserById(userId);
-    if (userById == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Id not found: " + userId);
-    }
+  public User findUserById (Long userId) {
+    return userRepository.findById(userId)
+      .orElseThrow(() -> new ResponseStatusException(
+        HttpStatus.NOT_FOUND, "User with id " + userId + " could not be found."));
+  }
+
+  public User findUserByUsername (String username) {
+    return userRepository.findByUsername(username)
+      .orElseThrow(() -> new ResponseStatusException(
+        HttpStatus.NOT_FOUND, "User with username " + username + " could not be found."));
   }
 
 }

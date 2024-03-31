@@ -3,22 +3,22 @@
  */
 
 -- User
-INSERT INTO USER (id, name, username, token, status, password, creation_date, birthday)
+INSERT INTO user (username, token, status, password, creation_date, birth_date)
 VALUES
-    (1, 'user1', 'user1', 'user1', 1, 'user1', '2024-01-01', '2000-01-01'),
-    (2, 'user2', 'user2', 'user2', 1, 'user2', '2024-01-02', '2000-01-02'),
-    (3, 'user3', 'user3', 'user3', 1, 'user3', '2024-01-03', '2000-01-03');
+    ('user1', 'token1', 1, 'password1', '2024-01-01', '2000-01-01'),
+    ('user2', 'token2', 1, 'password2', '2024-01-02', '2000-01-02'),
+    ('user3', 'token3', 1, 'password3', '2024-01-03', '2000-01-03');
 
 -- Theme
-INSERT INTO THEME (id, name)
+INSERT INTO THEME (name)
 VALUES
-    (1, 'Animal'),
-    (2, 'Food');
+    ('Animal'),
+    ('Food');
 
 -- Words
-INSERT INTO WORD_PAIR (id, theme_id, first_word, second_word)
+INSERT INTO WORD_PAIR (theme_id, first_word, second_word)
 VALUES
-    (1, 1, 'Dog', 'Cat'),
-    (2, 1, 'Crow', 'Swan'),
-    (3, 2, 'Apple', 'Orange'),
-    (4, 2, 'Pasta', 'Pizza');
+    (1, 'Dog', 'Cat'),
+    (1, 'Crow', 'Swan'),
+    (2, 'Apple', 'Orange'),
+    (2, 'Pasta', 'Pizza');
