@@ -90,7 +90,7 @@ public class UserService {
   }
 
   // this function handles the user status
-  public User logoutUser(Long userId) {
+  public void logoutUser(Long userId) {
     // find user by userId
     // if not found, throw exception
     User userById = findUserById(userId);
@@ -98,9 +98,6 @@ public class UserService {
     userById.setStatus(UserStatus.OFFLINE);
     userById = userRepository.save(userById);
     userRepository.flush();
-
-    return userById;
-
   }
 
   /**

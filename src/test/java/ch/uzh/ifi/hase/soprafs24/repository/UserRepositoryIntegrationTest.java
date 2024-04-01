@@ -30,6 +30,7 @@ public class UserRepositoryIntegrationTest {
     user.setStatus(UserStatus.OFFLINE);
     user.setToken("1");
     user.setCreationDate(new Date());
+    user.setBirthDate(new Date());
 
     entityManager.persist(user);
     entityManager.flush();
@@ -44,5 +45,31 @@ public class UserRepositoryIntegrationTest {
     assertEquals(found.get().getPassword(), user.getPassword());
     assertEquals(found.get().getToken(), user.getToken());
     assertEquals(found.get().getStatus(), user.getStatus());
+    assertEquals(found.get().getCreationDate(), user.getCreationDate());
+    assertEquals(found.get().getBirthDate(), user.getBirthDate());
   }
+
+  @Test
+  public void findByUsername_failed() {
+    // given
+    User user = new User();
+    user.setUsername("username");
+    user.setPassword("password");
+    user.setStatus(UserStatus.OFFLINE);
+    user.setToken("token");
+    user.setCreationDate(new Date());
+    user.setBirthDate(new Date());
+
+    entityManager.persist(user);
+    entityManager.flush();
+
+    String invalidUsername = "invalidUsername";
+
+    // when
+    Optional<User> found = userRepository.findByUsername(invalidUsername);
+
+    // then
+    assertFalse(found.isPresent());
+  }
+
 }

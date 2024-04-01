@@ -74,6 +74,7 @@ public class LobbyService {
     // if userId not found, then throw exception
     User hostUser = findUserById(newLobby.getHost().getUserId());
     Player hostPlayer = createPlayerFromUser(hostUser, true);
+    hostUser.setPlayer(hostPlayer);
 
     // add host to lobby
     newLobby.setHost(hostPlayer);
@@ -99,6 +100,8 @@ public class LobbyService {
     targetLobby.setRoundTimer(newLobby.getRoundTimer());
     targetLobby.setClueTimer(newLobby.getClueTimer());
     targetLobby.setDiscussionTimer(newLobby.getDiscussionTimer());
+    LobbyType type = determineLobbyType(targetLobby.getPassword());
+    targetLobby.setType(type);
 
     // update playerLimit
     // if new playerLimit < current playerCount, then throw except
@@ -112,35 +115,42 @@ public class LobbyService {
     // update themes
     List<Theme> newThemes = findThemesByNames(newLobby.getThemeNames());
     targetLobby.setThemes(newThemes);
-  }
 
+    // save
+    lobbyRepository.save(targetLobby);
+    lobbyRepository.flush();
+  }
 
   public Lobby addPlayerToLobby(Long lobbyId, Long userId){
     // find lobby by id
-    // if not found, then throw exception
     Lobby lobby = findLobbyById(lobbyId);
 
     // find user by id
     // if not found, then throw exception
     User user = findUserById(userId);
 
-    // create new player
-    Player newPlayer = createPlayerFromUser(user, false);
-
     // add player if current count < limit
     // if lobby is full, then throw exception
     if (lobby.getPlayerCount() < lobby.getPlayerLimit()) {
+      // create new player
+      Player newPlayer = createPlayerFromUser(user, false);
+      playerRepository.save(newPlayer);
+      playerRepository.flush();
+
+      user.setPlayer(newPlayer);
+      userRepository.save(user);
+      userRepository.flush();
+
       lobby.addPlayer(newPlayer);
+      lobby = lobbyRepository.save(lobby);
+      lobbyRepository.flush();
+
+      return lobby;
+
     } else {
       throw new ResponseStatusException(
         HttpStatus.CONFLICT, "Lobby with id " + lobbyId + " is full.");
     }
-
-    // save changes
-    lobby = lobbyRepository.save(lobby);
-    lobbyRepository.flush();
-
-    return lobby;
   }
 
   public void kickPlayerFromLobby(Long lobbyId, Long targetId, Long requesterId) {
@@ -158,6 +168,8 @@ public class LobbyService {
         // delete target player from database
         playerRepository.delete(targetPlayer);
         playerRepository.flush();
+        lobbyRepository.save(lobby);
+        lobbyRepository.flush();
       } else {
         throw new ResponseStatusException(
           HttpStatus.UNAUTHORIZED, "Kicking player is only allowed by the host.");
@@ -253,11 +265,6 @@ public class LobbyService {
       newPlayer.setUserId(user.getId());
       newPlayer.setUsername(user.getUsername());
       newPlayer.setHost(isHost);
-      newPlayer = playerRepository.save(newPlayer);
-      playerRepository.flush();
-
-      // update user
-      user.setPlayer(newPlayer);
 
       return newPlayer;
     }

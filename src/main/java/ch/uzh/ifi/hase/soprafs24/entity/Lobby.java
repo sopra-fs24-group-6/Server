@@ -29,7 +29,7 @@ public class Lobby implements Serializable {
   @Column()
   private String password;
 
-  @OneToMany(mappedBy = "lobby")
+  @OneToMany(mappedBy = "lobby", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Player> players = new ArrayList<>();
 
   @Column(nullable = false)

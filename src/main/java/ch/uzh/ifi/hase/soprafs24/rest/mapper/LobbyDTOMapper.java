@@ -5,7 +5,6 @@ import ch.uzh.ifi.hase.soprafs24.entity.Player;
 import ch.uzh.ifi.hase.soprafs24.entity.Theme;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyPostDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
@@ -32,6 +31,10 @@ public interface LobbyDTOMapper {
   // Custom mapping for themes (List<String> to List<Theme>)
   @Named("namesToThemeList")
   static List<Theme> namesToThemeList(List<String> names) {
+    if (names == null) {
+      return new ArrayList<>();
+    }
+
     List<Theme> themes = new ArrayList<>();
     for (String name : names) {
       Theme theme = new Theme();
@@ -58,6 +61,10 @@ public interface LobbyDTOMapper {
   // custom mapping for themes
   @Named("themesToNames")
   static List<String> themesToNames(List<Theme> themes) {
+    if (themes == null) {
+      return new ArrayList<>();
+    }
+
     List<String> themeNames = new ArrayList<>();
     for (Theme theme : themes) {
       String themeName = theme.getName();
@@ -69,6 +76,10 @@ public interface LobbyDTOMapper {
   // custom mapping for players
   @Named("playersToNames")
   static List<String> playersToNames(List<Player> players) {
+    if (players == null) {
+      return new ArrayList<>();
+    }
+
     List<String> playerNames = new ArrayList<>();
     for (Player player : players) {
       String playerName = player.getUsername();

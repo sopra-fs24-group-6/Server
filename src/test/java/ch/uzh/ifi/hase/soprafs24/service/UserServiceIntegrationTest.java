@@ -37,20 +37,21 @@ public class UserServiceIntegrationTest {
   @Test
   public void createUser_validInputs_success() {
     // given
-    assertTrue(userRepository.findByUsername("testUsername").isEmpty());
+    assertTrue(userRepository.findByUsername("username").isEmpty());
 
-    User testUser = new User();
-    testUser.setUsername("testUsername");
-    testUser.setPassword("password");
+    User userInput = new User();
+    userInput.setUsername("username");
+    userInput.setPassword("password");
 
     // when
-    User createdUser = userService.createUser(testUser);
+    User createdUser = userService.createUser(userInput);
 
     // then
-    assertEquals(testUser.getId(), createdUser.getId());
-    assertEquals(testUser.getUsername(), createdUser.getUsername());
-    assertEquals(testUser.getPassword(), createdUser.getPassword());
+    assertEquals(userInput.getId(), createdUser.getId());
+    assertEquals(userInput.getUsername(), createdUser.getUsername());
+    assertEquals(userInput.getPassword(), createdUser.getPassword());
     assertNotNull(createdUser.getToken());
+    assertNotNull(createdUser.getCreationDate());
     assertEquals(UserStatus.ONLINE, createdUser.getStatus());
   }
 
