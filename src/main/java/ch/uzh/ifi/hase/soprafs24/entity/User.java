@@ -20,94 +20,86 @@ import java.util.Date;
 @Table(name = "USER")
 public class User implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue
-    private Long id;
+  @Id
+  @GeneratedValue
+  private Long id;
 
-    @Column(nullable = false)
-    private String name;
+  @Column(nullable = true, unique = false)
+  private String name;
 
-    @Column(nullable = false)
-    private String password;
+  @Column(nullable = false, unique = true)
+  private String username;
 
-    @Column(nullable = false, unique = true)
-    private String username;
+  @Column(nullable = false, unique = true)
+  private String token;
 
-    @Column(nullable = false, unique = true)
-    private String token;
+  @Column(nullable = false)
+  private UserStatus status;
 
-    @Column(nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date creationDate;
+  @Column(nullable = false, unique = false)
+  private String password;
 
-    @Column(nullable = false)
-    private UserStatus status;
+  @Column(nullable = false)
+  private Date creation_date;
 
-    private Date birthDate;
+  @Column(nullable = true)
+  private Date birthday;
 
-    public Date getCreationDate() {
-        return creationDate;
-    }
+  public Long getId() {
+    return id;
+  }
 
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
-    }
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-    public Long getId() {
-        return id;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getUsername() {
+    return username;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setUsername(String username) {
+    this.username = username;
+  }
 
-    public String getPassword() {
-        return password;
-    }
+  public String getToken() {
+    return token;
+  }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+  public void setToken(String token) {
+    this.token = token;
+  }
 
-    public String getUsername() {
-        return username;
-    }
+  public UserStatus getStatus() {
+    return status;
+  }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+  public void setStatus(UserStatus status) {
+    this.status = status;
+  }
 
-    public String getToken() {
-        return token;
-    }
+  public String getPassword() {
+    return password;
+  }
 
-    public void setToken(String token) {
-        this.token = token;
-    }
+  public void setPassword(String password) {
+    this.password = password;
+  }
 
-    public UserStatus getStatus() {
-        return status;
-    }
+  public Date getCreationDate() { return creation_date; }
 
-    public void setStatus(UserStatus status) {
-        this.status = status;
-    }
+  public void setCreationDate(Date creation_date) { this.creation_date = creation_date; }
 
-    public void setBirthDate(Date birthDate) {
-        this.birthDate = birthDate;
-    }
+  public Date getBirthday() { return birthday; }
 
-    public Date getBirthDate() {
-        return this.birthDate;
-    }
+  public void setBirthday(Date birthday) { this.birthday = birthday; }
 }

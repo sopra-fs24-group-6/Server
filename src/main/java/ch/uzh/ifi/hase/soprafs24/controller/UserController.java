@@ -1,15 +1,15 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
-import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPutDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.UserEditDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,99 +22,77 @@ import java.util.List;
  * UserService and finally return the result.
  */
 @RestController
-@RequestMapping(value = "/users")
 public class UserController {
 
-    private final UserService userService;
+  private final UserService userService;
 
-    UserController(UserService userService) {
-        this.userService = userService;
+  UserController(UserService userService) {
+    this.userService = userService;
+  }
+
+  @GetMapping("/users")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<UserGetDTO> getAllUsers() {
+    // fetch all users in the internal representation
+    List<User> users = userService.getUsers();
+    List<UserGetDTO> userGetDTOs = new ArrayList<>();
+
+    // convert each user to the API representation
+    for (User user : users) {
+      userGetDTOs.add(DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
     }
+    return userGetDTOs;
+  }
 
-    @GetMapping("")
-    @ResponseStatus(HttpStatus.OK)
+    @PutMapping("/users/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody
-    public List<UserGetDTO> getAllUsers() {
-        // fetch all users in the internal representation
-        List<User> users = userService.getUsers();
-
-        List<UserGetDTO> userGetDTOs = new ArrayList<>();
-
-        // convert each user to the API representation
-        for (User user : users) {
-            userGetDTOs.add(DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
-        }
-        return userGetDTOs;
-    }
-
-    @PostMapping("/register")
-    @ResponseStatus(HttpStatus.CREATED)
-    @ResponseBody
-    public UserGetDTO createUser(@RequestBody UserPostDTO userPostDTO) {
-
-        // convert API user to internal representation
-        User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
-
-        // create user
-        User createdUser = userService.createUser(userInput);
-        // convert internal representation of user back to API
-        return DTOMapper.INSTANCE.convertEntityToUserGetDTO(createdUser);
-    }
-
-    @PostMapping("/login")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public UserGetDTO loginUser(@RequestBody UserPostDTO userPostDTO) {
-        User user = userService.verifyUser(userPostDTO.getUsername());
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login failed.");
-        }
-
-        user.setStatus(UserStatus.ONLINE);
-        userService.updateUser(user);
-
+    public UserGetDTO Edit_user(@PathVariable Long id, @RequestBody UserEditDTO userEditDTO) {
+        User userinput = DTOMapper.INSTANCE.convertUserEditDTOtoEntity(userEditDTO);
+        User user = userService.Edit(id , userinput);
         return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
     }
 
-    @PostMapping("/logout")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public void logoutUser(@RequestBody UserPostDTO userPostDTO) {
-        try {
-            User user = userService.getUser(userPostDTO.getId());
+  @GetMapping("/users/{userId}")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public UserGetDTO getUserProfile(@PathVariable("userId") Long userId) {
+    // fetch user in the internal representation
+    User user = userService.getUserProfile(userId);
+    return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
+  }
 
-            user.setStatus(UserStatus.OFFLINE);
+  @PostMapping("/users")
+  @ResponseStatus(HttpStatus.CREATED)
+  @ResponseBody
+  public UserGetDTO createUser(@RequestBody UserPostDTO userPostDTO) {
+    // convert API user to internal representation
+    User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
 
-            userService.updateUser(user);
-        } catch (ResponseStatusException e) {
-            if (e.getStatus().equals(HttpStatus.NOT_FOUND)) {
-                return;
-            }
-        }
+    // create user
+    User createdUser = userService.createUser(userInput);
+    // convert internal representation of user back to API
+    return DTOMapper.INSTANCE.convertEntityToUserGetDTO(createdUser);
+  }
+
+  @PostMapping("/authenticate")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public UserGetDTO loginExistent(@RequestBody UserPostDTO userPostDTO) {
+    User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
+    User authenticationUser = userService.authentication(userInput.getUsername(), userInput.getPassword());
+
+    return DTOMapper.INSTANCE.convertEntityToUserGetDTO(authenticationUser);
+  }
+
+  @PutMapping("logout/{id}")
+  public ResponseEntity<User> updateUserStatus(@PathVariable Long id, @RequestBody UserPutDTO UserPutDTO) {
+    try {
+      User updatedUser = userService.updateUserStatus(id, UserPutDTO.getStatus());
+      return ResponseEntity.ok(updatedUser);
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
-
-    @GetMapping("/{userId}")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public UserGetDTO getUser(@Validated @PathVariable Long userId) {
-        User findUser = userService.getUser(userId);
-        return DTOMapper.INSTANCE.convertEntityToUserGetDTO(findUser);
-    }
-
-    @PutMapping("/{userId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ResponseBody
-    public void updateUser(@Validated @PathVariable Long userId, @RequestBody UserPostDTO userPostDTO) {
-        User user = userService.getUser(userId);
-
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No user existed");
-        }
-
-        user.setUsername(userPostDTO.getUsername());
-        user.setBirthDate(userPostDTO.getBirthDate());
-
-        // create user
-        userService.updateUser(user);
-    }
+  }
 }

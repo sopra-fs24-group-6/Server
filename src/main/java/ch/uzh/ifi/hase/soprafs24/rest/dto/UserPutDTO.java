@@ -1,16 +1,22 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
-public class UserPostDTO {
+import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
+
+public class UserPutDTO {
 
   private String name;
 
   private String username;
 
+  private Long id;
+
+  private String password;
+
+  private UserStatus status;
+
   public String getName() {
     return name;
   }
-
-  private String password;
 
   public void setName(String name) {
     this.name = name;
@@ -30,5 +36,21 @@ public class UserPostDTO {
 
   public void setPassword(String password) {
     this.password = password;
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public UserStatus getStatus() {
+    return status;
+  }
+
+  public void setStatus(UserStatus status) {
+    this.status = status;
   }
 }
