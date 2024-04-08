@@ -10,6 +10,7 @@ import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,11 +89,36 @@ public class UserController {
 
   @PutMapping("logout/{id}")
   public ResponseEntity<User> updateUserStatus(@PathVariable Long id, @RequestBody UserPutDTO UserPutDTO) {
-    try {
-      User updatedUser = userService.updateUserStatus(id, UserPutDTO.getStatus());
-      return ResponseEntity.ok(updatedUser);
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    }
+      try {
+          User updatedUser = userService.updateUserStatus(id, UserPutDTO.getStatus());
+          return ResponseEntity.ok(updatedUser);
+      }
+      catch (Exception e) {
+          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+      }
   }
+
+    @GetMapping("/search/games/{username}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public UserGetDTO searchGameByUsername(@PathVariable("username") String username) {
+        // fetch game by username
+        User user = userService.searchGamesByUsername(username);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found for username: " + username);
+        }
+        return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
+    }
+    @GetMapping("/search/games/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public UserGetDTO searchGameById(@PathVariable("userId") Long userId) {
+        // fetch game by user ID
+        User user = userService.searchGameById(userId);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found for user ID: " + userId);
+        }
+        return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
+    }
+
 }

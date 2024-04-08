@@ -18,12 +18,17 @@
 | Aiqi Shuai | [#88](https://github.com/sopra-fs24-group-6/Server/issues/88) | Store Changes made to Profile data & birthday                 |
 | Aiqi Shuai | [#7](https://github.com/sopra-fs24-group-6/Client/issues/7)   | Implement the ability to edit the Profile and Save the Change |
 
+| Name               | Issue                                                       | Description (optional)                                        |
+|--------------------|-------------------------------------------------------------|---------------------------------------------------------------|
+| Alisher Dauysbekov | [#8](https://github.com/sopra-fs24-group-6/Client/issues/8) | Implement the ability set the birthdate but also the ability to delete it afterwards too                 |
+| Alisher Dauysbekov | [#4](https://github.com/sopra-fs24-group-6/Client/issues/4) | Implement the ability to set a birthdate |
+
 
 ## Week 2
 
 | Name | Issue | Description (optional) |
-| ---- | ----- | ---------------------- |
-|      |       |                        |
+| Alisher Dauysbekov | [#91](https://github.com/sopra-fs24-group-6/Server/issues/91) | ---------------------- |
+| Alisher Dauysbekov | [#92](https://github.com/sopra-fs24-group-6/Server/issues/92)      |                        |
 
 ## Week 3
 
