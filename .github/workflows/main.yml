@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+    # Do not run the workflow if changes are made to only "contributions.md"
+    paths-ignore:
+      - "contributions.md"
 
   # run the workflow manually from the Actions tab
   workflow_dispatch:
