@@ -109,14 +109,14 @@ public class UserController {
         }
         return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
     }
-    @GetMapping("/search/games/{userId}")
+    @GetMapping("/search/games/{lobbyId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public UserGetDTO searchGameById(@PathVariable("userId") Long userId) {
-        // fetch game by user ID
-        User user = userService.searchGameById(userId);
+    public UserGetDTO searchGameById(@PathVariable("lobbyId") Long lobbyId) {
+        // fetch game by lobby ID
+        User user = userService.searchGameById(lobbyId);
         if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found for user ID: " + userId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found for user ID: " + lobbyId);
         }
         return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
     }
