@@ -68,6 +68,7 @@ public class UserService {
     // update user properties
     userToBeUpdated.setUsername(userInput.getUsername());
     userToBeUpdated.setBirthDate(userInput.getBirthDate());
+    userToBeUpdated.setLanguage(userInput.getLanguage());
     // save to database
     userToBeUpdated = userRepository.save(userToBeUpdated);
     userRepository.flush();

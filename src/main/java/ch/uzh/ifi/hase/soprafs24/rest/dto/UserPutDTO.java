@@ -8,7 +8,17 @@ public class UserPutDTO {
 
   private Date birthDate;
 
-  public String getUsername() {
+  private String language;
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public String getUsername() {
     return username;
   }
 
