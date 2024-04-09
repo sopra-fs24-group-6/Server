@@ -2,7 +2,6 @@ package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.constant.LobbyStatus;
 import ch.uzh.ifi.hase.soprafs24.constant.LobbyType;
-import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.Player;
 import ch.uzh.ifi.hase.soprafs24.entity.Theme;
@@ -18,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -86,7 +84,7 @@ public class LobbyServiceTest {
     Mockito.when(lobbyRepository.findAll()).thenReturn(lobbyList);
 
     // when
-    List<Lobby> result = lobbyService.getLobbies();
+    List<Lobby> result = lobbyService.getAllLobbies();
 
     // then
     assertEquals(1, result.size());

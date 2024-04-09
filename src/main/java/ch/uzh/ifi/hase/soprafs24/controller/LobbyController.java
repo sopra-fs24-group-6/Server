@@ -38,9 +38,11 @@ public class LobbyController {
   @GetMapping("/lobbies")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<LobbyGetDTO> getAllLobbies() {
-    // fetch all lobbies in the internal representation
-    List<Lobby> lobbies = lobbyService.getLobbies();
+  public List<LobbyGetDTO> getLobbies(@RequestParam(required = false) String username,
+                                      @RequestParam(required = false) Long userId) {
+
+    List<Lobby> lobbies = lobbyService.getLobbies(username, userId);
+
     List<LobbyGetDTO> lobbyGetDTOs = new ArrayList<>();
     // convert each lobby to the API representation
     for (Lobby lobby : lobbies) {

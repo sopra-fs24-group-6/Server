@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -46,8 +47,52 @@ public class LobbyService {
   }
 
 
-  public List<Lobby> getLobbies() {
+  public List<Lobby> getLobbies(String username, Long userId) {
+    // if username is specified
+    if (username != null) {
+      Lobby lobbyByUsername = getLobbyByUsername(username);
+      return Collections.singletonList(lobbyByUsername);
+    }
+    // if userId is specified
+    if (userId != null) {
+      Lobby lobbyByUserId = getLobbyByUserId(userId);
+      return Collections.singletonList(lobbyByUserId);
+    }
+
+    // if no parameters, then return all lobbies
+    return getAllLobbies();
+  }
+
+  public List<Lobby> getAllLobbies() {
     return this.lobbyRepository.findAll();
+  }
+
+  public Lobby getLobbyByUsername(String username) {
+    // Find the player by username
+    Player player = playerRepository.findByUsername(username)
+      .orElseThrow(() -> new ResponseStatusException(
+        HttpStatus.NOT_FOUND, "Player with username " + username + " could not be found."));
+
+    // Check if the player is associated with a lobby
+    if (player.getLobby() == null) {
+      throw new ResponseStatusException(
+        HttpStatus.NOT_FOUND, "Player is not in any lobby.");
+    }
+    return player.getLobby();
+  }
+
+  public Lobby getLobbyByUserId(Long userId) {
+    // Find the player by userId
+    Player player = playerRepository.findById(userId)
+      .orElseThrow(() -> new ResponseStatusException(
+        HttpStatus.NOT_FOUND, "Player with userId " + userId + " could not be found."));
+
+    // Check if the player is associated with a lobby
+    if (player.getLobby() == null) {
+      throw new ResponseStatusException(
+        HttpStatus.NOT_FOUND, "Player is not in any lobby.");
+    }
+    return player.getLobby();
   }
 
   public Lobby getLobbyById(Long lobbyId) { return findLobbyById(lobbyId); }

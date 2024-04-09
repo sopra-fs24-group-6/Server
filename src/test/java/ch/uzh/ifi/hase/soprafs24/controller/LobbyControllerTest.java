@@ -28,12 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * UserControllerTest
- * This is a WebMvcTest which allows to test the UserController i.e. GET/POST
- * request without actually sending them over the network.
- * This tests if the UserController works.
- */
+
 @WebMvcTest(LobbyController.class)
 public class LobbyControllerTest {
 
@@ -95,7 +90,7 @@ public class LobbyControllerTest {
   public void getAllLobbies_thenReturnJsonArray() throws Exception {
     // given
     List<Lobby> allLobbies = Collections.singletonList(testLobby);
-    given(lobbyService.getLobbies()).willReturn(allLobbies);
+    given(lobbyService.getLobbies(Mockito.any(), Mockito.any())).willReturn(allLobbies);
 
     // when/then -> do the request + validate the result
     MockHttpServletRequestBuilder getRequest = get("/lobbies")
