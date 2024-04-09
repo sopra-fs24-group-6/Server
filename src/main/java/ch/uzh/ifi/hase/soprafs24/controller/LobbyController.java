@@ -49,7 +49,19 @@ public class LobbyController {
     return lobbyGetDTOs;
   }
 
-  @GetMapping("/lobbies/{lobbyId}")
+    @GetMapping("/lobby/{username}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public LobbyGetDTO findLobbyByUsername(@PathVariable String username) {
+        // Use the LobbyService to find the lobby by username
+        Lobby foundLobby = lobbyService.findLobbyByUsername(username);
+
+        // Convert the Lobby entity to LobbyGetDTO
+        return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(foundLobby);
+    }
+
+
+    @GetMapping("/lobbies/{lobbyId}")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public LobbyGetDTO getLobbyById(@PathVariable("lobbyId") Long lobbyId) {

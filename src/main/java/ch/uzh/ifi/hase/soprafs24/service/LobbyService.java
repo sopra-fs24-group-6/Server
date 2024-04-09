@@ -231,7 +231,23 @@ public class LobbyService {
         HttpStatus.NOT_FOUND, "Lobby with id " + lobbyId + " could not be found."));
   }
 
-  public User findUserById (Long userId) {
+    public Lobby findLobbyByUsername(String username) {
+        // Find the player by username
+        Player player = playerRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Player with username " + username + " could not be found."));
+
+        // Check if the player is associated with a lobby
+        if (player.getLobby() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Player is not in any lobby.");
+        }
+
+        return player.getLobby();
+    }
+
+
+    public User findUserById (Long userId) {
     return userRepository.findById(userId)
       .orElseThrow(() -> new ResponseStatusException(
         HttpStatus.NOT_FOUND, "User with id " + userId + " could not be found."));
