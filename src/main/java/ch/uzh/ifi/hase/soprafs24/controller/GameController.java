@@ -1,34 +1,24 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
-import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyGetDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.mapper.LobbyDTOMapper;
-import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import ch.uzh.ifi.hase.soprafs24.service.GameService;
+import ch.uzh.ifi.hase.soprafs24.websocket.dto.GameStartMessage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.stereotype.Controller;
 
-
-@RestController
+@Controller
 public class GameController {
 
-  private final LobbyService lobbyService;
+  private final GameService gameService;
 
-  GameController(LobbyService lobbyService) {
-    this.lobbyService = lobbyService;
+  @Autowired
+  GameController(GameService gameService) {
+    this.gameService = gameService;
   }
 
-
-  @PostMapping("/games")
-  @ResponseStatus(HttpStatus.CREATED)
-  @ResponseBody
-  public LobbyGetDTO startGame(@RequestBody Long lobbyId) {
-    /*
-      At this moment, just change status of the selected lobby.
-      Need to implement create new game.
-     */
-    Lobby startedLobby = lobbyService.startGame(lobbyId);
-    // convert internal representation of lobby back to API
-    return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(startedLobby);
+  @MessageMapping("/startGame")
+  public void startGame(@Payload GameStartMessage message) {
+    gameService.startGame(message.getLobbyId(), message.getUserId());
   }
-
 }
