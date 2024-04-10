@@ -12,6 +12,10 @@
 | Aiqi Shuai | [#7](https://github.com/sopra-fs24-group-6/Client/issues/7)   | Implement the ability to edit the Profile and Save the Change |
 | Alisher Dauysbekov | [#8](https://github.com/sopra-fs24-group-6/Client/issues/8) | Implement the ability set the birthdate but also the ability to delete it afterwards too                 |
 | Alisher Dauysbekov | [#4](https://github.com/sopra-fs24-group-6/Client/issues/4) | Implement the ability to set a birthdate |
+| Joao Sacramento| [#1] (https://github.com/sopra-fs24-group-6/Client/issues/1)|Implement the ability to register as a new user |
+| Joao Sacramento| [#2] (https://github.com/sopra-fs24-group-6/Client/issues/2) | Implement functionality to log in and log back out as a registered user |
+| Joao Sacramento| [#83] (https://github.com/sopra-fs24-group-6/Server/issues/83)| Correct credential management for new registered users |
+| Joao Sacramento| [#84] (https://github.com/sopra-fs24-group-6/Server/issues/84) |  Correct credential management for already registered users|
 
 
 ## Week 2
