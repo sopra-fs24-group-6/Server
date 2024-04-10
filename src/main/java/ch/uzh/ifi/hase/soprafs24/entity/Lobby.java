@@ -23,6 +23,9 @@ public class Lobby implements Serializable {
   @Column(nullable = false)
   private LobbyType type;
 
+  @Column()
+  private Boolean isPrivate;
+
   @Column(nullable = false)
   private LobbyStatus status;
 
@@ -111,6 +114,14 @@ public class Lobby implements Serializable {
 
   public void setType(LobbyType type) {
     this.type = type;
+  }
+
+  public Boolean getIsPrivate() {
+    return isPrivate;
+  }
+
+  public void setIsPrivate(Boolean aPrivate) {
+    isPrivate = aPrivate;
   }
 
   public LobbyStatus getStatus() {
