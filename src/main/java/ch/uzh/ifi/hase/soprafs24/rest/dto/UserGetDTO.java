@@ -13,7 +13,17 @@ public class UserGetDTO {
   private Date birthDate;
   private String token;
 
-  public Long getId() {
+  private String language;
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public Long getId() {
     return id;
   }
 

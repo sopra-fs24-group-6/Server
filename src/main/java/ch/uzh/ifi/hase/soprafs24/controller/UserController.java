@@ -1,10 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.User;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPutDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserIdDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.UserDTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -59,12 +56,12 @@ public class UserController {
     return UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
   }
 
-  @PostMapping("/users")
+  @PostMapping("/register")
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public UserGetDTO createUser(@RequestBody UserPostDTO userPostDTO) {
+  public UserGetDTO createUser(@RequestBody UserRegisterDTO userRegisterDTO) {
     // convert API user to internal representation
-    User userInput = UserDTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
+    User userInput = UserDTOMapper.INSTANCE.convertUserRegisterDTOtoEntity(userRegisterDTO);
     // create user
     User createdUser = userService.createUser(userInput);
     // convert internal representation of user back to API

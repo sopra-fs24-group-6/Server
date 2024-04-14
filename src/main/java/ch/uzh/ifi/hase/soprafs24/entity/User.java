@@ -44,7 +44,18 @@ public class User implements Serializable {
   @Column(nullable = true)
   private Date birthDate;
 
-  @OneToOne
+  @Column(nullable = false)
+  private String language;
+
+  public String getLanguage() {
+      return language;
+  }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    @OneToOne
   @JoinColumn(name = "player_id")
   private Player player;
 
