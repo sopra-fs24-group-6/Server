@@ -35,19 +35,19 @@ public class LobbyController {
     return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(createdLobby);
   }
 
-  @GetMapping("/lobbies")
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public List<LobbyGetDTO> getAllLobbies() {
-    // fetch all lobbies in the internal representation
-    List<Lobby> lobbies = lobbyService.getLobbies();
-    List<LobbyGetDTO> lobbyGetDTOs = new ArrayList<>();
-    // convert each lobby to the API representation
-    for (Lobby lobby : lobbies) {
-      lobbyGetDTOs.add(LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby));
+    @GetMapping("/lobbies")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public List<LobbyGetDTO> getAllLobbies() {
+        // fetch all lobbies in the internal representation
+        List<Lobby> lobbies = lobbyService.getLobbies();
+        List<LobbyGetDTO> lobbyGetDTOs = new ArrayList<>();
+        // convert each lobby to the API representation
+        for (Lobby lobby : lobbies) {
+            lobbyGetDTOs.add(LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby));
+        }
+        return lobbyGetDTOs;
     }
-    return lobbyGetDTOs;
-  }
 
     @GetMapping("/lobby/{username}")
     @ResponseStatus(HttpStatus.OK)
