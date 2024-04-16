@@ -16,12 +16,14 @@
 
 ## Week 2
 
-| Name         | Issue                                                         | Description (optional)                                              |
-|--------------|---------------------------------------------------------------|---------------------------------------------------------------------|
-| Kei Murakami | [#89](https://github.com/sopra-fs24-group-6/Server/issues/89) | Basic setup for lobby-management (entitles, controllers, seriveces) |
-| Kei Murakami | [#90](https://github.com/sopra-fs24-group-6/Server/issues/90) | Implement creation and store lobbies, players                       |
-| Kei Murakami | [#93](https://github.com/sopra-fs24-group-6/Server/issues/93) | Implement join and kick                                             |
-|  |                                                               |    |
+| Name               | Issue                                                           | Description (optional)                                             |
+|--------------------|-----------------------------------------------------------------|--------------------------------------------------------------------|
+| Kei Murakami       | [#89](https://github.com/sopra-fs24-group-6/Server/issues/89)   | Basic setup for lobby-management (entitles, controllers, seriveces) |
+| Kei Murakami       | [#90](https://github.com/sopra-fs24-group-6/Server/issues/90)   | Implement creation and store lobbies, players                      |
+| Kei Murakami       | [#93](https://github.com/sopra-fs24-group-6/Server/issues/93)   | Implement join and kick                                            |
+| Alisher Dauysbekov | [#105](https://github.com/sopra-fs24-group-6/Server/issues/105) | Implement endpoint for the votes of each player and make sure a player has only voted once   |
+| Alisher Dauysbekov | [#106](https://github.com/sopra-fs24-group-6/Server/issues/106) | Implement endpoit for the outcome of the voting |
+
 
 
 ## Week 3
