@@ -1,13 +1,22 @@
 package ch.uzh.ifi.hase.soprafs24.websocket.dto;
+import java.time.Instant;
 
 public class ChatMessage {
   private String content;
   private Long userId;
   private String username;
+  private Instant timestamp;
   private Long lobbyId;
 
+    public Instant getTimestamp() {
+        return timestamp;
+    }
 
-  public String getContent() {
+    public void setTimestamp(Instant timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public String getContent() {
     return content;
   }
 
