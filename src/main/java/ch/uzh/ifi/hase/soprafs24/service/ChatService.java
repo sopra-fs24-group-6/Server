@@ -23,19 +23,19 @@ public class ChatService {
 
     private final LobbyService lobbyService;
 
-    @Autowired
     private SessionManager sessionManager;
 
     @Autowired
-    public ChatService(SimpMessagingTemplate messagingTemplate, TranslationService translationService, UserService userService, LobbyService lobbyService) {
+    public ChatService(SimpMessagingTemplate messagingTemplate, TranslationService translationService, UserService userService, LobbyService lobbyService, SessionManager sessionManager) {
         this.messagingTemplate = messagingTemplate;
         this.translationService = translationService;
         this.userService = userService;
         this.lobbyService = lobbyService;
+        this.sessionManager = sessionManager;
     }
 
     public void sendTranslatedMessagesToUsers(Long lobbyId, ChatMessage chatMessage) {
-        String destination = "/topic/" + lobbyId + "/chat";
+        //String destination = "/topic/" + lobbyId + "/chat";
         // Broadcast message to each subscriber in their preferred language
         ConcurrentHashMap<String, Long> sessionMap = sessionManager.getSessionMap();
         for (Map.Entry<String, Long> entry : sessionMap.entrySet()) {
@@ -46,7 +46,9 @@ public class ChatService {
                 String user_language = user.getLanguage();
                 String translatedMessage = translationService.translateText(chatMessage.getContent(), user_language);
                 chatMessage.setContent(translatedMessage);
-                messagingTemplate.convertAndSendToUser(sessionId, destination, chatMessage);
+                // messagingTemplate.convertAndSendToUser(sessionId, destination, chatMessage);
+                String destination = "/queue/" + userId + "/chat";
+                messagingTemplate.convertAndSend(destination, chatMessage);
             }
         }
     }

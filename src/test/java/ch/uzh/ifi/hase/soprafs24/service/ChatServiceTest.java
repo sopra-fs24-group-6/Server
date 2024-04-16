@@ -58,7 +58,7 @@ class ChatServiceTest {
 //        fakeSessionMap.put("session2", 2L);
 
 
-        when(sessionManager.getSessionMap()).thenReturn(fakesessionManager);
+        when(sessionManager.getSessionMap()).thenReturn(fakesessionManager.getSessionMap());
         User user1 = new User();
         User user2 = new User();
         user1.setId(1L);
@@ -76,13 +76,15 @@ class ChatServiceTest {
         chatService.sendTranslatedMessagesToUsers(lobby1Id, originalMessage);
 
         // Assert
-        ChatMessage chatMessage1 = new ChatMessage();
-        ChatMessage chatMessage2 = new ChatMessage();
-
-        chatMessage1.setContent("Hello World Translated");
-        chatMessage2.setContent("你好，世界");
-        verify(messagingTemplate).convertAndSendToUser("session1", "/topic/1/chat", chatMessage1);
-        verify(messagingTemplate).convertAndSendToUser("session2", "/topic/1/chat", chatMessage2);
+//        ChatMessage chatMessage1 = new ChatMessage();
+//        ChatMessage chatMessage2 = new ChatMessage();
+//
+//        chatMessage1.setContent("Hello World Translated");
+//        chatMessage2.setContent("你好，世界");
+//        verify(messagingTemplate).convertAndSendToUser("session1", "/topic/1/chat", chatMessage1);
+//        verify(messagingTemplate).convertAndSendToUser("session2", "/topic/1/chat", chatMessage2);
+        verify(messagingTemplate).convertAndSend(eq("/queue/1/chat"), any(ChatMessage.class));
+        verify(messagingTemplate).convertAndSend(eq("/queue/2/chat"), any(ChatMessage.class));
         verifyNoMoreInteractions(messagingTemplate);
     }
 }

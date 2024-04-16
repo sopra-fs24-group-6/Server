@@ -56,7 +56,7 @@ public class UserController {
     return UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
   }
 
-  @PostMapping("/register")
+  @PostMapping("/users")
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public UserGetDTO createUser(@RequestBody UserRegisterDTO userRegisterDTO) {

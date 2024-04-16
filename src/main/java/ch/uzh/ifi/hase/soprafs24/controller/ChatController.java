@@ -21,16 +21,6 @@ public class ChatController {
     this.chatService = chatService;
   }
 
-  @MessageMapping("/chat/{lobbyId}/sendMessage")
-  public void broadcastMessage(@DestinationVariable Long lobbyId, @Payload ChatMessage message) {
-    // At this moment, just broadcast original message
-    // TODO: translate original message using Google API in ChatService
-    // TODO: broadcast original and translated content
-
-    String destination = "/topic/" + lobbyId + "/chat";
-    template.convertAndSend(destination, message);
-  }
-
     @MessageMapping("/chat/{lobbyId}/sendMessage")
     public void broadcastTranslatedMessage(@DestinationVariable Long lobbyId, @Payload ChatMessage message) {
         // At this moment, just broadcast original message
