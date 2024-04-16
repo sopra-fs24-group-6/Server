@@ -56,6 +56,7 @@ class ChatServiceTest {
         fakesessionManager.addSession("session2", 2L);
 //        fakeSessionMap.put("session1", 1L);
 //        fakeSessionMap.put("session2", 2L);
+        
 
         when(sessionManager.getSessionMap()).thenReturn(fakesessionManager);
         User user1 = new User();
