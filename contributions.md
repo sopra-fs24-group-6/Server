@@ -29,15 +29,13 @@
 | Nico Plüss| [#84] (https://github.com/sopra-fs24-group-6/Client/issues/84) |  Display players that have joined the lobby currently uses placeholder data |
 | Nico Plüss| []  |  Ability for admin to kick player|
 | Nico Plüss| [#11] (https://github.com/sopra-fs24-group-6/Client/issues/11) |  Frontend logic for sending post request for lobby creation|
-| Joao Sacramento| []  | Created new theme infrastructure |
-| Joao Sacramento| []  | Creation of custom buttom that matches the overarching scheme of the application|
-| Joao Sacramento| []  | Creation of different button styles for different usages, such as on hover color changes |
+| Joao Sacramento| [#88] (https://github.com/sopra-fs24-group-6/Client/issues/88) | Created new theme infrastructure |
+| Joao Sacramento| [#96] (https://github.com/sopra-fs24-group-6/Client/issues/96) | Creation of custom buttom that matches the overarching scheme of the application|
 | Joao Sacramento| [#72] (https://github.com/sopra-fs24-group-6/Client/issues/72) | Implementation of a Navigation Bar |
-| Joao Sacramento| []  | Navigation Bar matches the style of the application|
-| Joao Sacramento| []  | Import containers from NES style |
-| Joao Sacramento| []  | Creation of Sliders for lobby setting |
-| Joao Sacramento| []  | Style of SLiders adjusted to match app theme |
-| Joao Sacramento| []  | Import of radio buttons from NES style |
+| Joao Sacramento| [#98] (https://github.com/sopra-fs24-group-6/Client/issues/98) | Navigation Bar matches the style of the application|
+| Joao Sacramento| [#94] (https://github.com/sopra-fs24-group-6/Client/issues/94) | Import containers from NES style |
+| Joao Sacramento| [#95] (https://github.com/sopra-fs24-group-6/Client/issues/95)  | Creation of Sliders for lobby setting |
+| Joao Sacramento| [#97] (https://github.com/sopra-fs24-group-6/Client/issues/97) | Import of radio buttons from NES style |
 
 
 
@@ -52,7 +50,7 @@
 | Nico Plüss| [#79] (https://github.com/sopra-fs24-group-6/Client/issues/79) | Password pop-up if lobby is private |
 | Joao Sacramento| [#71] (https://github.com/sopra-fs24-group-6/Client/issues/71) | Adjust style of the Menu page to match the app theme|
 | Nico Plüss| [#83] (https://github.com/sopra-fs24-group-6/Client/issues/83) | Creation of logic behind the browse lobby view|
-| Joao Sacramento| []  | Adjust style of Lobby creation page to match the app theme |
+| Joao Sacramento| [#93] (https://github.com/sopra-fs24-group-6/Client/issues/93) | Adjust style of Lobby creation page to match the app theme |
 | Joao Sacramento| [#77] (https://github.com/sopra-fs24-group-6/Client/issues/77) | Adjust style of Lobby creation page for non admin users |
 | Joao Sacramento| [#78] (https://github.com/sopra-fs24-group-6/Client/issues/78) | Adjust style of the lobby browser page to match the app theme |
 | Joao Sacramento| [#75] (https://github.com/sopra-fs24-group-6/Client/issues/75) | Solve logic conflicts that stem from the integration of the new style components |
@@ -63,8 +61,8 @@
 | Nico Plüss| [#17] (https://github.com/sopra-fs24-group-6/Client/issues/17) | Clue submit and display logic |
 | Nico Plüss| [#87] (https://github.com/sopra-fs24-group-6/Client/issues/87) | Fetching roles and words from the server |
 | Nico Plüss| [#86] (https://github.com/sopra-fs24-group-6/Client/issues/86) | Role assignment |
-| Joao Sacramento| [] () | Registration style adjustment to fit the rest of the app |
-| Joao Sacramento| [] () | Log in style adjustment to fit the rest of the app |
+| Joao Sacramento| [#90] (https://github.com/sopra-fs24-group-6/Client/issues/90) | Registration style adjustment to fit the rest of the app |
+| Joao Sacramento| [#89] (https://github.com/sopra-fs24-group-6/Client/issues/89) | Log in style adjustment to fit the rest of the app |
 
 
 
