@@ -35,7 +35,5 @@ public class ChatController {
     public void broadcastTranslatedMessage(@DestinationVariable Long lobbyId, @Payload ChatMessage message) {
         // At this moment, just broadcast original message
         chatService.sendTranslatedMessagesToUsers(lobbyId, message);
-        String destination = "/topic/" + lobbyId + "/chat";
-        template.convertAndSend(destination, message);
     }
 }
