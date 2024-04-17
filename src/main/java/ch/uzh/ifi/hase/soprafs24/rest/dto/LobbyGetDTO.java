@@ -14,6 +14,8 @@ public class LobbyGetDTO {
 
   private String lobbyAdmin;
 
+  private Boolean isPrivate;
+
   private List<String> players;
 
   private Integer playerLimit;
@@ -55,6 +57,14 @@ public class LobbyGetDTO {
 
   public void setLobbyAdmin(String lobbyAdmin) {
     this.lobbyAdmin = lobbyAdmin;
+  }
+
+  public Boolean getIsPrivate() {
+    return isPrivate;
+  }
+
+  public void setIsPrivate(Boolean aPrivate) {
+    isPrivate = aPrivate;
   }
 
   public List<String> getPlayers() {
