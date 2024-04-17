@@ -1,30 +1,48 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
-import ch.uzh.ifi.hase.soprafs24.entity.Game;
+import ch.uzh.ifi.hase.soprafs24.constant.Role;
+import ch.uzh.ifi.hase.soprafs24.entity.*;
+import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.PlayerRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.WordPairRepository;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.EventNotification;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.ResultNotification;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.TurnNotification;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.WordNotification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 
 @Service
 public class GameService {
 
-  private final SimpMessagingTemplate messagingTemplate;
-  private final TimerService timerService;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final TimerService timerService;
 
-  @Autowired
-  public GameService(SimpMessagingTemplate messagingTemplate, TimerService timerService) {
-    this.messagingTemplate = messagingTemplate;
-    this.timerService = timerService;
-  }
+    private final LobbyRepository lobbyRepository;
+
+    private final WordPairRepository wordPairRepository;
+
+    private final PlayerRepository playerRepository;
+
+    @Autowired
+    public GameService(SimpMessagingTemplate messagingTemplate,
+                       TimerService timerService,
+                       @Qualifier("lobbyRepository")LobbyRepository lobbyRepository,
+                       @Qualifier("wordPairRepository")WordPairRepository wordPairRepository,
+                       @Qualifier("playerRepository")PlayerRepository playerRepository) {
+        this.messagingTemplate = messagingTemplate;
+        this.timerService = timerService;
+        this.lobbyRepository = lobbyRepository;
+        this.wordPairRepository = wordPairRepository;
+        this.playerRepository = playerRepository;
+    }
 
   public void startGame(Long lobbyId, Long userId) {
 
@@ -82,16 +100,58 @@ public class GameService {
     startClueTurn(game, shuffledPlayerIds);
   }
 
-  public void assignWordsAndRoles(Game game) {
-    // TODO: fetch words with certain theme from database
-    // TODO: assign word randomly
-    // TODO: notify assigned word to each player "/queue/{userId}/wordAssignment"
-    WordNotification wordNotification = new WordNotification();
-    wordNotification.setWord("dog");
-    messagingTemplate.convertAndSend("/queue/1/wordAssignment", wordNotification);
-    wordNotification.setWord(null);
-    messagingTemplate.convertAndSend("/queue/2/wordAssignment", wordNotification);
-  }
+    public void assignWordsAndRoles(Game game) {
+        // TODO: fetch words with certain theme from database
+        Lobby lobby = lobbyRepository.findById(game.getLobbyId()).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "Lobby with id " + game.getLobbyId() + " could not be found."));
+        List<Theme> gameThemes = lobby.getThemes();
+        Random random = new Random();
+        Theme randomTheme = gameThemes.stream()
+                .skip(random.nextInt(gameThemes.size())) // Skip a random number of elements
+                .findFirst() // This always succeeds unless the list is empty
+                .orElseThrow(() -> new NoSuchElementException("No themes available in the lobby")); // Throw if the list is empty
+        // TODO: assign word randomly
+        List<WordPair> wordPairList = wordPairRepository.findByTheme_Id(randomTheme.getId());
+        WordPair randomWordPair = wordPairList.stream()
+                .skip(random.nextInt(wordPairList.size())) // Skip a random number of elements
+                .findFirst() // This always succeeds unless the list is empty
+                .orElseThrow(() -> new NoSuchElementException("No word pairs available in the theme")); // Throw if the list is empty
+        boolean assignFirstAsWolf = random.nextBoolean();
+        String wolf_word = assignFirstAsWolf ? randomWordPair.getFirstWord() : randomWordPair.getSecondWord();
+        String villager_word = assignFirstAsWolf ? randomWordPair.getSecondWord() : randomWordPair.getFirstWord();
+        // TODO: notify assigned word to each player "/queue/{userId}/wordAssignment"
+        List<Player> players = lobby.getPlayers();
+        if (players == null || players.isEmpty()) {
+            throw new IllegalStateException("No players available");
+        }
+        // Select a random player to be the wolf
+        int wolfIndex = random.nextInt(players.size());
+        for (int i = 0; i < players.size(); i++) {
+            if (i != wolfIndex) { // Skip the wolf
+                Player villager = players.get(i);
+                villager.setRole(Role.VILLAGER);
+                villager.setWord(villager_word);
+                Player updatedPlayer = playerRepository.save(villager);
+                playerRepository.flush();
+                WordNotification villagerNotification = new WordNotification();
+                villagerNotification.setWord(villager_word);
+                villagerNotification.setRole(Role.VILLAGER);
+                String destination = "/queue/" + villager.getUserId() + "/wordAssignment";
+                messagingTemplate.convertAndSend(destination, villagerNotification);
+            } else {
+                Player wolf = players.get(i);
+                wolf.setRole(Role.WOLF);
+                wolf.setWord(wolf_word);
+                Player updatedPlayer = playerRepository.save(wolf);
+                playerRepository.flush();
+                WordNotification wolfNotification = new WordNotification();
+                wolfNotification.setWord(wolf_word);
+                wolfNotification.setRole(Role.VILLAGER);
+                String destination = "/queue/" + wolf.getUserId() + "/wordAssignment";
+                messagingTemplate.convertAndSend(destination, wolfNotification);
+            }
+        }
+    }
 
   private void startClueTurn(Game game, List<Long> playerIds) {
     if (!playerIds.isEmpty()) {
