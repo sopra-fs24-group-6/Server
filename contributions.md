@@ -36,7 +36,8 @@
 | Joao Sacramento| [#94](https://github.com/sopra-fs24-group-6/Client/issues/94) | Import containers from NES style |
 | Joao Sacramento| [#95](https://github.com/sopra-fs24-group-6/Client/issues/95) | Creation of Sliders for lobby setting |
 | Joao Sacramento| [#97](https://github.com/sopra-fs24-group-6/Client/issues/97) | Import of radio buttons from NES style |
-
+| Alisher Dauysbekov | [#105](https://github.com/sopra-fs24-group-6/Server/issues/105) | Implement endpoint for the votes of each player and make sure a player has only voted once   |
+| Alisher Dauysbekov | [#106](https://github.com/sopra-fs24-group-6/Server/issues/106) | Implement endpoit for the outcome of the voting |
 
 
 ## Week 3
