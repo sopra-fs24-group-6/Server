@@ -39,7 +39,7 @@ public class VoteController {
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("/vote/{lobbyId}/results")
+    @GetMapping("/votes/{lobbyId}/results")
     @ResponseStatus(HttpStatus.OK)
     public Map<String, Object> getVotingResults(@PathVariable("lobbyId") Long lobbyId) {
         return voteService.calculateResults(lobbyId);
