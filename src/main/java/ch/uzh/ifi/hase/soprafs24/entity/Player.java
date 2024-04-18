@@ -91,7 +91,7 @@ public class Player implements Serializable {
     this.language = language;
   }
 
-  public Boolean getHost() {
+    public Boolean getHost() {
     return isHost;
   }
 

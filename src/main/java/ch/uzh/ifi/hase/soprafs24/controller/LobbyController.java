@@ -1,11 +1,10 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyGetDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyPostDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.PasswordDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserIdDTO;
+import ch.uzh.ifi.hase.soprafs24.entity.Player;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.LobbyDTOMapper;
+import ch.uzh.ifi.hase.soprafs24.rest.mapper.PlayerDTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -59,6 +58,19 @@ public class LobbyController {
     Lobby lobby = lobbyService.getLobbyById(lobbyId);
     return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby);
   }
+
+    @GetMapping("/lobbies/{lobbyId}/players")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public List<PlayerDTO> getPlayers(@PathVariable("lobbyId") Long lobbyId) {
+        // fetch lobby in the internal representation
+        List<Player> plauers = lobbyService.getPlayersById(lobbyId);
+        List<PlayerDTO> playerDTOS = new ArrayList<>();
+        for(Player player : plauers) {
+            playerDTOS.add(PlayerDTOMapper.INSTANCE.convertEntityToPlayerDTO(player));
+        }
+        return playerDTOS;
+    }
 
   @PutMapping("/lobbies/{lobbyId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)

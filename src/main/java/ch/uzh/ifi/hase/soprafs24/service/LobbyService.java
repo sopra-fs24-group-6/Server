@@ -109,6 +109,13 @@ public class LobbyService {
 
   public Lobby getLobbyById(Long lobbyId) { return findLobbyById(lobbyId); }
 
+    public List<Player> getPlayersById(Long lobbyId){
+      Lobby lobby = lobbyRepository.findById(lobbyId)
+              .orElseThrow(() -> new ResponseStatusException(
+                      HttpStatus.NOT_FOUND, "Lobby with id " + lobbyId + " could not be found."));
+      return lobby.getPlayers();
+    }
+
   public Lobby createLobby(Lobby newLobby) {
     // check if input name already exists
     // if so, then trow exception
@@ -142,6 +149,8 @@ public class LobbyService {
     // flush() is called
     newLobby = lobbyRepository.save(newLobby);
     lobbyRepository.flush();
+
+      System.out.println(newLobby);
 
     log.debug("Created Information for User: {}", newLobby);
     return newLobby;
@@ -228,6 +237,7 @@ public class LobbyService {
         playerRepository.flush();
         lobbyRepository.save(lobby);
         lobbyRepository.flush();
+          System.out.println(lobby);
       } else {
         throw new ResponseStatusException(
           HttpStatus.UNAUTHORIZED, "Kicking player is only allowed by the host.");

@@ -53,6 +53,15 @@ public class ChatService {
         }
     }
 
+    public void sendTranslatedMessagesToUser(Long userId, ChatMessage chatMessage) {
+//        User user = userService.getUser(userId);
+//        String translatedMessage = translationService.translateText(chatMessage.getContent(), user.getLanguage());
+//        chatMessage.setContent(translatedMessage);
+//        messagingTemplate.convertAndSendToUser(sessionId, destination, chatMessage);
+        String destination = "/queue/" + userId + "/private";
+        messagingTemplate.convertAndSend(destination, chatMessage);
+    }
+
     public boolean checkRightlobby(Long lobbyId, Long userId) {
         Lobby current = lobbyService.getLobbyByUserId(userId);
         return lobbyId.equals(current.getId());
