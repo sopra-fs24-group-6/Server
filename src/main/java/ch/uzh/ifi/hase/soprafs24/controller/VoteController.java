@@ -22,7 +22,7 @@ public class VoteController {
         this.voteService = voteService;
     }
 
-    @PostMapping("/vote/{lobbyId}/sendVote")
+    @PostMapping("/votes/{lobbyId}")
     @ResponseStatus(HttpStatus.CREATED)
     public void sendVote(@PathVariable("lobbyId") Long lobbyId, @RequestBody VoteDTO voteDTO) {
         Vote vote = VoteDTOMapper.INSTANCE.convertVoteDTOtoEntity(voteDTO);
@@ -30,7 +30,7 @@ public class VoteController {
         voteService.saveVote(vote);
     }
 
-    @GetMapping("/vote/{lobbyId}/getVotes")
+    @GetMapping("/votes/{lobbyId}")
     @ResponseStatus(HttpStatus.OK)
     public List<Object> getVotesByLobby(@PathVariable("lobbyId") Long lobbyId) {
         List<Vote> votes = voteService.getVotesByLobbyId(lobbyId);
