@@ -114,10 +114,11 @@ public class LobbyService {
     // if so, then trow exception
     checkIfLobbyNameExists(newLobby.getName());
 
-    // set lobby type
+    // set lobby type and isPrivate
     // if password is set, then PRIVATE, else PUBLIC
     LobbyType type = determineLobbyType(newLobby.getPassword());
     newLobby.setType(type);
+    newLobby.setIsPrivate(type == LobbyType.PRIVATE);
 
     // set status
     newLobby.setStatus(LobbyStatus.WAITING);
