@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.constant.Role;
+import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.PlayerRepository;
@@ -14,16 +15,20 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
 
 @Service
+@Transactional
 public class GameService {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final TimerService timerService;
+
+    private final TranslationService translationService;
 
     private final LobbyRepository lobbyRepository;
 
@@ -31,14 +36,17 @@ public class GameService {
 
     private final PlayerRepository playerRepository;
 
+
     @Autowired
     public GameService(SimpMessagingTemplate messagingTemplate,
                        TimerService timerService,
+                       TranslationService translationService,
                        @Qualifier("lobbyRepository")LobbyRepository lobbyRepository,
                        @Qualifier("wordPairRepository")WordPairRepository wordPairRepository,
                        @Qualifier("playerRepository")PlayerRepository playerRepository) {
         this.messagingTemplate = messagingTemplate;
         this.timerService = timerService;
+        this.translationService = translationService;
         this.lobbyRepository = lobbyRepository;
         this.wordPairRepository = wordPairRepository;
         this.playerRepository = playerRepository;
@@ -59,13 +67,24 @@ public class GameService {
 
   public Game initializeGame(Long lobbyId, Long userId) {
     // TODO: find lobby by lobbyId and verify host's userId
-    // TODO: initialize game (set theme, duration, players, etc. to game instance)
-    Game game =  new Game();
-    game.setLobbyId(1L);
-    game.setRoundTimer(16);
-    game.setClueTimer(3);
-    game.setDiscussionTimer(5);
-    return game;
+      Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(() -> new ResponseStatusException(
+              HttpStatus.NOT_FOUND, "Lobby with id " + lobbyId + " could not be found."));
+      if (userId.equals(lobby.getHost().getUserId())) {
+          // TODO: initialize game (set theme, duration, players, etc. to game instance)
+          Game game =  new Game();
+          game.setLobbyId(lobbyId);
+          game.setRoundTimer(lobby.getRoundTimer());
+          game.setClueTimer(lobby.getClueTimer());
+          game.setDiscussionTimer(lobby.getDiscussionTimer());
+          assignWordsAndRoles(game);
+          System.out.println(game);
+          System.out.println(lobby);
+          return game;
+      }else {
+          // Optionally, you could log this attempt, throw an exception, or return null
+          System.out.println("User is not the host of the lobby. No action taken.");
+          return null; // Indicates no game was initialized due to the condition not being met
+      }
   }
 
   public void notifyGameEvents(Game game, String eventType) {
@@ -101,17 +120,21 @@ public class GameService {
   }
 
     public void assignWordsAndRoles(Game game) {
-        // TODO: fetch words with certain theme from database
+        // Done: fetch words with certain theme from database
         Lobby lobby = lobbyRepository.findById(game.getLobbyId()).orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "Lobby with id " + game.getLobbyId() + " could not be found."));
-        List<Theme> gameThemes = lobby.getThemes();
+
+        List<String> gameThemes = lobby.getThemeNames();
+        for(String theme : gameThemes) {
+            System.out.println(theme);
+        }
         Random random = new Random();
-        Theme randomTheme = gameThemes.stream()
+        String randomTheme = gameThemes.stream()
                 .skip(random.nextInt(gameThemes.size())) // Skip a random number of elements
                 .findFirst() // This always succeeds unless the list is empty
                 .orElseThrow(() -> new NoSuchElementException("No themes available in the lobby")); // Throw if the list is empty
-        // TODO: assign word randomly
-        List<WordPair> wordPairList = wordPairRepository.findByTheme_Id(randomTheme.getId());
+        // Done: assign word randomly
+        List<WordPair> wordPairList = wordPairRepository.findByTheme_Name(randomTheme);
         WordPair randomWordPair = wordPairList.stream()
                 .skip(random.nextInt(wordPairList.size())) // Skip a random number of elements
                 .findFirst() // This always succeeds unless the list is empty
@@ -119,7 +142,7 @@ public class GameService {
         boolean assignFirstAsWolf = random.nextBoolean();
         String wolf_word = assignFirstAsWolf ? randomWordPair.getFirstWord() : randomWordPair.getSecondWord();
         String villager_word = assignFirstAsWolf ? randomWordPair.getSecondWord() : randomWordPair.getFirstWord();
-        // TODO: notify assigned word to each player "/queue/{userId}/wordAssignment"
+        // Done: notify assigned word to each player "/queue/{userId}/wordAssignment"
         List<Player> players = lobby.getPlayers();
         if (players == null || players.isEmpty()) {
             throw new IllegalStateException("No players available");
@@ -134,8 +157,10 @@ public class GameService {
                 Player updatedPlayer = playerRepository.save(villager);
                 playerRepository.flush();
                 WordNotification villagerNotification = new WordNotification();
+                //For cost concern, this function is commented
+//                String Translated_text = translationService.translateText("your assigned word is: " + villager_word, villager.getLanguage());
+//                villagerNotification.setWord(Translated_text);
                 villagerNotification.setWord(villager_word);
-                villagerNotification.setRole(Role.VILLAGER);
                 String destination = "/queue/" + villager.getUserId() + "/wordAssignment";
                 messagingTemplate.convertAndSend(destination, villagerNotification);
             } else {
@@ -145,8 +170,10 @@ public class GameService {
                 Player updatedPlayer = playerRepository.save(wolf);
                 playerRepository.flush();
                 WordNotification wolfNotification = new WordNotification();
-                wolfNotification.setWord(wolf_word);
-                wolfNotification.setRole(Role.VILLAGER);
+                //For cost concern, this function is commented
+//                String wolfanouncement = translationService.translateText("Your role is wolf.",wolf.getLanguage());
+//                wolfNotification.setWord(wolfanouncement);
+                wolfNotification.setWord("You are the wolf");
                 String destination = "/queue/" + wolf.getUserId() + "/wordAssignment";
                 messagingTemplate.convertAndSend(destination, wolfNotification);
             }

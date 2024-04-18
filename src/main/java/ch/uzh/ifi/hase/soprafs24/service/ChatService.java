@@ -44,8 +44,8 @@ public class ChatService {
             User user = userService.getUser(userId);
             if (checkRightlobby(lobbyId,userId)) {
                 String user_language = user.getLanguage();
-                String translatedMessage = translationService.translateText(chatMessage.getContent(), user_language);
-                chatMessage.setContent(translatedMessage);
+//                String translatedMessage = translationService.translateText(chatMessage.getContent(), user_language);
+//                chatMessage.setContent(translatedMessage);
                 // messagingTemplate.convertAndSendToUser(sessionId, destination, chatMessage);
                 String destination = "/queue/" + userId + "/chat";
                 messagingTemplate.convertAndSend(destination, chatMessage);

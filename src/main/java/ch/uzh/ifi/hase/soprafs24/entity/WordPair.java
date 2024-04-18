@@ -24,7 +24,16 @@ public class WordPair implements Serializable {
   @Column(nullable = false)
   private String secondWord;
 
-
+    //For testing purposes
+    @Override
+    public String toString() {
+        return "WordPair{" +
+                "\n\t\tid=" + id +
+                ",\n\t\tthemeName=" + (theme != null ? theme.getName() : "null") +
+                ",\n\t\tfirstWord='" + firstWord + '\'' +
+                ",\n\t\tsecondWord='" + secondWord + '\'' +
+                "\n\t}";
+    }
   public Long getId() {
     return id;
   }

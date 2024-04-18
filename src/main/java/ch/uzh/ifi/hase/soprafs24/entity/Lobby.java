@@ -7,6 +7,7 @@ import java.io.Serializable;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Entity
@@ -62,7 +63,30 @@ public class Lobby implements Serializable {
   @JoinColumn(name = "host_id", nullable = false)
   private Player host;
 
-
+    // For Testing Purposes
+    @Override
+    public String toString() {
+        return "Lobby{" +
+                "\n\tid=" + id +
+                ",\n\tname='" + name + '\'' +
+                ",\n\ttype=" + type +
+                ",\n\tstatus=" + status +
+                ",\n\tpassword='" + (password != null ? "[PROTECTED]" : "null") + '\'' +
+                ",\n\tplayers=" + players.stream()
+                .map(Player::toString)
+                .collect(Collectors.joining(", ", "[", "]")) +
+                ",\n\tplayerLimit=" + playerLimit +
+                ",\n\tplayerCount=" + playerCount +
+                ",\n\tthemes=" + themes.stream()
+                .map(Theme::toString)
+                .collect(Collectors.joining(", ", "[", "]")) +
+                ",\n\trounds=" + rounds +
+                ",\n\troundTimer=" + roundTimer +
+                ",\n\tclueTimer=" + clueTimer +
+                ",\n\tdiscussionTimer=" + discussionTimer +
+                ",\n\thost=" + (host != null ? host.toString() : "null") +
+                "\n}";
+    }
   /*
   Additional methods
   */

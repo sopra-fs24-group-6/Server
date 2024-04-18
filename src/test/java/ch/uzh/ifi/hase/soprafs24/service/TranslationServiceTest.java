@@ -13,8 +13,8 @@ public class TranslationServiceTest {
 
     @Test
     public void testTranslateText() {
-        String originalText = "这届话事人我选吹鸡，他说可以带我们上月球";
-        String targetLanguage = "en"; // English
+        String originalText = "Your assigned word is wolf.";
+        String targetLanguage = "de"; // Prefer language
         String translatedText = translationService.translateText(originalText, targetLanguage);
 
         System.out.println("Original: " + originalText);

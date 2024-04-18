@@ -59,12 +59,24 @@ public class LobbyService {
       return Collections.singletonList(lobbyByUserId);
     }
 
+      //For Testing purposes
+      List<Lobby> lobbies = this.lobbyRepository.findAll();
+      for (Lobby lobby : lobbies) {
+          System.out.println("Current Lobby: " + lobby.getId());
+      }
+
     // if no parameters, then return all lobbies
     return getAllLobbies();
   }
 
   public List<Lobby> getAllLobbies() {
-    return this.lobbyRepository.findAll();
+      //For Testing purposes
+      List<Lobby> lobbies = this.lobbyRepository.findAll();
+      for (Lobby lobby : lobbies) {
+          System.out.println("Current Lobby: " + lobby.getId());
+      }
+      return this.lobbyRepository.findAll();
+
   }
 
   public Lobby getLobbyByUsername(String username) {
@@ -309,6 +321,7 @@ public class LobbyService {
       Player newPlayer = new Player();
       newPlayer.setUserId(user.getId());
       newPlayer.setUsername(user.getUsername());
+      newPlayer.setLanguage(user.getLanguage());
       newPlayer.setHost(isHost);
 
       return newPlayer;

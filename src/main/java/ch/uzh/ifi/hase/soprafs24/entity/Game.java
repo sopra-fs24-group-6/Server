@@ -6,6 +6,17 @@ public class Game {
   Integer clueTimer;
   Integer discussionTimer;
 
+  //For testing
+    @Override
+    public String toString() {
+        return "Game{\n" +
+                "\tlobbyId=" + lobbyId + ",\n" +
+                "\troundTimer=" + roundTimer + ",\n" +
+                "\tclueTimer=" + clueTimer + ",\n" +
+                "\tdiscussionTimer=" + discussionTimer + "\n" +
+                '}';
+    }
+
   public Long getLobbyId() {
     return lobbyId;
   }

@@ -25,8 +25,10 @@ public class Player implements Serializable {
   @Column(nullable = true)
   private String word;
 
+  //Still think about whether it should be enum or string. If you are curious about how the enum should be, you can
+    // visit the comment in Language, but for now, I'll make it string
   @Column(nullable = true)
-  private Language language;
+  private String language;
 
   @Column(nullable = false)
   private Boolean isHost;
@@ -36,6 +38,19 @@ public class Player implements Serializable {
   private Lobby lobby;
 
 
+    // For testing purposes
+    @Override
+    public String toString() {
+        return "Player{" +
+                "\n\tuserId=" + userId +
+                ",\n\tusername='" + username + '\'' +
+                ",\n\trole=" + role +
+                ",\n\tword='" + word + '\'' +
+                ",\n\tlanguage=" + language +
+                ",\n\tisHost=" + isHost +
+                ",\n\tlobbyId=" + (lobby != null ? lobby.getId() : "null") +
+                "\n}";
+    }
   public Long getUserId() {
     return userId;
   }
@@ -68,11 +83,11 @@ public class Player implements Serializable {
     this.word = word;
   }
 
-  public Language getLanguage() {
+  public String getLanguage() {
     return language;
   }
 
-  public void setLanguage(Language language) {
+  public void setLanguage(String language) {
     this.language = language;
   }
 
