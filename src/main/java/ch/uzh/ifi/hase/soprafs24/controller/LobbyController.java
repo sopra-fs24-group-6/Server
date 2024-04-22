@@ -66,16 +66,16 @@ public class LobbyController {
     return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby);
   }
 
-    @MessageMapping("/lobbies/{lobbyId}/players")
+    @GetMapping("/lobbies/{lobbyId}/players")
     @ResponseBody
-    public void getPlayers(@PathVariable("lobbyId") Long lobbyId) {
+    public List<PlayerDTO> getPlayers(@PathVariable("lobbyId") Long lobbyId) {
         // fetch lobby in the internal representation
         List<Player> players = lobbyService.getPlayersById(lobbyId);
         List<PlayerDTO> playerDTOS = new ArrayList<>();
         for(Player player : players) {
             playerDTOS.add(PlayerDTOMapper.INSTANCE.convertEntityToPlayerDTO(player));
         }
-        lobbyService.sendPlayerListToLobby(playerDTOS, lobbyId);
+        return playerDTOS;
     }
 
   @PutMapping("/lobbies/{lobbyId}")
