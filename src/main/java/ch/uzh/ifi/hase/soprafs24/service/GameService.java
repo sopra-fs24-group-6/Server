@@ -57,7 +57,27 @@ public class GameService {
     startRound(game);
   }
 
-  public Game initializeGame(Long lobbyId, Long userId) {
+    public void endGame(Game game) {
+        Lobby lobby = lobbyRepository.findById(game.getLobbyId()).orElseThrow(() -> new ResponseStatusException( HttpStatus.NOT_FOUND, "Lobby with id " + game.getLobbyId() + " could not be found."));
+
+        List<Player> players = lobby.getPlayers();
+
+        for (Player player : players) {
+// using ID getter of player
+            playerRepository.deleteById(player.getId());
+        }
+        /**
+         * remove player from Lobby table
+         * https://docs.spring.io/spring-data/commons/docs/current/api/org/springframework/data/repository/CrudRepository.html#deleteById(ID)
+         */
+        lobbyRepository.delete(lobby);
+
+        // Maybe new event in rabit Queue?
+        notifyGameEvents(game, "EndGame");
+    }
+
+
+    public Game initializeGame(Long lobbyId, Long userId) {
     // TODO: find lobby by lobbyId and verify host's userId
     // TODO: initialize game (set theme, duration, players, etc. to game instance)
     Game game =  new Game();
