@@ -10,11 +10,13 @@ import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.PlayerRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.ThemeRepository;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -35,11 +37,15 @@ public class LobbyService {
   private final LobbyRepository lobbyRepository;
   private final ThemeRepository themeRepository;
 
+  private final SimpMessagingTemplate messagingTemplate;
+
   @Autowired
-  public LobbyService(UserRepository userRepository,
+  public LobbyService(SimpMessagingTemplate messagingTemplate,
+                      UserRepository userRepository,
                       PlayerRepository playerRepository,
                       @Qualifier("lobbyRepository") LobbyRepository lobbyRepository,
                       ThemeRepository themeRepository) {
+    this.messagingTemplate = messagingTemplate;
     this.userRepository = userRepository;
     this.playerRepository = playerRepository;
     this.lobbyRepository = lobbyRepository;
@@ -116,6 +122,16 @@ public class LobbyService {
       return lobby.getPlayers();
     }
 
+    public void sendPlayerListToLobby(List<PlayerDTO> playerDTOS, long lobbyId) {
+        String destination = "/lobbies/" + lobbyId + "/players";
+        System.out.println("Hello");
+        for(PlayerDTO playerDTO : playerDTOS) {
+            System.out.println(playerDTO);
+        }
+        System.out.println("KL");
+        messagingTemplate.convertAndSend(destination, playerDTOS);
+    }
+
   public Lobby createLobby(Lobby newLobby) {
     // check if input name already exists
     // if so, then trow exception
@@ -156,7 +172,7 @@ public class LobbyService {
     return newLobby;
   }
 
-  public void updateLobby (Long lobbyId, Lobby newLobby) {
+  public Lobby updateLobby (Long lobbyId, Lobby newLobby) {
     // find lobby by id
     // if not found, then throw exception
     Lobby targetLobby = findLobbyById(lobbyId);
@@ -186,6 +202,9 @@ public class LobbyService {
     // save
     lobbyRepository.save(targetLobby);
     lobbyRepository.flush();
+
+    // return the lobby, in case the client want to use it.
+      return targetLobby;
   }
 
   public Lobby addPlayerToLobby(Long lobbyId, Long userId){
@@ -211,6 +230,7 @@ public class LobbyService {
       lobby.addPlayer(newPlayer);
       lobby = lobbyRepository.save(lobby);
       lobbyRepository.flush();
+        System.out.println(lobby);
 
       return lobby;
 
@@ -220,7 +240,7 @@ public class LobbyService {
     }
   }
 
-  public void kickPlayerFromLobby(Long lobbyId, Long targetId, Long requesterId) {
+  public Lobby kickPlayerFromLobby(Long lobbyId, Long targetId, Long requesterId) {
     // find lobby by id
     // if not found, then throw exception
     Lobby lobby = findLobbyById(lobbyId);
@@ -238,6 +258,8 @@ public class LobbyService {
         lobbyRepository.save(lobby);
         lobbyRepository.flush();
           System.out.println(lobby);
+          return lobby;
+
       } else {
         throw new ResponseStatusException(
           HttpStatus.UNAUTHORIZED, "Kicking player is only allowed by the host.");

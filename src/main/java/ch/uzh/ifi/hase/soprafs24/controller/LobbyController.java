@@ -7,6 +7,7 @@ import ch.uzh.ifi.hase.soprafs24.rest.mapper.LobbyDTOMapper;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.PlayerDTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -31,6 +32,12 @@ public class LobbyController {
     // create lobby
     Lobby createdLobby = lobbyService.createLobby(lobbyInput);
     // convert internal representation of lobby back to API
+      // send the list of players to the lobby room
+    List<PlayerDTO> playerDTOS = new ArrayList<>();
+      for(Player player : createdLobby.getPlayers()) {
+          playerDTOS.add(PlayerDTOMapper.INSTANCE.convertEntityToPlayerDTO(player));
+      }
+    lobbyService.sendPlayerListToLobby(playerDTOS, createdLobby.getId());
     return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(createdLobby);
   }
 
@@ -59,26 +66,26 @@ public class LobbyController {
     return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby);
   }
 
-    @GetMapping("/lobbies/{lobbyId}/players")
-    @ResponseStatus(HttpStatus.OK)
+    @MessageMapping("/lobbies/{lobbyId}/players")
     @ResponseBody
-    public List<PlayerDTO> getPlayers(@PathVariable("lobbyId") Long lobbyId) {
+    public void getPlayers(@PathVariable("lobbyId") Long lobbyId) {
         // fetch lobby in the internal representation
-        List<Player> plauers = lobbyService.getPlayersById(lobbyId);
+        List<Player> players = lobbyService.getPlayersById(lobbyId);
         List<PlayerDTO> playerDTOS = new ArrayList<>();
-        for(Player player : plauers) {
+        for(Player player : players) {
             playerDTOS.add(PlayerDTOMapper.INSTANCE.convertEntityToPlayerDTO(player));
         }
-        return playerDTOS;
+        lobbyService.sendPlayerListToLobby(playerDTOS, lobbyId);
     }
 
   @PutMapping("/lobbies/{lobbyId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void updateLobby(@PathVariable("lobbyId") Long lobbyId, @RequestBody LobbyPostDTO lobbyPostDTO) {
+  public LobbyGetDTO updateLobby(@PathVariable("lobbyId") Long lobbyId, @RequestBody LobbyPostDTO lobbyPostDTO) {
     // convert API user to internal representation
     Lobby lobbyInput = LobbyDTOMapper.INSTANCE.convertLobbyPostDTOtoEntity(lobbyPostDTO);
     // update lobby
-    lobbyService.updateLobby(lobbyId, lobbyInput);
+    Lobby lobby = lobbyService.updateLobby(lobbyId, lobbyInput);
+    return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby);
   }
 
   @PostMapping("/lobbies/{lobbyId}/players")
@@ -87,6 +94,11 @@ public class LobbyController {
   public LobbyGetDTO joinLobby(@PathVariable("lobbyId") Long lobbyId, @RequestBody UserIdDTO userIdDTO) {
     // add player to lobby
     Lobby updatedLobby = lobbyService.addPlayerToLobby(lobbyId, userIdDTO.getUserId());
+      List<PlayerDTO> playerDTOS = new ArrayList<>();
+      for(Player player : updatedLobby.getPlayers()) {
+          playerDTOS.add(PlayerDTOMapper.INSTANCE.convertEntityToPlayerDTO(player));
+      }
+      lobbyService.sendPlayerListToLobby(playerDTOS, updatedLobby.getId());
     return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(updatedLobby);
   }
 
@@ -95,7 +107,12 @@ public class LobbyController {
   public void kickPlayer(@PathVariable("lobbyId") Long lobbyId,
                          @PathVariable("userId") Long targetUserId,
                          @RequestBody UserIdDTO requesterIdDTO) {
-    lobbyService.kickPlayerFromLobby(lobbyId, targetUserId, requesterIdDTO.getUserId());
+    Lobby lobby = lobbyService.kickPlayerFromLobby(lobbyId, targetUserId, requesterIdDTO.getUserId());
+      List<PlayerDTO> playerDTOS = new ArrayList<>();
+      for(Player player : lobby.getPlayers()) {
+          playerDTOS.add(PlayerDTOMapper.INSTANCE.convertEntityToPlayerDTO(player));
+      }
+      lobbyService.sendPlayerListToLobby(playerDTOS, lobby.getId());
   }
 
   @PostMapping("/lobbies/{lobbyId}/authentication")

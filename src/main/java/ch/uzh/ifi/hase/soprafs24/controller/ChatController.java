@@ -27,9 +27,9 @@ public class ChatController {
         chatService.sendTranslatedMessagesToUsers(lobbyId, message);
     }
 
-    @MessageMapping("/private/{userId}/sendMessage")
-    public void unicastTranslatedMessage(@DestinationVariable Long userId, @Payload ChatMessage message) {
-        // At this moment, just broadcast original message
-        chatService.sendTranslatedMessagesToUser(userId, message);
-    }
+//    @MessageMapping("/private/{userId}/sendMessage")
+//    public void unicastTranslatedMessage(@DestinationVariable Long userId, @Payload ChatMessage message) {
+//        // At this moment, just broadcast original message
+//        chatService.sendTranslatedMessagesToUser(userId, message);
+//    }
 }

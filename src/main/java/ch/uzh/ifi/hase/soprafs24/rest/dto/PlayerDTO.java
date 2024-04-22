@@ -11,6 +11,14 @@ public class PlayerDTO {
 
     private String username;
 
+    @Override
+    public String toString() {
+        return "PlayerDTO{" +
+                "userId=" + userId +
+                ", username='" + username + '\'' +
+                '}';
+    }
+
     public Long getUserId() {
         return userId;
     }
