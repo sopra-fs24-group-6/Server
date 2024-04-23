@@ -42,7 +42,13 @@ public class TimerService {
     startTimer(lobbyId, "discussion", duration, onTimerEnd);
   }
 
-  private void startTimer(Long lobbyId, String timerType, Integer duration, Runnable onTimerEnd) {
+  public void startIntervalTimer(Game game, Runnable onTimerEnd) {
+    Long lobbyId = game.getLobbyId();
+    Integer duration = 3;
+    startTimer(lobbyId, "interval", duration, onTimerEnd);
+  }
+
+  public void startTimer(Long lobbyId, String timerType, Integer duration, Runnable onTimerEnd) {
     stopTimer(lobbyId, timerType);
 
     AtomicInteger remainingTime = new AtomicInteger(duration);
@@ -62,7 +68,7 @@ public class TimerService {
     timerMap.put(timerType, future);
   }
 
-  private void stopTimer(Long lobbyId, String timerType) {
+  public void stopTimer(Long lobbyId, String timerType) {
     Map<String, ScheduledFuture<?>> timers = gameTimers.get(lobbyId);
     if (timers != null) {
       ScheduledFuture<?> future = timers.remove(timerType);

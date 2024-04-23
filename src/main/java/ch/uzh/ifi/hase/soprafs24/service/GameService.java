@@ -24,18 +24,12 @@ import java.util.*;
 @Service
 @Transactional
 public class GameService {
-
     private final SimpMessagingTemplate messagingTemplate;
     private final TimerService timerService;
-
     private final TranslationService translationService;
-
     private final LobbyRepository lobbyRepository;
-
     private final WordPairRepository wordPairRepository;
-
     private final PlayerRepository playerRepository;
-
 
     @Autowired
     public GameService(SimpMessagingTemplate messagingTemplate,
@@ -60,23 +54,24 @@ public class GameService {
     // notify all players that the game has been started
     notifyGameEvents(game, "startGame");
 
-    // start round
+    // interval -> start round
     // TODO: implement multiple rounds
-    startRound(game);
+    timerService.startIntervalTimer(game, () -> startRound(game));
   }
 
   public Game initializeGame(Long lobbyId, Long userId) {
-    // TODO: find lobby by lobbyId and verify host's userId
+    // find lobby by lobbyId and verify host's userId
       Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(() -> new ResponseStatusException(
               HttpStatus.NOT_FOUND, "Lobby with id " + lobbyId + " could not be found."));
       if (userId.equals(lobby.getHost().getUserId())) {
-          // TODO: initialize game (set theme, duration, players, etc. to game instance)
+          // initialize game (set theme, duration, players, etc. to game instance)
           Game game =  new Game();
           game.setLobbyId(lobbyId);
           game.setRoundTimer(lobby.getRoundTimer());
           game.setClueTimer(lobby.getClueTimer());
           game.setDiscussionTimer(lobby.getDiscussionTimer());
-          assignWordsAndRoles(game);
+          game.setPlayers(lobby.getPlayers());
+          game.setThemeNames(lobby.getThemeNames());
           System.out.println(game);
           System.out.println(lobby);
           return game;
@@ -94,37 +89,46 @@ public class GameService {
   }
 
   public void startRound(Game game) {
-    /**
-     * Round proceeds as follows:
-     *  1. start round timer
-     *  2. assign word to player
-     *  3. shuffle players' order
-     *  4. start clue turn for each player
-     *  5. start discussion phase
-     *  6. start voting phase (not implemented yet)
-     *  7. calculate result of voting
-     *  8. announce winner(s) and loser(s)
-     */
+    // notification
+    notifyGameEvents(game, "clue");
+    // interval -> start assign phase
+    // timerService.startIntervalTimer(game, () -> startAssignPhase(game));
+    startAssignPhase(game);
+  }
 
-    // start round timer
-    notifyGameEvents(game, "startRound");
-    timerService.startRoundTimer(game, () -> onEndRoundTimer(game));
-
-    // assign words and roles
+  public void startAssignPhase(Game game) {
+    // assign words and roles, and notify each player
     assignWordsAndRoles(game);
+    // interval -> start clue phase
+    timerService.startIntervalTimer(game, () -> startCluePhase(game));
+  }
 
-    // start clue phase -> discussion phase -> results
-    // phase transition is managed by timer
-    List<Long> shuffledPlayerIds = new ArrayList<>(Arrays.asList(1L, 2L));
-    startClueTurn(game, shuffledPlayerIds);
+  public void startCluePhase(Game game) {
+    // shuffle players order
+    List<Long> shuffledPlayerIds = shufflePlayersOrder(game);
+
+    // start round timer -> when finished, then start discussion phase
+    timerService.startRoundTimer(game, () -> startDiscussionPhase(game));
+
+    // start clue turn, loop until roundTimer ends
+    game.setIsCluePhase(true);
+    Integer currentIndex = 0;
+    startClueTurn(game, shuffledPlayerIds, currentIndex);
+  }
+
+  private List<Long> shufflePlayersOrder(Game game) {
+    List<Player> players = game.getPlayers();
+    List<Long> shuffledPlayerIds = new ArrayList<>();
+    for (Player player : players) {
+      shuffledPlayerIds.add(player.getUserId());
+    }
+    Collections.shuffle(shuffledPlayerIds);
+    System.out.println(shuffledPlayerIds);
+    return shuffledPlayerIds;
   }
 
     public void assignWordsAndRoles(Game game) {
-        // Done: fetch words with certain theme from database
-        Lobby lobby = lobbyRepository.findById(game.getLobbyId()).orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.NOT_FOUND, "Lobby with id " + game.getLobbyId() + " could not be found."));
-
-        List<String> gameThemes = lobby.getThemeNames();
+        List<String> gameThemes = game.getThemeNames();
         for(String theme : gameThemes) {
             System.out.println(theme);
         }
@@ -143,7 +147,7 @@ public class GameService {
         String wolf_word = assignFirstAsWolf ? randomWordPair.getFirstWord() : randomWordPair.getSecondWord();
         String villager_word = assignFirstAsWolf ? randomWordPair.getSecondWord() : randomWordPair.getFirstWord();
         // Done: notify assigned word to each player "/queue/{userId}/wordAssignment"
-        List<Player> players = lobby.getPlayers();
+        List<Player> players = game.getPlayers();
         if (players == null || players.isEmpty()) {
             throw new IllegalStateException("No players available");
         }
@@ -180,32 +184,32 @@ public class GameService {
         }
     }
 
-  private void startClueTurn(Game game, List<Long> playerIds) {
-    if (!playerIds.isEmpty()) {
-      Long currentPlayerId = playerIds.remove(0);
-      TurnNotification turnNotification = new TurnNotification();
-      turnNotification.setUserId(currentPlayerId);
-      messagingTemplate.convertAndSend("/topic/" + game.getLobbyId() + "/clueTurn", turnNotification);
-      timerService.startClueTimer(game, () -> onEndClueTimer(game, playerIds));
+  private void startClueTurn(Game game, List<Long> playerIds, Integer currentIndex) {
+    Long currentPlayerId = playerIds.get(currentIndex);
+    TurnNotification turnNotification = new TurnNotification();
+    turnNotification.setUserId(currentPlayerId);
+    messagingTemplate.convertAndSend("/topic/" + game.getLobbyId() + "/clueTurn", turnNotification);
+    timerService.startClueTimer(game, () -> onEndClueTimer(game, playerIds, currentIndex));
+  }
+
+  public void onEndClueTimer(Game game, List<Long> playerIds, Integer currentIndex) {
+    if (game.getIsCluePhase()) {
+      Integer nextIndex = (currentIndex + 1) % playerIds.size();
+      startClueTurn(game, playerIds, nextIndex);
     }
   }
 
-  public void onEndClueTimer(Game game, List<Long> playerIds) {
-    if (playerIds.isEmpty()) {
-      notifyGameEvents(game, "startDiscussion");
-      timerService.startDiscussionTimer(game, () -> onEndDiscussionTimer(game));
-    } else {
-      startClueTurn(game, playerIds);
-    }
+  public void startDiscussionPhase(Game game) {
+    // stop clue timer
+    game.setIsCluePhase(false);
+    timerService.stopTimer(game.getLobbyId(), "clue");
+    // start discussion phase
+    notifyGameEvents(game, "discussion");
+    timerService.startDiscussionTimer(game, () -> startVotingPhase(game));
   }
 
-  public void onEndDiscussionTimer(Game game) {
-    notifyGameEvents(game, "StartVoting");
-  }
-
-  public void onEndRoundTimer(Game game) {
-    notifyGameEvents(game, "EndRound");
-    notifyResults(game);
+  public void startVotingPhase(Game game) {
+    notifyGameEvents(game, "vote");
   }
 
   public void notifyResults(Game game) {
