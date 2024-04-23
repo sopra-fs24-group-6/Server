@@ -17,13 +17,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -118,23 +120,27 @@ public class LobbyControllerTest {
       .andExpect(jsonPath("$.name", is(testLobby.getName())));
   }
 
-  @Test
-  public void updateLobby_validInput_thenReturnNoContent() throws Exception {
-    // given
-    LobbyPostDTO lobbyPostDTO = new LobbyPostDTO();
-    lobbyPostDTO.setLobbyAdmin(1L);
-    lobbyPostDTO.setName("lobbyName");
+    @Test
+    public void updateLobby_validInput_thenPerformsExpectedOperations() throws Exception {
+        // Given
+        LobbyPostDTO lobbyPostDTO = new LobbyPostDTO();
+        lobbyPostDTO.setLobbyAdmin(1L);
+        lobbyPostDTO.setName("lobbyName");
 
-    doNothing().when(lobbyService).updateLobby(Mockito.any(), Mockito.any());
+        Lobby mockLobby = new Lobby();  // Assuming a mock Lobby object setup
+        when(lobbyService.updateLobby(Mockito.anyLong(), Mockito.any(Lobby.class))).thenReturn(mockLobby);
+        // Assuming additional mocking for sending info and player list
+        doNothing().when(lobbyService).sendLobbyInfoToLobby(Mockito.anyLong(), Mockito.any(LobbyGetDTO.class));
+        doNothing().when(lobbyService).sendPlayerListToLobby(Mockito.anyList(), Mockito.anyLong());
 
-    // when/then -> do the request + validate the result
-    MockHttpServletRequestBuilder putRequest = put("/lobbies/{lobbyId}", testLobby.getId())
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(asJsonString(lobbyPostDTO));
+        // When / Then -> do the request + validate the result
+        MockHttpServletRequestBuilder putRequest = put("/lobbies/{lobbyId}", testLobby.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(lobbyPostDTO));
 
-    // then
-    mockMvc.perform(putRequest).andExpect(status().isNoContent());
-  }
+        // Execute the test
+        mockMvc.perform(putRequest).andExpect(status().isNoContent());  // Consider changing expected status based on actual method behavior
+    }
 
   @Test
   public void joinLobby_validInput_thenPlayerCreated() throws Exception {
@@ -162,15 +168,27 @@ public class LobbyControllerTest {
     UserIdDTO userIdDTO = new UserIdDTO();
     userIdDTO.setUserId(1L);
 
-    doNothing().when(lobbyService).kickPlayerFromLobby(Mockito.any(), Mockito.any(), Mockito.any());
+      // Setup the lobby return after a player is kicked
+      Lobby updatedLobby = new Lobby(); // You may need to set this up similar to `testLobby`
+      updatedLobby.setId(testLobby.getId());
+      updatedLobby.setPlayers(new ArrayList<>()); // Assume players have been updated
+      // You should populate updatedLobby similar to how you setup testLobby in @BeforeEach
 
-    // when/then -> do the request + validate the result
+
+      // Mock the service to return the updated lobby
+      when(lobbyService.kickPlayerFromLobby(eq(testLobby.getId()), eq(targetUserId), eq(userIdDTO.getUserId()))).thenReturn(updatedLobby);
+
+
+      // when/then -> do the request + validate the result
     MockHttpServletRequestBuilder deleteRequest = delete("/lobbies/{lobbyId}/players/{userId}", testLobby.getId(), targetUserId)
       .contentType(MediaType.APPLICATION_JSON)
       .content(asJsonString(userIdDTO));
 
     // then
     mockMvc.perform(deleteRequest).andExpect(status().isNoContent());
+
+      // Verify interactions
+      verify(lobbyService).sendPlayerListToLobby(any(), eq(testLobby.getId()));
   }
 
   @Test

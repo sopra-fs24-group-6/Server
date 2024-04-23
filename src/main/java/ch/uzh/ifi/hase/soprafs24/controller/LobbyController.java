@@ -80,12 +80,20 @@ public class LobbyController {
 
   @PutMapping("/lobbies/{lobbyId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public LobbyGetDTO updateLobby(@PathVariable("lobbyId") Long lobbyId, @RequestBody LobbyPostDTO lobbyPostDTO) {
+  public void updateLobby(@PathVariable("lobbyId") Long lobbyId, @RequestBody LobbyPostDTO lobbyPostDTO) {
     // convert API user to internal representation
     Lobby lobbyInput = LobbyDTOMapper.INSTANCE.convertLobbyPostDTOtoEntity(lobbyPostDTO);
     // update lobby
-    Lobby lobby = lobbyService.updateLobby(lobbyId, lobbyInput);
-    return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby);
+    Lobby updatedLobby = lobbyService.updateLobby(lobbyId, lobbyInput);
+    // send Lobby info to client side:
+      LobbyGetDTO lobbyGetDTO = LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(updatedLobby);
+      lobbyService.sendLobbyInfoToLobby(lobbyId, lobbyGetDTO);
+      // send player list to client side:
+      List<PlayerDTO> playerDTOS = new ArrayList<>();
+      for(Player player : updatedLobby.getPlayers()) {
+          playerDTOS.add(PlayerDTOMapper.INSTANCE.convertEntityToPlayerDTO(player));
+      }
+      lobbyService.sendPlayerListToLobby(playerDTOS, lobbyId);
   }
 
   @PostMapping("/lobbies/{lobbyId}/players")

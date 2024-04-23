@@ -10,6 +10,7 @@ import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.PlayerRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.ThemeRepository;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,6 +133,12 @@ public class LobbyService {
         messagingTemplate.convertAndSend(destination, playerDTOS);
     }
 
+    public void sendLobbyInfoToLobby(long lobbyId, LobbyGetDTO lobbyGetDTO) {
+        String destination = "/lobbies/" + lobbyId + "/lobby_info";
+        System.out.println("Hello");
+        messagingTemplate.convertAndSend(destination, lobbyGetDTO);
+    }
+
   public Lobby createLobby(Lobby newLobby) {
     // check if input name already exists
     // if so, then trow exception
@@ -203,8 +210,7 @@ public class LobbyService {
     lobbyRepository.save(targetLobby);
     lobbyRepository.flush();
 
-    // return the lobby, in case the client want to use it.
-      return targetLobby;
+    return targetLobby;
   }
 
   public Lobby addPlayerToLobby(Long lobbyId, Long userId){
