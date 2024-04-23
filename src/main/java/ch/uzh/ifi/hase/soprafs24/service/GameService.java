@@ -61,25 +61,25 @@ public class GameService {
 
   public Game initializeGame(Long lobbyId, Long userId) {
     // find lobby by lobbyId and verify host's userId
-      Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(() -> new ResponseStatusException(
-              HttpStatus.NOT_FOUND, "Lobby with id " + lobbyId + " could not be found."));
-      if (userId.equals(lobby.getHost().getUserId())) {
-          // initialize game (set theme, duration, players, etc. to game instance)
-          Game game =  new Game();
-          game.setLobbyId(lobbyId);
-          game.setRoundTimer(lobby.getRoundTimer());
-          game.setClueTimer(lobby.getClueTimer());
-          game.setDiscussionTimer(lobby.getDiscussionTimer());
-          game.setPlayers(lobby.getPlayers());
-          game.setThemeNames(lobby.getThemeNames());
-          System.out.println(game);
-          System.out.println(lobby);
-          return game;
-      }else {
-          // Optionally, you could log this attempt, throw an exception, or return null
-          System.out.println("User is not the host of the lobby. No action taken.");
-          return null; // Indicates no game was initialized due to the condition not being met
-      }
+    Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(() -> new ResponseStatusException(
+      HttpStatus.NOT_FOUND, "Lobby with id " + lobbyId + " could not be found."));
+    if (userId.equals(lobby.getHost().getUserId())) {
+      // initialize game (set theme, duration, players, etc. to game instance)
+      Game game = new Game();
+      game.setLobbyId(lobbyId);
+      game.setRoundTimer(lobby.getRoundTimer());
+      game.setClueTimer(lobby.getClueTimer());
+      game.setDiscussionTimer(lobby.getDiscussionTimer());
+      game.setPlayers(lobby.getPlayers());
+      game.setThemeNames(lobby.getThemeNames());
+      System.out.println(game);
+      System.out.println(lobby);
+      return game;
+    } else {
+      // Optionally, you could log this attempt, throw an exception, or return null
+      System.out.println("User is not the host of the lobby. No action taken.");
+      return null; // Indicates no game was initialized due to the condition not being met
+    }
   }
 
   public void notifyGameEvents(Game game, String eventType) {
@@ -221,6 +221,25 @@ public class GameService {
     resultNotification.setWinners(winners);
     resultNotification.setLosers(losers);
     messagingTemplate.convertAndSend("/topic/" + game.getLobbyId() + "/result", resultNotification);
+  }
+
+  public void endGame(Game game) {
+    Lobby lobby = lobbyRepository.findById(game.getLobbyId()).orElseThrow(() -> new ResponseStatusException( HttpStatus.NOT_FOUND, "Lobby with id " + game.getLobbyId() + " could not be found."));
+
+    List<Player> players = lobby.getPlayers();
+
+    for (Player player : players) {
+// using ID getter of player
+      playerRepository.deleteById(player.getId());
+    }
+    /**
+     * remove player from Lobby table
+     * https://docs.spring.io/spring-data/commons/docs/current/api/org/springframework/data/repository/CrudRepository.html#deleteById(ID)
+     */
+    lobbyRepository.delete(lobby);
+
+    // Maybe new event in rabit Queue?
+    notifyGameEvents(game, "EndGame");
   }
 
 }
