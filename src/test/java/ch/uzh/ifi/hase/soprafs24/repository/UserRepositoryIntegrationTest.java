@@ -2,12 +2,15 @@ package ch.uzh.ifi.hase.soprafs24.repository;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,6 +23,18 @@ public class UserRepositoryIntegrationTest {
 
   @Autowired
   private UserRepository userRepository;
+
+//    @AfterEach
+//    public void afterEachTest(TestInfo testInfo) {
+//        System.out.println("After UserRepositoryTest: " + testInfo.getDisplayName());
+//        System.out.println("Current Environment Variables:");
+//        String googleCredentials = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
+//        if (googleCredentials != null) {
+//            System.out.println("GOOGLE_APPLICATION_CREDENTIALS = " + googleCredentials);
+//        } else {
+//            System.out.println("GOOGLE_APPLICATION_CREDENTIALS is not set.");
+//        }
+//    }
 
   @Test
   public void findByUsername_success() {

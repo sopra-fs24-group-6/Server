@@ -10,14 +10,17 @@ import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.PlayerRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.ThemeRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.mockito.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -77,6 +80,17 @@ public class LobbyServiceTest {
     MockitoAnnotations.openMocks(this);
   }
 
+//    @AfterEach
+//    public void afterEachTest(TestInfo testInfo) {
+//        System.out.println("AfterLobbyServiceTest: " + testInfo.getDisplayName());
+//        System.out.println("Current Environment Variables:");
+//        String googleCredentials = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
+//        if (googleCredentials != null) {
+//            System.out.println("GOOGLE_APPLICATION_CREDENTIALS = " + googleCredentials);
+//        } else {
+//            System.out.println("GOOGLE_APPLICATION_CREDENTIALS is not set.");
+//        }
+//    }
   @Test
   public void getAllLobbies_success() {
     // given
