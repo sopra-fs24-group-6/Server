@@ -5,8 +5,10 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -20,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -48,6 +51,18 @@ public class LobbyControllerTest {
     testLobby.setId(1L);
     testLobby.setName("lobbyName");
   }
+
+//    @AfterEach
+//    public void afterEachTest(TestInfo testInfo) {
+//        System.out.println("After LobbyControllerTest: " + testInfo.getDisplayName());
+//        System.out.println("Current Environment Variables:");
+//        String googleCredentials = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
+//        if (googleCredentials != null) {
+//            System.out.println("GOOGLE_APPLICATION_CREDENTIALS = " + googleCredentials);
+//        } else {
+//            System.out.println("GOOGLE_APPLICATION_CREDENTIALS is not set.");
+//        }
+//    }
 
   @Test
   public void createLobby_validInput_thenLobbyCreated() throws Exception {

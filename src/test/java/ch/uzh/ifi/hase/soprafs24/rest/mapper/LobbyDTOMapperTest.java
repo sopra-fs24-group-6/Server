@@ -6,12 +6,15 @@ import ch.uzh.ifi.hase.soprafs24.entity.Player;
 import ch.uzh.ifi.hase.soprafs24.entity.Theme;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.mapstruct.Mapping;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -37,6 +40,18 @@ public class LobbyDTOMapperTest {
 //    testLobby.setClueTimer(10);
 //    testLobby.setDiscussionTimer(60);
 //  }
+
+//    @AfterEach
+//    public void afterEachTest(TestInfo testInfo) {
+//        System.out.println("After LobbyDTOMapperTest: " + testInfo.getDisplayName());
+//        System.out.println("Current Environment Variables:");
+//        String googleCredentials = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
+//        if (googleCredentials != null) {
+//            System.out.println("GOOGLE_APPLICATION_CREDENTIALS = " + googleCredentials);
+//        } else {
+//            System.out.println("GOOGLE_APPLICATION_CREDENTIALS is not set.");
+//        }
+//    }
 
   @Test
   public void createLobby_fromLobbyPostDTO_toLobby_success() {
@@ -95,7 +110,7 @@ public class LobbyDTOMapperTest {
     // check content
     assertEquals(testLobby.getId(), lobbyGetDTO.getId());
     assertEquals(testLobby.getName(), lobbyGetDTO.getName());
-    assertEquals(testLobby.getHost().getUsername(), lobbyGetDTO.getLobbyAdmin());
+    assertEquals(testLobby.getHost().getUserId(), Long.parseLong(lobbyGetDTO.getLobbyAdmin()));
     assertEquals(testLobby.getPlayers().get(0).getUsername(), lobbyGetDTO.getPlayers().get(0));
     assertEquals(testLobby.getPlayerLimit(), lobbyGetDTO.getPlayerLimit());
     assertEquals(testLobby.getPlayerCount(), lobbyGetDTO.getPlayerCount());

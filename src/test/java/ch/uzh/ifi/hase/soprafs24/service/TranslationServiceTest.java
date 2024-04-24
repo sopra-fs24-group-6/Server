@@ -1,7 +1,13 @@
 package ch.uzh.ifi.hase.soprafs24.service;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+import com.google.cloud.translate.TranslateException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
@@ -11,16 +17,38 @@ public class TranslationServiceTest {
     @Autowired
     private TranslationService translationService;
 
+//    @AfterEach
+//    public void afterEachTest(TestInfo testInfo) {
+//        System.out.println("AfterTranslationServiceTest: " + testInfo.getDisplayName());
+//        System.out.println("Current Environment Variables:");
+//        String googleCredentials = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
+//        if (googleCredentials != null) {
+//            System.out.println("GOOGLE_APPLICATION_CREDENTIALS = " + googleCredentials);
+//        } else {
+//            System.out.println("GOOGLE_APPLICATION_CREDENTIALS is not set.");
+//        }
+//    }
     @Test
     public void testTranslateText() {
-        String originalText = "Your assigned word is wolf.";
-        String targetLanguage = "de"; // Prefer language
-        String translatedText = translationService.translateText(originalText, targetLanguage);
+        try {
+            String originalText = "Your assigned word is wolf.";
+            String targetLanguage = "de";
+            String translatedText = translationService.translateText(originalText, targetLanguage);
 
-        System.out.println("Original: " + originalText);
-        System.out.println("Translated: " + translatedText);
+            System.out.println("Original: " + originalText);
+            System.out.println("Translated: " + translatedText);
 
-        // Basic assertion to check if translation is not the same as the original text
-        assertNotEquals(originalText, translatedText);
+            assertNotEquals(originalText, translatedText);
+        } catch (TranslateException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof GoogleJsonResponseException) {
+                GoogleJsonResponseException googleEx = (GoogleJsonResponseException) cause;
+                System.err.println("Google API responded with an error: " + googleEx.getDetails());
+                System.err.println("API call failed with status code: " + googleEx.getStatusCode() + " and message: " + googleEx.getContent());
+            } else {
+                System.err.println("Translation failed with message: " + e.getMessage());
+            }
+            throw e; // Re-throw to make the test fail and indicate the error clearly.
+        }
     }
 }

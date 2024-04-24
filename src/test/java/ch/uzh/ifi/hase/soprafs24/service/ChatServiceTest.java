@@ -6,8 +6,10 @@ import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.ChatMessage;
 import ch.uzh.ifi.hase.soprafs24.websocket.listener.SessionManager;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -42,6 +44,18 @@ class ChatServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
+//    @AfterEach
+//    public void afterEachTest(TestInfo testInfo) {
+//        System.out.println("After ChatServiceTest: " + testInfo.getDisplayName());
+//        System.out.println("Current Environment Variables:");
+//        String googleCredentials = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
+//        if (googleCredentials != null) {
+//            System.out.println("GOOGLE_APPLICATION_CREDENTIALS = " + googleCredentials);
+//        } else {
+//            System.out.println("GOOGLE_APPLICATION_CREDENTIALS is not set.");
+//        }
+//    }
+
     @Test
     void testSendTranslatedMessagesToUsers() {
         // Arrange
@@ -50,6 +64,7 @@ class ChatServiceTest {
         lobby1.setId(lobby1Id);
         ChatMessage originalMessage = new ChatMessage();
         originalMessage.setContent("HelloWorld");
+        originalMessage.setUserId(3L);
         SessionManager fakesessionManager = new SessionManager();
 //        ConcurrentHashMap<String, Long> fakeSessionMap = new ConcurrentHashMap<>();
         fakesessionManager.addSession("session1", 1L);
@@ -61,12 +76,18 @@ class ChatServiceTest {
         when(sessionManager.getSessionMap()).thenReturn(fakesessionManager.getSessionMap());
         User user1 = new User();
         User user2 = new User();
+        User sender = new User();
         user1.setId(1L);
+        user1.setUsername("user1");
         user1.setLanguage("en");
         user2.setId(2L);
+        user2.setUsername("user2");
         user2.setLanguage("zh");
+        sender.setId(3L);
+        sender.setUsername("user3");
         when(userService.getUser(1L)).thenReturn(user1);
         when(userService.getUser(2L)).thenReturn(user2);
+        when(userService.getUser(3L)).thenReturn(sender);
         when(translationService.translateText("Hello World", "en")).thenReturn("Hello World Translated");
         when(translationService.translateText("Hello World", "zh")).thenReturn("你好，世界");
         when(lobbyService.getLobbyByUserId(user1.getId())).thenReturn(lobby1);
