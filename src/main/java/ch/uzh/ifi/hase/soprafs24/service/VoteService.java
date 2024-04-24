@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Vote;
 import ch.uzh.ifi.hase.soprafs24.repository.VoteRepository;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.VoteDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,13 +22,30 @@ public class VoteService {
         this.voteRepository = voteRepository;
     }
 
-    public Vote saveVote(Vote vote) {
+    public void saveVoteAndNotifyResult(Long lobbyId, VoteDTO voteDTO) {
+        // mapping to internal entity
+        Vote newVote = new Vote();
+        newVote.setLobbyId(lobbyId);
+        newVote.setVoterUserId(voteDTO.getVoterUserId());
+        newVote.setVotedUserId(voteDTO.getVotedUserId());
+
+        // save vote, if not voted yet
+        saveVote(newVote);
+
+        //
+    }
+
+    public void saveVote(Vote vote) {
         // Check if the voter has already voted in this lobby
         if (!hasVoted(vote.getVoterUserId(), vote.getLobbyId())) {
-            return voteRepository.save(vote);
+            voteRepository.save(vote);
+            voteRepository.flush();
         } else {
             throw new IllegalStateException("Voter has already voted in this lobby.");
         }
+
+        // TODO: check if all players have voted
+        // TODO: if so, calculate result and notify it
     }
 
     public List<Vote> getVotesByLobbyId(Long lobbyId) {

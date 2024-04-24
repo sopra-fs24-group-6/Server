@@ -35,7 +35,6 @@ public class ChatService {
     }
 
     public void sendTranslatedMessagesToUsers(Long lobbyId, ChatMessage chatMessage) {
-        //String destination = "/topic/" + lobbyId + "/chat";
         // Broadcast message to each subscriber in their preferred language
         ConcurrentHashMap<String, Long> sessionMap = sessionManager.getSessionMap();
         for (Map.Entry<String, Long> entry : sessionMap.entrySet()) {
@@ -46,8 +45,30 @@ public class ChatService {
                 String user_language = user.getLanguage();
                 String translatedMessage = translationService.translateText(chatMessage.getContent(), user_language);
                 chatMessage.setContent(translatedMessage);
+                User sender = userService.getUser(chatMessage.getUserId());
+                chatMessage.setUsername(sender.getUsername());
                 // messagingTemplate.convertAndSendToUser(sessionId, destination, chatMessage);
                 String destination = "/queue/" + userId + "/chat";
+                messagingTemplate.convertAndSend(destination, chatMessage);
+            }
+        }
+    }
+
+    public void sendTranslatedClueMessagesToUsers(Long lobbyId, ChatMessage chatMessage) {
+        // Broadcast message to each subscriber in their preferred language
+        ConcurrentHashMap<String, Long> sessionMap = sessionManager.getSessionMap();
+        for (Map.Entry<String, Long> entry : sessionMap.entrySet()) {
+            String sessionId = entry.getKey();
+            Long userId = entry.getValue();
+            User user = userService.getUser(userId);
+            if (checkRightlobby(lobbyId,userId)) {
+                String user_language = user.getLanguage();
+                String translatedMessage = translationService.translateText(chatMessage.getContent(), user_language);
+                chatMessage.setContent(translatedMessage);
+                User sender = userService.getUser(chatMessage.getUserId());
+                chatMessage.setUsername(sender.getUsername());
+                // messagingTemplate.convertAndSendToUser(sessionId, destination, chatMessage);
+                String destination = "/queue/" + userId + "/clue";
                 messagingTemplate.convertAndSend(destination, chatMessage);
             }
         }

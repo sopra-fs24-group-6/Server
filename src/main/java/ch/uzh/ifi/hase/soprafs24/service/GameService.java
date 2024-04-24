@@ -6,6 +6,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.PlayerRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.WordPairRepository;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.EventNotification;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.ResultNotification;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.TurnNotification;
@@ -89,8 +90,6 @@ public class GameService {
   }
 
   public void startRound(Game game) {
-    // notification
-    notifyGameEvents(game, "clue");
     // interval -> start assign phase
     // timerService.startIntervalTimer(game, () -> startAssignPhase(game));
     startAssignPhase(game);
@@ -110,6 +109,9 @@ public class GameService {
     // start round timer -> when finished, then start discussion phase
     timerService.startRoundTimer(game, () -> startDiscussionPhase(game));
 
+    // notification
+    notifyGameEvents(game, "clue");
+
     // start clue turn, loop until roundTimer ends
     game.setIsCluePhase(true);
     Integer currentIndex = 0;
@@ -123,7 +125,6 @@ public class GameService {
       shuffledPlayerIds.add(player.getUserId());
     }
     Collections.shuffle(shuffledPlayerIds);
-    System.out.println(shuffledPlayerIds);
     return shuffledPlayerIds;
   }
 
@@ -132,11 +133,14 @@ public class GameService {
         for(String theme : gameThemes) {
             System.out.println(theme);
         }
+
+        // select theme randomly
         Random random = new Random();
         String randomTheme = gameThemes.stream()
                 .skip(random.nextInt(gameThemes.size())) // Skip a random number of elements
                 .findFirst() // This always succeeds unless the list is empty
                 .orElseThrow(() -> new NoSuchElementException("No themes available in the lobby")); // Throw if the list is empty
+
         // Done: assign word randomly
         List<WordPair> wordPairList = wordPairRepository.findByTheme_Name(randomTheme);
         WordPair randomWordPair = wordPairList.stream()
@@ -146,6 +150,7 @@ public class GameService {
         boolean assignFirstAsWolf = random.nextBoolean();
         String wolf_word = assignFirstAsWolf ? randomWordPair.getFirstWord() : randomWordPair.getSecondWord();
         String villager_word = assignFirstAsWolf ? randomWordPair.getSecondWord() : randomWordPair.getFirstWord();
+
         // Done: notify assigned word to each player "/queue/{userId}/wordAssignment"
         List<Player> players = game.getPlayers();
         if (players == null || players.isEmpty()) {
@@ -162,9 +167,9 @@ public class GameService {
                 playerRepository.flush();
                 WordNotification villagerNotification = new WordNotification();
                 //For cost concern, this function is commented
-                String Translated_text = translationService.translateText("your assigned word is: " + villager_word, villager.getLanguage());
-                villagerNotification.setWord(Translated_text);
-//                villagerNotification.setWord(villager_word);
+                // String Translated_text = translationService.translateText("your assigned word is: " + villager_word, villager.getLanguage());
+                // villagerNotification.setWord(Translated_text);
+                villagerNotification.setWord(villager_word);
                 String destination = "/queue/" + villager.getUserId() + "/wordAssignment";
                 messagingTemplate.convertAndSend(destination, villagerNotification);
             } else {
@@ -175,9 +180,9 @@ public class GameService {
                 playerRepository.flush();
                 WordNotification wolfNotification = new WordNotification();
                 //For cost concern, this function is commented
-                String wolfanouncement = translationService.translateText("Your role is wolf.",wolf.getLanguage());
-                wolfNotification.setWord(wolfanouncement);
-//                wolfNotification.setWord("You are the wolf");
+                // String wolfanouncement = translationService.translateText("Your role is wolf.",wolf.getLanguage());
+                // wolfNotification.setWord(wolfanouncement);
+                wolfNotification.setWord(null);
                 String destination = "/queue/" + wolf.getUserId() + "/wordAssignment";
                 messagingTemplate.convertAndSend(destination, wolfNotification);
             }
@@ -210,6 +215,15 @@ public class GameService {
 
   public void startVotingPhase(Game game) {
     notifyGameEvents(game, "vote");
+
+    List<PlayerDTO> playerDTOS = new ArrayList<>();
+    for (Player player : game.getPlayers()) {
+      PlayerDTO playerDTO = new PlayerDTO();
+      playerDTO.setUserId(player.getUserId());
+      playerDTO.setUsername(player.getUsername());
+      playerDTOS.add(playerDTO);
+    }
+    messagingTemplate.convertAndSend("/topic/" + game.getLobbyId() + "/players", playerDTOS);
   }
 
   public void notifyResults(Game game) {
