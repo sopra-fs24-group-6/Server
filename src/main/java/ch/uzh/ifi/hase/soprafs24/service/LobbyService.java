@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,6 +41,8 @@ public class LobbyService {
 
   private final SimpMessagingTemplate messagingTemplate;
 
+  private Lobby defaultLobby = new Lobby();
+
   @Autowired
   public LobbyService(SimpMessagingTemplate messagingTemplate,
                       UserRepository userRepository,
@@ -52,6 +55,23 @@ public class LobbyService {
     this.lobbyRepository = lobbyRepository;
     this.themeRepository = themeRepository;
   }
+
+    @PostConstruct
+    private void initializeDefaultLobby() {
+        defaultLobby = new Lobby();
+        defaultLobby.setName("Default Lobby");
+        defaultLobby.setPassword(null); // Assuming public by default
+        defaultLobby.setType(LobbyType.PUBLIC);
+        defaultLobby.setStatus(LobbyStatus.WAITING);
+        defaultLobby.setPlayerLimit(10);
+        defaultLobby.setPlayerCount(0);
+        defaultLobby.setRounds(3);
+        defaultLobby.setRoundTimer(60);
+        defaultLobby.setClueTimer(10);
+        defaultLobby.setDiscussionTimer(30);
+        defaultLobby.setThemes(themeRepository.findAll());
+        // You might want to set a default theme or leave it empty
+    }
 
 
   public List<Lobby> getLobbies(String username, Long userId) {
@@ -114,7 +134,14 @@ public class LobbyService {
     return player.getLobby();
   }
 
-  public Lobby getLobbyById(Long lobbyId) { return findLobbyById(lobbyId); }
+  public Lobby getLobbyById(Long lobbyId) {
+      Lobby lobby = findLobbyById(lobbyId);
+      if (lobby == null) {
+          // Return a copy of the default lobby to avoid modification of the original
+          return defaultLobby;
+      }
+      return lobby;
+  }
 
     public List<Player> getPlayersById(Long lobbyId){
       Lobby lobby = lobbyRepository.findById(lobbyId)
