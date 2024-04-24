@@ -77,6 +77,8 @@
 
 ## Week 4
 
-| Name | Issue | Description (optional) |
-| ---- | ----- | ---------------------- |
-|      |       |                        |
+| Name         | Issue                                                           | Description (optional)                                     |
+|--------------|-----------------------------------------------------------------|------------------------------------------------------------|
+| Kei Murakami | [#164](https://github.com/sopra-fs24-group-6/Server/issues/164) | Add interval timer between game events                     |
+| Kei Murakami | [#165](https://github.com/sopra-fs24-group-6/Server/issues/165) | Implement trigger for clue phase                           |
+| Kei Murakami | [#168](https://github.com/sopra-fs24-group-6/Server/issues/168) | Connect game events sequence to work correctly with client |
