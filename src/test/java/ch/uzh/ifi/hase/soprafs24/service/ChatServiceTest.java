@@ -50,6 +50,7 @@ class ChatServiceTest {
         lobby1.setId(lobby1Id);
         ChatMessage originalMessage = new ChatMessage();
         originalMessage.setContent("HelloWorld");
+        originalMessage.setUserId(3L);
         SessionManager fakesessionManager = new SessionManager();
 //        ConcurrentHashMap<String, Long> fakeSessionMap = new ConcurrentHashMap<>();
         fakesessionManager.addSession("session1", 1L);
@@ -61,12 +62,18 @@ class ChatServiceTest {
         when(sessionManager.getSessionMap()).thenReturn(fakesessionManager.getSessionMap());
         User user1 = new User();
         User user2 = new User();
+        User sender = new User();
         user1.setId(1L);
+        user1.setUsername("user1");
         user1.setLanguage("en");
         user2.setId(2L);
+        user2.setUsername("user2");
         user2.setLanguage("zh");
+        sender.setId(3L);
+        sender.setUsername("user3");
         when(userService.getUser(1L)).thenReturn(user1);
         when(userService.getUser(2L)).thenReturn(user2);
+        when(userService.getUser(3L)).thenReturn(sender);
         when(translationService.translateText("Hello World", "en")).thenReturn("Hello World Translated");
         when(translationService.translateText("Hello World", "zh")).thenReturn("你好，世界");
         when(lobbyService.getLobbyByUserId(user1.getId())).thenReturn(lobby1);
