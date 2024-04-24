@@ -106,4 +106,8 @@ public class Player implements Serializable {
   public void setLobby(Lobby lobby) {
     this.lobby = lobby;
   }
+
+    public Long getId() {
+      return userId;
+    }
 }

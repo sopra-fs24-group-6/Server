@@ -11,25 +11,23 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class ChatController {
 
-  private final SimpMessagingTemplate template;
 
   private final ChatService chatService;
 
-  public ChatController(SimpMessagingTemplate template, ChatService chatService)
+  public ChatController(ChatService chatService)
   {
-    this.template = template;
     this.chatService = chatService;
   }
 
     @MessageMapping("/chat/{lobbyId}/sendMessage")
     public void broadcastTranslatedMessage(@DestinationVariable Long lobbyId, @Payload ChatMessage message) {
-        // At this moment, just broadcast original message
+        // translate message and send to each player
         chatService.sendTranslatedMessagesToUsers(lobbyId, message);
     }
 
-//    @MessageMapping("/private/{userId}/sendMessage")
-//    public void unicastTranslatedMessage(@DestinationVariable Long userId, @Payload ChatMessage message) {
-//        // At this moment, just broadcast original message
-//        chatService.sendTranslatedMessagesToUser(userId, message);
-//    }
+  @MessageMapping("/clue/{lobbyId}/sendMessage")
+  public void broadcastTranslatedClueMessage(@DestinationVariable Long lobbyId, @Payload ChatMessage message) {
+    // translate message and send to each player
+    chatService.sendTranslatedClueMessagesToUsers(lobbyId, message);
+  }
 }
