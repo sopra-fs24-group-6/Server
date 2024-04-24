@@ -7,7 +7,7 @@ jobs:
         env:
           GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
         run: |
-          echo "$GCP_SA_KEY" > gcp-key.json
+          echo "$GCP_SERVICE_CREDENTIALS" > gcp-key.json
           echo "GOOGLE_APPLICATION_CREDENTIALS=gcp-key.json" >> $GITHUB_ENV
       - name: Build and Test
         run: ./gradlew build
