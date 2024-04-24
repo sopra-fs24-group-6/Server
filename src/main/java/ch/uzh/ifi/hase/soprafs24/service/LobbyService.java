@@ -70,6 +70,7 @@ public class LobbyService {
         defaultLobby.setClueTimer(10);
         defaultLobby.setDiscussionTimer(30);
         defaultLobby.setThemes(themeRepository.findAll());
+        defaultLobby.setId(999L);
         // You might want to set a default theme or leave it empty
     }
 
