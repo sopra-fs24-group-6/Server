@@ -38,6 +38,8 @@
 | Joao Sacramento| [#97](https://github.com/sopra-fs24-group-6/Client/issues/97) | Import of radio buttons from NES style |
 | Alisher Dauysbekov | [#105](https://github.com/sopra-fs24-group-6/Server/issues/105) | Implement endpoint for the votes of each player and make sure a player has only voted once   |
 | Alisher Dauysbekov | [#106](https://github.com/sopra-fs24-group-6/Server/issues/106) | Implement endpoit for the outcome of the voting |
+| Aiqi Shuai | [#94](https://github.com/sopra-fs24-group-6/Server/issues/94) | Accomodate(store) for language selection by the player |
+| Aiqi Shuai | [#9](https://github.com/sopra-fs24-group-6/Server/issues/9) | Chat translation |
 
 
 ## Week 3
@@ -69,11 +71,22 @@
 | Kei Murakami    | [#104](https://github.com/sopra-fs24-group-6/Server/issues/104) | Implement endpoint for transition between game and voting                                                                                                                                   |
 | Kei Murakami    | [#98](https://github.com/sopra-fs24-group-6/Server/issues/98)   | Ensure the chat service can handle and broadcast messages in real-time                                                                                                                                   |
 | Kei Murakami    | [#102](https://github.com/sopra-fs24-group-6/Server/issues/102) | Track the round timer to update player state                                                                                                                                   |
+| Aiqi Shuai | [#149](https://github.com/sopra-fs24-group-6/Server/issues/149) | Adding a session manager |
+| Aiqi Shuai | [#100](https://github.com/sopra-fs24-group-6/Server/issues/100) | Set up away for the api to know what languages should be |
+| Aiqi Shuai | [#95](https://github.com/sopra-fs24-group-6/Server/issues/95) | Handle word choice given a certain theme & storage of the chosen word |
 
 
 
 ## Week 4
 
-| Name | Issue | Description (optional) |
-| ---- | ----- | ---------------------- |
-|      |       |                        |
+| Name       | Issue                                                        | Description (optional)                                       |
+| ---------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Aiqi Shuai | [#173](https://github.com/sopra-fs24-group-6/Server/issues/173) | Sending all players information to the client side when someone create the lobby. |
+| Aiqi Shuai | [#172](https://github.com/sopra-fs24-group-6/Server/issues/172) | Sending all players information to the client side when someone was kicked out of the lobby. |
+| Aiqi Shuai | [#171](https://github.com/sopra-fs24-group-6/Server/issues/171) | Send initialized lobby info or play info to client side, when they first entered the lobby |
+| Aiqi Shuai | [#170](https://github.com/sopra-fs24-group-6/Server/issues/170) | Sending the lobby information to all players when there is a change |
+| Aiqi Shuai | [#169](https://github.com/sopra-fs24-group-6/Server/issues/169) | Sending all players information to the client side when someone join the lobby. |
+| Aiqi Shuai | [#166](https://github.com/sopra-fs24-group-6/Server/issues/166) | Implement game initialization function                       |
+
+
+
