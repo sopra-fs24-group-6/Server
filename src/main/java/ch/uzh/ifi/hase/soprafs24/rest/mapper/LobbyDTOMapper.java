@@ -46,7 +46,7 @@ public interface LobbyDTOMapper {
 
   @Mapping(source = "id", target = "id")
   @Mapping(source = "name", target = "name")
-  @Mapping(source = "host.username", target = "lobbyAdmin")
+  @Mapping(source = "host.userId", target = "lobbyAdmin")
   @Mapping(source = "isPrivate", target = "isPrivate")
   @Mapping(source = "players", target = "players", qualifiedByName = "playersToNames")
   @Mapping(source = "playerLimit", target = "playerLimit")

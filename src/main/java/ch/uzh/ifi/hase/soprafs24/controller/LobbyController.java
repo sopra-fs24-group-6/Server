@@ -66,6 +66,7 @@ public class LobbyController {
     return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby);
   }
 
+  
     @GetMapping("/lobbies/{lobbyId}/players")
     @ResponseBody
     public List<PlayerDTO> getPlayers(@PathVariable("lobbyId") Long lobbyId) {
