@@ -42,33 +42,36 @@
 
 ## Week 3
 
-| Name            | Issue                                                            | Description (optional) |
-|-----------------|------------------------------------------------------------------| ---------------------- |
-| Nico Plüss      | [#82](https://github.com/sopra-fs24-group-6/Client/issues/82)   | Logic to make a GET request to server for retrieving available lobbies |
-| Nico Plüss      | [#81](https://github.com/sopra-fs24-group-6/Client/issues/81)   | Displaying info for available lobbies currently uses placeholder data|
-| Nico Plüss      | [#80](https://github.com/sopra-fs24-group-6/Client/issues/80)   | ability to refresh lobby data |
-| Nico Plüss      | [#76](https://github.com/sopra-fs24-group-6/Client/issues/76)   | Logic implementation to join available lobby |
-| Nico Plüss      | [#79](https://github.com/sopra-fs24-group-6/Client/issues/79)   | Password pop-up if lobby is private |
-| Joao Sacramento | [#71](https://github.com/sopra-fs24-group-6/Client/issues/71)   | Adjust style of the Menu page to match the app theme|
-| Nico Plüss      | [#83](https://github.com/sopra-fs24-group-6/Client/issues/83)   | Creation of logic behind the browse lobby view|
-| Joao Sacramento | [#93](https://github.com/sopra-fs24-group-6/Client/issues/93)   | Adjust style of Lobby creation page to match the app theme |
-| Joao Sacramento | [#77](https://github.com/sopra-fs24-group-6/Client/issues/77)   | Adjust style of Lobby creation page for non admin users |
-| Joao Sacramento | [#78](https://github.com/sopra-fs24-group-6/Client/issues/78)   | Adjust style of the lobby browser page to match the app theme |
-| Joao Sacramento | [#75](https://github.com/sopra-fs24-group-6/Client/issues/75)   | Solve logic conflicts that stem from the integration of the new style components |
-| Joao Sacramento | [#73](https://github.com/sopra-fs24-group-6/Client/issues/73)   | Correct Navigation Bar routing |
-| Joao Sacramento | [#74](https://github.com/sopra-fs24-group-6/Client/issues/74)   | Correct Menu button routing |
-| Nico Plüss      | [#28](https://github.com/sopra-fs24-group-6/Client/issues/28)   | Timer Logic |
-| Nico Plüss      | [#17](https://github.com/sopra-fs24-group-6/Client/issues/17)   | Round nbr & Word display at the start of the round |
-| Nico Plüss      | [#17](https://github.com/sopra-fs24-group-6/Client/issues/17)   | Clue submit and display logic |
-| Nico Plüss      | [#87](https://github.com/sopra-fs24-group-6/Client/issues/87)   | Fetching roles and words from the server |
-| Nico Plüss      | [#86](https://github.com/sopra-fs24-group-6/Client/issues/86)   | Role assignment |
-| Joao Sacramento | [#90](https://github.com/sopra-fs24-group-6/Client/issues/90)   | Registration style adjustment to fit the rest of the app |
-| Joao Sacramento | [#89](https://github.com/sopra-fs24-group-6/Client/issues/89)   | Log in style adjustment to fit the rest of the app |
-| Kei Murakami    | [#97](https://github.com/sopra-fs24-group-6/Server/issues/97)   | Design and implement the API endpoint(s) for sending and receiving chat messages                                                   |
-| Kei Murakami    | [#103](https://github.com/sopra-fs24-group-6/Server/issues/103) | Pass timer set by the admin to the frontend                                                                                                                                   |
-| Kei Murakami    | [#104](https://github.com/sopra-fs24-group-6/Server/issues/104) | Implement endpoint for transition between game and voting                                                                                                                                   |
-| Kei Murakami    | [#98](https://github.com/sopra-fs24-group-6/Server/issues/98)   | Ensure the chat service can handle and broadcast messages in real-time                                                                                                                                   |
-| Kei Murakami    | [#102](https://github.com/sopra-fs24-group-6/Server/issues/102) | Track the round timer to update player state                                                                                                                                   |
+| Name               | Issue                                                           | Description (optional) |
+|--------------------|-----------------------------------------------------------------| ---------------------- |
+| Nico Plüss         | [#82](https://github.com/sopra-fs24-group-6/Client/issues/82)   | Logic to make a GET request to server for retrieving available lobbies |
+| Nico Plüss         | [#81](https://github.com/sopra-fs24-group-6/Client/issues/81)   | Displaying info for available lobbies currently uses placeholder data|
+| Nico Plüss         | [#80](https://github.com/sopra-fs24-group-6/Client/issues/80)   | ability to refresh lobby data |
+| Nico Plüss         | [#76](https://github.com/sopra-fs24-group-6/Client/issues/76)   | Logic implementation to join available lobby |
+| Nico Plüss         | [#79](https://github.com/sopra-fs24-group-6/Client/issues/79)   | Password pop-up if lobby is private |
+| Joao Sacramento    | [#71](https://github.com/sopra-fs24-group-6/Client/issues/71)   | Adjust style of the Menu page to match the app theme|
+| Nico Plüss         | [#83](https://github.com/sopra-fs24-group-6/Client/issues/83)   | Creation of logic behind the browse lobby view|
+| Joao Sacramento    | [#93](https://github.com/sopra-fs24-group-6/Client/issues/93)   | Adjust style of Lobby creation page to match the app theme |
+| Joao Sacramento    | [#77](https://github.com/sopra-fs24-group-6/Client/issues/77)   | Adjust style of Lobby creation page for non admin users |
+| Joao Sacramento    | [#78](https://github.com/sopra-fs24-group-6/Client/issues/78)   | Adjust style of the lobby browser page to match the app theme |
+| Joao Sacramento    | [#75](https://github.com/sopra-fs24-group-6/Client/issues/75)   | Solve logic conflicts that stem from the integration of the new style components |
+| Joao Sacramento    | [#73](https://github.com/sopra-fs24-group-6/Client/issues/73)   | Correct Navigation Bar routing |
+| Joao Sacramento    | [#74](https://github.com/sopra-fs24-group-6/Client/issues/74)   | Correct Menu button routing |
+| Nico Plüss         | [#28](https://github.com/sopra-fs24-group-6/Client/issues/28)   | Timer Logic |
+| Nico Plüss         | [#17](https://github.com/sopra-fs24-group-6/Client/issues/17)   | Round nbr & Word display at the start of the round |
+| Nico Plüss         | [#17](https://github.com/sopra-fs24-group-6/Client/issues/17)   | Clue submit and display logic |
+| Nico Plüss         | [#87](https://github.com/sopra-fs24-group-6/Client/issues/87)   | Fetching roles and words from the server |
+| Nico Plüss         | [#86](https://github.com/sopra-fs24-group-6/Client/issues/86)   | Role assignment |
+| Joao Sacramento    | [#90](https://github.com/sopra-fs24-group-6/Client/issues/90)   | Registration style adjustment to fit the rest of the app |
+| Joao Sacramento    | [#89](https://github.com/sopra-fs24-group-6/Client/issues/89)   | Log in style adjustment to fit the rest of the app |
+| Kei Murakami       | [#97](https://github.com/sopra-fs24-group-6/Server/issues/97)   | Design and implement the API endpoint(s) for sending and receiving chat messages                                                   |
+| Kei Murakami       | [#103](https://github.com/sopra-fs24-group-6/Server/issues/103) | Pass timer set by the admin to the frontend                                                                                                                                   |
+| Kei Murakami       | [#104](https://github.com/sopra-fs24-group-6/Server/issues/104) | Implement endpoint for transition between game and voting                                                                                                                                   |
+| Kei Murakami       | [#98](https://github.com/sopra-fs24-group-6/Server/issues/98)   | Ensure the chat service can handle and broadcast messages in real-time                                                                                                                                   |
+| Kei Murakami       | [#102](https://github.com/sopra-fs24-group-6/Server/issues/102) | Track the round timer to update player state                                                                                                                                   |
+| Alisher Dauysbekov | [#108](https://github.com/sopra-fs24-group-6/Client/issues/108) | Implement end of the game functionalities (Who won the game) |
+| Alisher Dauysbekov | [#107](https://github.com/sopra-fs24-group-6/Client/issues/107) | Calculate winners and losers based on vote result|
+
 
 
 
