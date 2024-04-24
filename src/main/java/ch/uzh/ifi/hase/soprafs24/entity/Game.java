@@ -1,10 +1,15 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
+import java.util.List;
+
 public class Game {
-  Long lobbyId;
-  Integer roundTimer;
-  Integer clueTimer;
-  Integer discussionTimer;
+  private Long lobbyId;
+  private Integer roundTimer;
+  private Integer clueTimer;
+  private Integer discussionTimer;
+  private Boolean isCluePhase;
+  private List<Player> players;
+  private List<String> themeNames;
 
   //For testing
     @Override
@@ -47,5 +52,29 @@ public class Game {
 
   public void setDiscussionTimer(Integer discussionTimer) {
     this.discussionTimer = discussionTimer;
+  }
+
+  public Boolean getIsCluePhase() {
+    return isCluePhase;
+  }
+
+  public void setIsCluePhase(Boolean isCluePhase) {
+    this.isCluePhase = isCluePhase;
+  }
+
+  public List<Player> getPlayers() {
+    return players;
+  }
+
+  public void setPlayers(List<Player> players) {
+    this.players = players;
+  }
+
+  public List<String> getThemeNames() {
+    return themeNames;
+  }
+
+  public void setThemeNames(List<String> themeNames) {
+    this.themeNames = themeNames;
   }
 }

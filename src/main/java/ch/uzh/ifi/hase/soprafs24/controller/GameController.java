@@ -17,14 +17,14 @@ public class GameController {
     this.gameService = gameService;
   }
 
-//  @MessageMapping("/startGame")
-//  public void startGame(@Payload GameStartMessage message) {
-//    gameService.startGame(message.getLobbyId(), message.getUserId());
-//  }
+  @MessageMapping("/startGame")
+  public void startGame(@Payload GameStartMessage message) {
+    gameService.startGame(message.getLobbyId(), message.getUserId());
+  }
 
     //For Testing Purposes
-    @MessageMapping("/startGame")
-    public void startGame(@Payload GameStartMessage message) {
-        gameService.initializeGame(message.getLobbyId(), message.getUserId());
-    }
+//    @MessageMapping("/startGame")
+//    public void startGame(@Payload GameStartMessage message) {
+//        gameService.initializeGame(message.getLobbyId(), message.getUserId());
+//    }
 }
