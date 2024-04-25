@@ -218,6 +218,7 @@ public class LobbyService {
     targetLobby.setRoundTimer(newLobby.getRoundTimer());
     targetLobby.setClueTimer(newLobby.getClueTimer());
     targetLobby.setDiscussionTimer(newLobby.getDiscussionTimer());
+    targetLobby.setRounds(newLobby.getRounds());
     LobbyType type = determineLobbyType(targetLobby.getPassword());
     targetLobby.setType(type);
 
