@@ -31,7 +31,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_SERVICE_CREDENTIALS }}  # Include Google credentials if needed for tests
+          GCP_SERVICE_CREDENTIALS: ${{ secrets.GCP_SERVICE_CREDENTIALS }}  # Include Google credentials if needed for tests
+
 
       # Upload test reports
       - name: Upload test reports
