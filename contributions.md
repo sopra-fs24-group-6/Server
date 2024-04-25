@@ -73,9 +73,8 @@
 | Kei Murakami    | [#102](https://github.com/sopra-fs24-group-6/Server/issues/102) | Track the round timer to update player state                                                                                                                                   |
 | Aiqi Shuai | [#149](https://github.com/sopra-fs24-group-6/Server/issues/149) | Adding a session manager |
 | Aiqi Shuai | [#100](https://github.com/sopra-fs24-group-6/Server/issues/100) | Set up away for the api to know what languages should be |
-| Aiqi Shuai | [#95](https://github.com/sopra-fs24-group-6/Server/issues/95) | Handle word choice given a certain theme & storage of the chosen word | |
-| Alisher Dauysbekov | [#108](https://github.com/sopra-fs24-group-6/Client/issues/108) | Implement end of the game functionalities (Who won the game) |
-| Alisher Dauysbekov | [#107](https://github.com/sopra-fs24-group-6/Client/issues/107) | Calculate winners and losers based on vote result|
+| Aiqi Shuai | [#95](https://github.com/sopra-fs24-group-6/Server/issues/95) | Handle word choice given a certain theme & storage of the chosen word |
+
 
 
 ## Week 4
@@ -88,12 +87,6 @@
 | Aiqi Shuai | [#170](https://github.com/sopra-fs24-group-6/Server/issues/170) | Sending the lobby information to all players when there is a change |
 | Aiqi Shuai | [#169](https://github.com/sopra-fs24-group-6/Server/issues/169) | Sending all players information to the client side when someone join the lobby. |
 | Aiqi Shuai | [#166](https://github.com/sopra-fs24-group-6/Server/issues/166) | Implement game initialization function                       |
-| Kei Murakami | [#164](https://github.com/sopra-fs24-group-6/Server/issues/164) | Add interval timer between game events                     |
-| Kei Murakami | [#165](https://github.com/sopra-fs24-group-6/Server/issues/165) | Implement trigger for clue phase                           |
-| Kei Murakami | [#168](https://github.com/sopra-fs24-group-6/Server/issues/168) | Connect game events sequence to work correctly with client |
 
 
-## Week 5
-| Name       | Issue                                                        | Description (optional)                                       |
-| ---------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-|  |  |  |
+

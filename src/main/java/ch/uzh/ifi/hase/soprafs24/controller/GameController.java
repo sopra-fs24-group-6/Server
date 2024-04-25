@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 public class GameController {
@@ -17,14 +18,15 @@ public class GameController {
     this.gameService = gameService;
   }
 
+
   @MessageMapping("/startGame")
-  public void startGame(@Payload GameStartMessage message) {
-    gameService.startGame(message.getLobbyId(), message.getUserId());
+  public void startGame(@PathVariable("lobbyId") Long lobbyId, @Payload GameStartMessage message) {
+    gameService.startGame(lobbyId, message.getUserId());
   }
 
-    //For Testing Purposes
-//    @MessageMapping("/startGame")
-//    public void startGame(@Payload GameStartMessage message) {
-//        gameService.initializeGame(message.getLobbyId(), message.getUserId());
-//    }
+  // For Testing Purposes
+  // @MessageMapping("/startGame")
+  // public void startGame(@Payload GameStartMessage message) {
+  // gameService.initializeGame(message.getLobbyId(), message.getUserId());
+  // }
 }

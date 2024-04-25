@@ -6,8 +6,10 @@ import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.ChatMessage;
 import ch.uzh.ifi.hase.soprafs24.websocket.listener.SessionManager;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -41,6 +43,18 @@ class ChatServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
+
+//    @AfterEach
+//    public void afterEachTest(TestInfo testInfo) {
+//        System.out.println("After ChatServiceTest: " + testInfo.getDisplayName());
+//        System.out.println("Current Environment Variables:");
+//        String googleCredentials = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
+//        if (googleCredentials != null) {
+//            System.out.println("GOOGLE_APPLICATION_CREDENTIALS = " + googleCredentials);
+//        } else {
+//            System.out.println("GOOGLE_APPLICATION_CREDENTIALS is not set.");
+//        }
+//    }
 
     @Test
     void testSendTranslatedMessagesToUsers() {

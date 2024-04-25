@@ -5,9 +5,12 @@ import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPutDTO;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 import java.util.Date;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -31,6 +34,18 @@ public class UserDTOMapperTest {
     assertEquals(userPostDTO.getUsername(), user.getUsername());
     assertEquals(userPostDTO.getPassword(), user.getPassword());
   }
+
+//    @AfterEach
+//    public void afterEachTest(TestInfo testInfo) {
+//        System.out.println("After UserDTOMapperTest: " + testInfo.getDisplayName());
+//        System.out.println("Current Environment Variables:");
+//        String googleCredentials = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
+//        if (googleCredentials != null) {
+//            System.out.println("GOOGLE_APPLICATION_CREDENTIALS = " + googleCredentials);
+//        } else {
+//            System.out.println("GOOGLE_APPLICATION_CREDENTIALS is not set.");
+//        }
+//    }
 
   @Test
   public void testGetUser_fromUser_toUserGetDTO_success() {
