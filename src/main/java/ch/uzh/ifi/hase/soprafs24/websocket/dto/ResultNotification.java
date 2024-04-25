@@ -1,11 +1,13 @@
 package ch.uzh.ifi.hase.soprafs24.websocket.dto;
 
+import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
+
 import java.util.List;
 
 public class ResultNotification {
   private String winnerRole;
-  private List<Long> winners;
-  private List<Long> losers;
+  private List<PlayerDTO> winners;
+  private List<PlayerDTO> losers;
 
   public String getWinnerRole() {
     return winnerRole;
@@ -15,19 +17,19 @@ public class ResultNotification {
     this.winnerRole = winnerRole;
   }
 
-  public List<Long> getWinners() {
+  public List<PlayerDTO> getWinners() {
     return winners;
   }
 
-  public void setWinners(List<Long> winners) {
+  public void setWinners(List<PlayerDTO> winners) {
     this.winners = winners;
   }
 
-  public List<Long> getLosers() {
+  public List<PlayerDTO> getLosers() {
     return losers;
   }
 
-  public void setLosers(List<Long> losers) {
+  public void setLosers(List<PlayerDTO> losers) {
     this.losers = losers;
   }
 }

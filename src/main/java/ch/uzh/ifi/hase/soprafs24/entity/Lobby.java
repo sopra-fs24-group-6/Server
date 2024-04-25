@@ -63,7 +63,7 @@ public class Lobby implements Serializable {
   private Integer discussionTimer;
 
   @OneToOne
-  @JoinColumn(name = "host_id", nullable = false)
+  @JoinColumn(name = "host_id")
   private Player host;
 
     // For Testing Purposes
