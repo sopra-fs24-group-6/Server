@@ -18,7 +18,7 @@ public class GameController {
     this.gameService = gameService;
   }
 
-  @MessageMapping("game/{lobbyid}/startGame")
+  @MessageMapping("/startGame")
   public void startGame(@PathVariable("lobbyId") Long lobbyId, @Payload GameStartMessage message) {
     gameService.startGame(lobbyId, message.getUserId());
   }

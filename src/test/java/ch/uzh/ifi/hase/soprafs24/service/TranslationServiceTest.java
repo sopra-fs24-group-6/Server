@@ -30,25 +30,13 @@ public class TranslationServiceTest {
 //    }
     @Test
     public void testTranslateText() {
-        try {
-            String originalText = "Your assigned word is wolf.";
-            String targetLanguage = "de";
-            String translatedText = translationService.translateText(originalText, targetLanguage);
+        String originalText = "Your assigned word is wolf.";
+        String targetLanguage = "de";
+        String translatedText = translationService.translateText(originalText, targetLanguage);
 
-            System.out.println("Original: " + originalText);
-            System.out.println("Translated: " + translatedText);
+        System.out.println("Original: " + originalText);
+        System.out.println("Translated: " + translatedText);
 
-            assertNotEquals(originalText, translatedText);
-        } catch (TranslateException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof GoogleJsonResponseException) {
-                GoogleJsonResponseException googleEx = (GoogleJsonResponseException) cause;
-                System.err.println("Google API responded with an error: " + googleEx.getDetails());
-                System.err.println("API call failed with status code: " + googleEx.getStatusCode() + " and message: " + googleEx.getContent());
-            } else {
-                System.err.println("Translation failed with message: " + e.getMessage());
-            }
-            throw e; // Re-throw to make the test fail and indicate the error clearly.
-        }
+        assertNotEquals(originalText, translatedText);
     }
 }
