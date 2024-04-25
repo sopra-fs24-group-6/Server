@@ -27,8 +27,10 @@ jobs:
           java-version: "17"
 
       - name: Set up Google Cloud credentials
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
         run: |
-          echo "${{ secrets.GCP_SERVICE_CREDENTIALS }}" > gcp-credentials.json
+          echo "$GCP_SA_KEY" | base64 --decode > gcp-credentials.json
           echo "GOOGLE_APPLICATION_CREDENTIALS=gcp-credentials.json" >> $GITHUB_ENV
 
       - name: Test and analyze
