@@ -13,6 +13,7 @@ import ch.uzh.ifi.hase.soprafs24.websocket.dto.TurnNotification;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.WordNotification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
 
 
 @Service
@@ -31,6 +34,7 @@ public class GameService {
     private final LobbyRepository lobbyRepository;
     private final WordPairRepository wordPairRepository;
     private final PlayerRepository playerRepository;
+    private final Map<Long, Game> activeGames = new ConcurrentHashMap<>();
 
     @Autowired
     public GameService(SimpMessagingTemplate messagingTemplate,
@@ -51,13 +55,14 @@ public class GameService {
 
     // initialize game
     Game game = initializeGame(lobbyId, userId);
+    activeGames.put(game.getLobbyId(), game);
 
     // notify all players that the game has been started
     notifyGameEvents(game, "startGame");
 
     // interval -> start round
     // TODO: implement multiple rounds
-    timerService.startIntervalTimer(game, () -> startRound(game));
+    timerService.startIntervalTimer(game, 3, () -> startRound(game));
   }
 
   public Game initializeGame(Long lobbyId, Long userId) {
@@ -73,8 +78,6 @@ public class GameService {
       game.setDiscussionTimer(lobby.getDiscussionTimer());
       game.setPlayers(lobby.getPlayers());
       game.setThemeNames(lobby.getThemeNames());
-      System.out.println(game);
-      System.out.println(lobby);
       return game;
     } else {
       // Optionally, you could log this attempt, throw an exception, or return null
@@ -99,7 +102,7 @@ public class GameService {
     // assign words and roles, and notify each player
     assignWordsAndRoles(game);
     // interval -> start clue phase
-    timerService.startIntervalTimer(game, () -> startCluePhase(game));
+    timerService.startIntervalTimer(game, 3, () -> startCluePhase(game));
   }
 
   public void startCluePhase(Game game) {
@@ -226,34 +229,61 @@ public class GameService {
     messagingTemplate.convertAndSend("/topic/" + game.getLobbyId() + "/players", playerDTOS);
   }
 
-  public void notifyResults(Game game) {
-    // TODO: calculate results and notify to players
+  public void notifyResults(Long lobbyId, Result result) {
+    // winnerRole
+    String winnerRole = result.getWinnerRole().name();
+    // winners
+    List<PlayerDTO> winners = new ArrayList<>();
+    List<Player> winnerPlayers = result.getWinnerPlayers();
+    for (Player player : winnerPlayers) {
+      PlayerDTO playerDTO = new PlayerDTO();
+      playerDTO.setUserId(player.getUserId());
+      playerDTO.setUsername(player.getUsername());
+      winners.add(playerDTO);
+    }
+    // losers
+    List<PlayerDTO> losers = new ArrayList<>();
+    List<Player> loserPlayers = result.getLoserPlayers();
+    for (Player player : loserPlayers) {
+      PlayerDTO playerDTO = new PlayerDTO();
+      playerDTO.setUserId(player.getUserId());
+      playerDTO.setUsername(player.getUsername());
+      losers.add(playerDTO);
+    }
+
+    // set variables to resultNotification
     ResultNotification resultNotification = new ResultNotification();
-    resultNotification.setWinnerRole("WOLF");
-    List<Long> winners = new ArrayList<>(Arrays.asList(1L, 3L));
-    List<Long> losers = new ArrayList<>(Arrays.asList(2L));
+    resultNotification.setWinnerRole(winnerRole);
     resultNotification.setWinners(winners);
     resultNotification.setLosers(losers);
-    messagingTemplate.convertAndSend("/topic/" + game.getLobbyId() + "/result", resultNotification);
+
+    // notify result
+    Game game = getActiveGameByLobbyId(lobbyId);
+    notifyGameEvents(game, "gameResult");
+    messagingTemplate.convertAndSend("/topic/" + lobbyId + "/result", resultNotification);
+
+    // interval -> end game
+    timerService.startIntervalTimer(game, 3, () -> endGame(game));
   }
 
+  // @Transactional
   public void endGame(Game game) {
-    Lobby lobby = lobbyRepository.findById(game.getLobbyId()).orElseThrow(() -> new ResponseStatusException( HttpStatus.NOT_FOUND, "Lobby with id " + game.getLobbyId() + " could not be found."));
-
-    List<Player> players = lobby.getPlayers();
-
-    for (Player player : players) {
-// using ID getter of player
-      playerRepository.deleteById(player.getId());
-    }
-    /**
-     * remove player from Lobby table
-     * https://docs.spring.io/spring-data/commons/docs/current/api/org/springframework/data/repository/CrudRepository.html#deleteById(ID)
-     */
+    // delete lobby, and players by cascade setting
+    Lobby lobby = lobbyRepository.findById(game.getLobbyId())
+      .orElseThrow(() -> new ResponseStatusException(
+        HttpStatus.NOT_FOUND, "Lobby with id " + game.getLobbyId() + " could not be found."));
     lobbyRepository.delete(lobby);
 
-    // Maybe new event in rabit Queue?
-    notifyGameEvents(game, "EndGame");
+    // notify end game
+    notifyGameEvents(game, "endGame");
+  }
+
+  public List<Player> getActivePlayers(Long lobbyId) {
+      return activeGames.get(lobbyId).getPlayers();
+  }
+
+  public Game getActiveGameByLobbyId(Long lobbyId) {
+      return activeGames.get(lobbyId);
   }
 
 }

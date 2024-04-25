@@ -42,9 +42,8 @@ public class TimerService {
     startTimer(lobbyId, "discussion", duration, onTimerEnd);
   }
 
-  public void startIntervalTimer(Game game, Runnable onTimerEnd) {
+  public void startIntervalTimer(Game game, Integer duration, Runnable onTimerEnd) {
     Long lobbyId = game.getLobbyId();
-    Integer duration = 3;
     startTimer(lobbyId, "interval", duration, onTimerEnd);
   }
 

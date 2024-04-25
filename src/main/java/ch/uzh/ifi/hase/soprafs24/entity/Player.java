@@ -1,7 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
 import ch.uzh.ifi.hase.soprafs24.constant.Role;
-import ch.uzh.ifi.hase.soprafs24.constant.Language;
 
 import javax.persistence.*;
 import java.io.Serializable;

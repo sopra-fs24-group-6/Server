@@ -1,15 +1,18 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
+import ch.uzh.ifi.hase.soprafs24.constant.Role;
+import ch.uzh.ifi.hase.soprafs24.entity.Player;
+import ch.uzh.ifi.hase.soprafs24.entity.Result;
 import ch.uzh.ifi.hase.soprafs24.entity.Vote;
 import ch.uzh.ifi.hase.soprafs24.repository.VoteRepository;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.VoteDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -22,18 +25,6 @@ public class VoteService {
         this.voteRepository = voteRepository;
     }
 
-    public void saveVoteAndNotifyResult(Long lobbyId, VoteDTO voteDTO) {
-        // mapping to internal entity
-        Vote newVote = new Vote();
-        newVote.setLobbyId(lobbyId);
-        newVote.setVoterUserId(voteDTO.getVoterUserId());
-        newVote.setVotedUserId(voteDTO.getVotedUserId());
-
-        // save vote, if not voted yet
-        saveVote(newVote);
-
-        //
-    }
 
     public void saveVote(Vote vote) {
         // Check if the voter has already voted in this lobby
@@ -43,63 +34,71 @@ public class VoteService {
         } else {
             throw new IllegalStateException("Voter has already voted in this lobby.");
         }
-
-        // TODO: check if all players have voted
-        // TODO: if so, calculate result and notify it
-    }
-
-    public List<Vote> getVotesByLobbyId(Long lobbyId) {
-        return voteRepository.findByLobbyId(lobbyId);
     }
 
     private boolean hasVoted(Long voterUserId, Long lobbyId) {
         return voteRepository.findByVoterUserIdAndLobbyId(voterUserId, lobbyId).isPresent();
     }
 
-    public Map<String, Object> calculateResults(Long lobbyId) {
+    public Optional<Result> calculateResults(Long lobbyId, List<Player> players) {
+        // get all votes by lobbyId
         List<Vote> votes = voteRepository.findByLobbyId(lobbyId);
-        Map<Long, Integer> voteCount = new HashMap<>();
 
-        // Count votes for each voted user
+        // if all players voted, then calculate and return result
+        if (votes.size() == players.size()) {
+            // determine winner's role
+            Role winnerRole = determineWinnerRole(votes, players);
+
+            // get result based on winnerRole
+            Result result = getResultFromWinnerRole(winnerRole, players);
+            return Optional.of(result);
+
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private Role determineWinnerRole(List<Vote> votes, List<Player> players) {
+        Map<Long, Integer> voteCount = new HashMap<>();
         votes.forEach(vote -> voteCount.merge(vote.getVotedUserId(), 1, Integer::sum));
 
-        // Determine majority vote
-        boolean majorityIsWolf = false; // This assumes we know the roles somehow (to be implemented)
-        int maxVotes = 0;
-        for (Map.Entry<Long, Integer> entry : voteCount.entrySet()) {
-            if (entry.getValue() > maxVotes) {
-                maxVotes = entry.getValue();
-                majorityIsWolf = isWolf(entry.getKey()); // isWolf needs to check the user's role
-            }
+        // find max number of voting
+        Integer maxVotes = voteCount.values().stream().max(Integer::compare).orElse(0);
+
+        // find max voted player(s)
+        List<Long> maxVotedPlayerUserIds = voteCount.entrySet().stream()
+          .filter(entry -> Objects.equals(entry.getValue(), maxVotes))
+          .map(Map.Entry::getKey)
+          .toList();
+
+        // determine winner's role. if tied voting, then wolf wins
+        Role winnerRole;
+        if (maxVotedPlayerUserIds.size() >= 2) {
+            winnerRole = Role.WOLF;
+        } else  {
+            Player maxVotedPlayer = players.stream()
+              .filter(player -> player.getUserId().equals(maxVotedPlayerUserIds.get(0)))
+              .findFirst()
+              .orElseThrow(() -> new IllegalStateException("No player found with the given userId"));
+            winnerRole = (maxVotedPlayer.getRole() == Role.WOLF) ? Role.VILLAGER : Role.WOLF;
         }
 
-        // Determine winners and losers based on majority vote
-        String winningRole = majorityIsWolf ? "Villagers" : "Wolf";
-        String losingRole = majorityIsWolf ? "Wolf" : "Villagers";
-
-        // This would need to collect user IDs of winners and losers
-        List<Long> winners = findWinners(lobbyId, winningRole);
-        List<Long> losers = findWinners(lobbyId, losingRole);
-
-        // Return the results
-        Map<String, Object> results = new HashMap<>();
-        results.put("winners", winners);
-        results.put("losers", losers);
-        results.put("winningRole", winningRole);
-
-        return results;
+        return winnerRole;
     }
 
-    private boolean isWolf(Long userId) {
-        // This method should check if the given userId belongs to a player who is a wolf
-        // Placeholder for actual implementation
-        return false;
-    }
+    private Result getResultFromWinnerRole(Role winnerRole, List<Player> players) {
+        // classify players into winners and losers
+        Map<Boolean, List<Player>> partitionedPlayers = players.stream()
+          .collect(Collectors.partitioningBy(player -> player.getRole() == winnerRole));
+        List<Player> winnerPlayers = partitionedPlayers.get(true);
+        List<Player> loserPlayers = partitionedPlayers.get(false);
 
-    private List<Long> findWinners(Long lobbyId, String role) {
-        // This method should return the list of user IDs who are winners based on the role
-        // Placeholder for actual implementation
-        return List.of();
+        // crate and return Result entity
+        Result result = new Result();
+        result.setWinnerRole(winnerRole);
+        result.setWinnerPlayers(winnerPlayers);
+        result.setLoserPlayers(loserPlayers);
+        return result;
     }
 }
 
