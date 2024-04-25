@@ -18,14 +18,15 @@ public class GameController {
     this.gameService = gameService;
   }
 
+
   @MessageMapping("/startGame")
   public void startGame(@PathVariable("lobbyId") Long lobbyId, @Payload GameStartMessage message) {
     gameService.startGame(lobbyId, message.getUserId());
   }
 
-    //For Testing Purposes
-//    @MessageMapping("/startGame")
-//    public void startGame(@Payload GameStartMessage message) {
-//        gameService.initializeGame(message.getLobbyId(), message.getUserId());
-//    }
+  // For Testing Purposes
+  // @MessageMapping("/startGame")
+  // public void startGame(@Payload GameStartMessage message) {
+  // gameService.initializeGame(message.getLobbyId(), message.getUserId());
+  // }
 }
