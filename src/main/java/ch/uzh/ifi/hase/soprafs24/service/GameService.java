@@ -5,6 +5,7 @@ import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.PlayerRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.WordPairRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.EventNotification;
@@ -32,6 +33,7 @@ public class GameService {
     private final TimerService timerService;
     private final TranslationService translationService;
     private final LobbyRepository lobbyRepository;
+    private final UserRepository userRepository;
     private final WordPairRepository wordPairRepository;
     private final PlayerRepository playerRepository;
     private final Map<Long, Game> activeGames = new ConcurrentHashMap<>();
@@ -43,13 +45,15 @@ public class GameService {
                        TranslationService translationService,
                        @Qualifier("lobbyRepository")LobbyRepository lobbyRepository,
                        @Qualifier("wordPairRepository")WordPairRepository wordPairRepository,
-                       @Qualifier("playerRepository")PlayerRepository playerRepository) {
+                       @Qualifier("playerRepository")PlayerRepository playerRepository,
+                       @Qualifier("userRepository")UserRepository userRepository) {
         this.messagingTemplate = messagingTemplate;
         this.timerService = timerService;
         this.translationService = translationService;
         this.lobbyRepository = lobbyRepository;
         this.wordPairRepository = wordPairRepository;
         this.playerRepository = playerRepository;
+        this.userRepository = userRepository;
         this.random = new Random();
     }
 
@@ -271,20 +275,23 @@ public class GameService {
     timerService.startIntervalTimer(game, 3, () -> endGame(lobbyId));
   }
 
-  // @Transactional
+  @Transactional
   public void endGame(Long lobbyId) {
     // notify end game
     Game game = getActiveGameByLobbyId(lobbyId);
     notifyGameEvents(game, "endGame");
 
-    // delete players
-    playerRepository.deleteAll(game.getPlayers());
-    playerRepository.flush();
+    // delete relationship between user and player
+    for (Player player : game.getPlayers()) {
+      Optional<User> user = userRepository.findById(player.getUserId());
+      if (user.isPresent()) {
+        user.get().setPlayer(null);
+        userRepository.save(user.get());
+        userRepository.flush();
+      }
+    }
 
-    // delete lobby
-//    Lobby lobby = lobbyRepository.findById(lobbyId)
-//      .orElseThrow(() -> new ResponseStatusException(
-//        HttpStatus.NOT_FOUND, "Lobby with id " + game.getLobbyId() + " could not be found."));
+    // delete lobby, and players by cascade setting
     lobbyRepository.deleteById(lobbyId);
     lobbyRepository.flush();
   }
