@@ -35,6 +35,7 @@ public class GameService {
     private final WordPairRepository wordPairRepository;
     private final PlayerRepository playerRepository;
     private final Map<Long, Game> activeGames = new ConcurrentHashMap<>();
+    private Random random;
 
     @Autowired
     public GameService(SimpMessagingTemplate messagingTemplate,
@@ -49,6 +50,7 @@ public class GameService {
         this.lobbyRepository = lobbyRepository;
         this.wordPairRepository = wordPairRepository;
         this.playerRepository = playerRepository;
+        this.random = new Random();
     }
 
   public void startGame(Long lobbyId, Long userId) {
@@ -139,7 +141,7 @@ public class GameService {
         }
 
         // select theme randomly
-        Random random = new Random();
+        // Random random = new Random();
         String randomTheme = gameThemes.stream()
                 .skip(random.nextInt(gameThemes.size())) // Skip a random number of elements
                 .findFirst() // This always succeeds unless the list is empty
@@ -287,6 +289,10 @@ public class GameService {
 
   public Game getActiveGameByLobbyId(Long lobbyId) {
       return activeGames.get(lobbyId);
+  }
+
+  public void setRandom(Random random) {
+    this. random = random;
   }
 
 }
