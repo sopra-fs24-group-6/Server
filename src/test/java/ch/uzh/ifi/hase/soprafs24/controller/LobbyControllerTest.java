@@ -52,34 +52,24 @@ public class LobbyControllerTest {
     testLobby.setName("lobbyName");
   }
 
-//    @AfterEach
-//    public void afterEachTest(TestInfo testInfo) {
-//        System.out.println("After LobbyControllerTest: " + testInfo.getDisplayName());
-//        System.out.println("Current Environment Variables:");
-//        String googleCredentials = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
-//        if (googleCredentials != null) {
-//            System.out.println("GOOGLE_APPLICATION_CREDENTIALS = " + googleCredentials);
-//        } else {
-//            System.out.println("GOOGLE_APPLICATION_CREDENTIALS is not set.");
-//        }
-//    }
 
   @Test
   public void createLobby_validInput_thenLobbyCreated() throws Exception {
-    // given
+    // given: lobbyPostDTO and created lobby
     LobbyPostDTO lobbyPostDTO = new LobbyPostDTO();
     lobbyPostDTO.setLobbyAdmin(1L);
     lobbyPostDTO.setName("lobbyName");
 
     given(lobbyService.createLobby(Mockito.any())).willReturn(testLobby);
 
-    // when/then -> do the request + validate the result
+    // when: POST request
     MockHttpServletRequestBuilder postRequest = post("/lobbies")
       .contentType(MediaType.APPLICATION_JSON)
       .content(asJsonString(lobbyPostDTO));
 
     // then
-    mockMvc.perform(postRequest).andExpect(status().isCreated())
+    mockMvc.perform(postRequest)
+      .andExpect(status().isCreated())
       .andExpect(jsonPath("$.id", is(testLobby.getId().intValue())))
       .andExpect(jsonPath("$.name", is(testLobby.getName())));
   }
