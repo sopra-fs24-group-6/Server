@@ -20,8 +20,11 @@ public class GameController {
 
 
   @MessageMapping("/startGame")
-  public void startGame(@PathVariable("lobbyId") Long lobbyId, @Payload GameStartMessage message) {
-    gameService.startGame(lobbyId, message.getUserId());
+  //public void startGame(@PathVariable("lobbyId") Long lobbyId, @Payload GameStartMessage message) {
+  public void startGame(@Payload GameStartMessage message) {
+    //gameService.startGame(lobbyId, message.getUserId());
+    System.out.printf("lobbyId:"+ message.getLobbyId()+ "userId:"+ message.getUserId());
+    gameService.startGame(message.getLobbyId(), message.getUserId());
   }
 
   // For Testing Purposes
