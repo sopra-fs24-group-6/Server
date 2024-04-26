@@ -268,19 +268,25 @@ public class GameService {
     messagingTemplate.convertAndSend("/topic/" + lobbyId + "/result", resultNotification);
 
     // interval -> end game
-    timerService.startIntervalTimer(game, 3, () -> endGame(game));
+    timerService.startIntervalTimer(game, 3, () -> endGame(lobbyId));
   }
 
   // @Transactional
-  public void endGame(Game game) {
-    // delete lobby, and players by cascade setting
-    Lobby lobby = lobbyRepository.findById(game.getLobbyId())
-      .orElseThrow(() -> new ResponseStatusException(
-        HttpStatus.NOT_FOUND, "Lobby with id " + game.getLobbyId() + " could not be found."));
-    lobbyRepository.delete(lobby);
-
+  public void endGame(Long lobbyId) {
     // notify end game
+    Game game = getActiveGameByLobbyId(lobbyId);
     notifyGameEvents(game, "endGame");
+
+    // delete players
+    playerRepository.deleteAll(game.getPlayers());
+    playerRepository.flush();
+
+    // delete lobby
+//    Lobby lobby = lobbyRepository.findById(lobbyId)
+//      .orElseThrow(() -> new ResponseStatusException(
+//        HttpStatus.NOT_FOUND, "Lobby with id " + game.getLobbyId() + " could not be found."));
+    lobbyRepository.deleteById(lobbyId);
+    lobbyRepository.flush();
   }
 
   public List<Player> getActivePlayers(Long lobbyId) {
