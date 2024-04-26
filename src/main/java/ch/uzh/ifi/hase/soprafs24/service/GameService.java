@@ -178,8 +178,8 @@ public class GameService {
                 playerRepository.flush();
                 WordNotification villagerNotification = new WordNotification();
                 //For cost concern, this function is commented
-                // String Translated_text = translationService.translateText("your assigned word is: " + villager_word, villager.getLanguage());
-                // villagerNotification.setWord(Translated_text);
+//                 String Translated_text = translationService.translateText("your assigned word is: " + villager_word, villager.getLanguage());
+//                 villagerNotification.setWord(Translated_text);
                 villagerNotification.setWord(villager_word);
                 String destination = "/queue/" + villager.getUserId() + "/wordAssignment";
                 messagingTemplate.convertAndSend(destination, villagerNotification);
@@ -192,8 +192,8 @@ public class GameService {
                 playerRepository.flush();
                 WordNotification wolfNotification = new WordNotification();
                 //For cost concern, this function is commented
-                // String wolfanouncement = translationService.translateText("Your role is wolf.",wolf.getLanguage());
-                // wolfNotification.setWord(wolfanouncement);
+//                 String wolfanouncement = translationService.translateText("Your role is wolf.",wolf.getLanguage());
+//                 wolfNotification.setWord(wolfanouncement);
                 wolfNotification.setWord(null);
                 String destination = "/queue/" + wolf.getUserId() + "/wordAssignment";
                 messagingTemplate.convertAndSend(destination, wolfNotification);
