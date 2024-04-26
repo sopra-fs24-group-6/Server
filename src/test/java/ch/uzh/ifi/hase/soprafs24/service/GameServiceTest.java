@@ -1,21 +1,16 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
-import ch.uzh.ifi.hase.soprafs24.constant.LobbyStatus;
-import ch.uzh.ifi.hase.soprafs24.constant.LobbyType;
 import ch.uzh.ifi.hase.soprafs24.constant.Role;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
+import ch.uzh.ifi.hase.soprafs24.matcher.WordNotificationMatcher;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
-import ch.uzh.ifi.hase.soprafs24.websocket.dto.WordNotification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
-import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -107,7 +102,20 @@ public class GameServiceTest {
     // when
     gameService.assignWordsAndRoles(game);
 
-    // then
+    // then: save players the number of players times
     verify(playerRepository, times(3)).save(any(Player.class));
+    // then: notify word to each player
+    verify(messagingTemplate, times(1))
+      .convertAndSend(
+        eq("/queue/1/wordAssignment"),
+        argThat(new WordNotificationMatcher(null)));
+    verify(messagingTemplate, times(1))
+      .convertAndSend(
+        eq("/queue/2/wordAssignment"),
+        argThat(new WordNotificationMatcher("Word4")));
+    verify(messagingTemplate, times(1))
+      .convertAndSend(
+        eq("/queue/3/wordAssignment"),
+        argThat(new WordNotificationMatcher("Word4")));
   }
 }
