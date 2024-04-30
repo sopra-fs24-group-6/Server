@@ -32,12 +32,6 @@ public class LobbyController {
     // create lobby
     Lobby createdLobby = lobbyService.createLobby(lobbyInput);
     // convert internal representation of lobby back to API
-      // send the list of players to the lobby room
-    List<PlayerDTO> playerDTOS = new ArrayList<>();
-      for(Player player : createdLobby.getPlayers()) {
-          playerDTOS.add(PlayerDTOMapper.INSTANCE.convertEntityToPlayerDTO(player));
-      }
-    lobbyService.sendPlayerListToLobby(playerDTOS, createdLobby.getId());
     return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(createdLobby);
   }
 

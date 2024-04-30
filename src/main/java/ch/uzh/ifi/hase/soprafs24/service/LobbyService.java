@@ -12,6 +12,7 @@ import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.ThemeRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.mapper.LobbyDTOMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -62,7 +64,7 @@ public class LobbyService {
         defaultLobby.setName("Default Lobby");
         defaultLobby.setPassword(null); // Assuming public by default
         defaultLobby.setType(LobbyType.PUBLIC);
-        defaultLobby.setStatus(LobbyStatus.WAITING);
+        defaultLobby.setStatus(LobbyStatus.OPEN);
         defaultLobby.setPlayerLimit(10);
         defaultLobby.setPlayerCount(0);
         defaultLobby.setRounds(3);
@@ -87,24 +89,12 @@ public class LobbyService {
       return Collections.singletonList(lobbyByUserId);
     }
 
-      //For Testing purposes
-      List<Lobby> lobbies = this.lobbyRepository.findAll();
-      for (Lobby lobby : lobbies) {
-          System.out.println("Current Lobby: " + lobby.getId());
-      }
-
     // if no parameters, then return all lobbies
     return getAllLobbies();
   }
 
   public List<Lobby> getAllLobbies() {
-      //For Testing purposes
-      List<Lobby> lobbies = this.lobbyRepository.findAll();
-      for (Lobby lobby : lobbies) {
-          System.out.println("Current Lobby: " + lobby.getId());
-      }
       return this.lobbyRepository.findAll();
-
   }
 
   public Lobby getLobbyByUsername(String username) {
@@ -153,17 +143,11 @@ public class LobbyService {
 
     public void sendPlayerListToLobby(List<PlayerDTO> playerDTOS, long lobbyId) {
         String destination = "/lobbies/" + lobbyId + "/players";
-        System.out.println("Hello");
-        for(PlayerDTO playerDTO : playerDTOS) {
-            System.out.println(playerDTO);
-        }
-        System.out.println("KL");
         messagingTemplate.convertAndSend(destination, playerDTOS);
     }
 
     public void sendLobbyInfoToLobby(long lobbyId, LobbyGetDTO lobbyGetDTO) {
         String destination = "/lobbies/" + lobbyId + "/lobby_info";
-        System.out.println("Hello");
         messagingTemplate.convertAndSend(destination, lobbyGetDTO);
     }
 
@@ -179,7 +163,7 @@ public class LobbyService {
     newLobby.setIsPrivate(type == LobbyType.PRIVATE);
 
     // set status
-    newLobby.setStatus(LobbyStatus.WAITING);
+    newLobby.setStatus(LobbyStatus.OPEN);
 
     // set themes by names
     // if name not found, then throw exception
@@ -200,8 +184,6 @@ public class LobbyService {
     // flush() is called
     newLobby = lobbyRepository.save(newLobby);
     lobbyRepository.flush();
-
-      System.out.println(newLobby);
 
     log.debug("Created Information for User: {}", newLobby);
     return newLobby;
@@ -262,10 +244,13 @@ public class LobbyService {
       userRepository.save(user);
       userRepository.flush();
 
+      // add player to lobby, and update lobby status
       lobby.addPlayer(newPlayer);
+      if (lobby.getPlayerCount().equals((lobby.getPlayerLimit()))) {
+        lobby.setStatus(LobbyStatus.FULL);
+      }
       lobby = lobbyRepository.save(lobby);
       lobbyRepository.flush();
-        System.out.println(lobby);
 
       return lobby;
 
@@ -275,36 +260,79 @@ public class LobbyService {
     }
   }
 
+  private Lobby removePlayrFromLobby(Lobby lobby, Player player) {
+    // remove relation between user and player
+    User user = findUserById(player.getUserId());
+    user.setPlayer(null);
+    userRepository.save(user);
+    userRepository.flush();
+
+    // remove relation between lobby and player
+    lobby.removePlayer(player);
+
+    // delete player
+    playerRepository.delete(player);
+    playerRepository.flush();
+
+    // update lobby
+    lobby.setStatus(LobbyStatus.OPEN);
+    lobbyRepository.save(lobby);
+    lobbyRepository.flush();
+
+    return lobby;
+  }
+
   public Lobby kickPlayerFromLobby(Long lobbyId, Long targetId, Long requesterId) {
     // find lobby by id
     // if not found, then throw exception
     Lobby lobby = findLobbyById(lobbyId);
+    Player targetPlayer = findPlayerById(targetId);
 
     // check if target player is in lobby
-    Player targetPlayer = findUserById(targetId).getPlayer();
-    if (targetPlayer != null && targetPlayer.getLobby().getId().equals(lobbyId)) {
-      // check if requester is host player
-      if (lobby.getHost().getUserId().equals(requesterId)) {
-        // remove target player from lobby
-        lobby.removePlayer(targetPlayer);
-        // delete target player from database
-        playerRepository.delete(targetPlayer);
-        playerRepository.flush();
-        lobbyRepository.save(lobby);
-        lobbyRepository.flush();
-          System.out.println(lobby);
-          return lobby;
-
-      } else {
-        throw new ResponseStatusException(
-          HttpStatus.UNAUTHORIZED, "Kicking player is only allowed by the host.");
-      }
-    } else {
+    if (!targetPlayer.getLobby().getId().equals(lobbyId)) {
       throw new ResponseStatusException(
-        HttpStatus.NOT_FOUND, "Target player with id" + targetId + " could not be found.");
+        HttpStatus.BAD_REQUEST, "Player with id" + targetId + " is not in lobby with id" + lobbyId + ".");
     }
+    // check if requester is host player
+    if (!lobby.getHost().getUserId().equals(requesterId)) {
+      throw new ResponseStatusException(
+        HttpStatus.UNAUTHORIZED, "Kicking player is only allowed by the host.");
+    }
+
+    // TODO: notify kicked player
+
+    return removePlayrFromLobby(lobby, targetPlayer);
   }
 
+  public void leaveLobby(Long userId) {
+    // find player by userId
+    Optional<Player> foundPlayer = playerRepository.findById(userId);
+
+    if (foundPlayer.isPresent()) {
+      Player player = foundPlayer.get();
+
+      // find lobby
+      if (player.getLobby() == null) {
+        throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "Player with id " + userId + " is not associated with any lobby.");
+      }
+      Long lobbyId = player.getLobby().getId();
+      Lobby lobby = findLobbyById(lobbyId);
+
+      // TODO: implement the case if host leaves
+
+      // if lobby status is OPEN or FULL, then remove player
+      if (lobby.getStatus() == LobbyStatus.OPEN || lobby.getStatus() == LobbyStatus.FULL) {
+
+        // remove player from lobby
+        Lobby updatedLobby = removePlayrFromLobby(lobby, player);
+
+        // notify updated players
+        LobbyGetDTO lobbyGetDTO = LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(updatedLobby);
+        sendLobbyInfoToLobby(lobbyId, lobbyGetDTO);
+      }
+    }
+  }
 
   public void authenticateLobby (Long lobbyId, String password) {
     // find lobby by id
@@ -319,17 +347,6 @@ public class LobbyService {
     }
   }
 
-  public Lobby startGame (Long lobbyId) {
-    // find lobby by id
-    // if not found, then throw exception
-    Lobby lobby = findLobbyById(lobbyId);
-
-    // change status to IN_PROGRESS
-    lobby.setStatus(LobbyStatus.IN_PROGRESS);
-
-    return lobby;
-  }
-
   public List<String> getThemes () {
     List<Theme> themes = themeRepository.findAll();
     List<String> themeNames = new ArrayList<>();
@@ -337,6 +354,13 @@ public class LobbyService {
       themeNames.add(theme.getName());
     }
     return themeNames;
+  }
+
+  public void updateLobbyStatus(Long lobbyId, LobbyStatus newStatus) {
+    Lobby lobby = findLobbyById(lobbyId);
+    lobby.setStatus(newStatus);
+    lobbyRepository.save(lobby);
+    lobbyRepository.flush();
   }
 
 
@@ -362,8 +386,14 @@ public class LobbyService {
         HttpStatus.NOT_FOUND, "User with id " + userId + " could not be found."));
   }
 
+  public Player findPlayerById (Long userId) {
+    return playerRepository.findById(userId)
+      .orElseThrow(() -> new ResponseStatusException(
+        HttpStatus.NOT_FOUND, "Player with id " + userId + " could not be found."));
+  }
+
   public LobbyType determineLobbyType (String password) {
-    return password != null ? LobbyType.PRIVATE : LobbyType.PUBLIC;
+    return (password != null && !password.isEmpty()) ? LobbyType.PRIVATE : LobbyType.PUBLIC;
   }
 
   public List<Theme> findThemesByNames(List<String> themeNames) {

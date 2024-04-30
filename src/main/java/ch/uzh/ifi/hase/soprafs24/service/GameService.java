@@ -65,10 +65,8 @@ public class GameService {
 
     // notify all players that the game has been started
     notifyGameEvents(game, "startGame");
-    System.out.println("Stage 2 reached");
 
     // interval -> start round
-    // TODO: implement multiple rounds
     timerService.startIntervalTimer(game, 3, () -> startRound(game));
   }
 
@@ -140,9 +138,6 @@ public class GameService {
 
     public void assignWordsAndRoles(Game game) {
         List<String> gameThemes = game.getThemeNames();
-        for(String theme : gameThemes) {
-            System.out.println(theme);
-        }
 
         // select theme randomly
         // Random random = new Random();
@@ -171,7 +166,6 @@ public class GameService {
         for (int i = 0; i < players.size(); i++) {
             if (i != wolfIndex) { // Skip the wolf
                 Player villager = players.get(i);
-                System.out.println("villager has been selected");
                 villager.setRole(Role.VILLAGER);
                 villager.setWord(villager_word);
                 Player updatedPlayer = playerRepository.save(villager);
@@ -185,7 +179,6 @@ public class GameService {
                 messagingTemplate.convertAndSend(destination, villagerNotification);
             } else {
                 Player wolf = players.get(i);
-                System.out.println("wolf has been selected");
                 wolf.setRole(Role.WOLF);
                 wolf.setWord(wolf_word);
                 Player updatedPlayer = playerRepository.save(wolf);
@@ -294,6 +287,9 @@ public class GameService {
     // delete lobby, and players by cascade setting
     lobbyRepository.deleteById(lobbyId);
     lobbyRepository.flush();
+
+    // delete game
+    activeGames.remove(lobbyId);
   }
 
   public List<Player> getActivePlayers(Long lobbyId) {

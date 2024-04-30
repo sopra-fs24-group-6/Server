@@ -16,7 +16,9 @@ public class LobbyGetDTO {
 
   private Boolean isPrivate;
 
-  private List<String> players;
+  private List<PlayerDTO> players;
+
+  private String status;
 
   private Integer playerLimit;
 
@@ -31,8 +33,6 @@ public class LobbyGetDTO {
   private Integer clueTimer;
 
   private Integer discussionTimer;
-
-  private String password;
 
 
   public Long getId() {
@@ -67,12 +67,20 @@ public class LobbyGetDTO {
     isPrivate = aPrivate;
   }
 
-  public List<String> getPlayers() {
+  public List<PlayerDTO> getPlayers() {
     return players;
   }
 
-  public void setPlayers(List<String> players) {
+  public void setPlayers(List<PlayerDTO> players) {
     this.players = players;
+  }
+
+  public String getStatus() {
+    return status;
+  }
+
+  public void setStatus(String status) {
+    this.status = status;
   }
 
   public Integer getPlayerLimit() {
@@ -130,13 +138,4 @@ public class LobbyGetDTO {
   public void setDiscussionTimer(Integer discussionTimer) {
     this.discussionTimer = discussionTimer;
   }
-
-  public String getPassword() {
-    return password;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-  }
-
 }

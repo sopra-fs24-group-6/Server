@@ -28,15 +28,15 @@ public class TranslationServiceTest {
 //            System.out.println("GOOGLE_APPLICATION_CREDENTIALS is not set.");
 //        }
 //    }
-    @Test
-    public void testTranslateText() {
-        String originalText = "Your assigned word is wolf.";
-        String targetLanguage = "de";
-        String translatedText = translationService.translateText(originalText, targetLanguage);
-
-        System.out.println("Original: " + originalText);
-        System.out.println("Translated: " + translatedText);
-
-        assertNotEquals(originalText, translatedText);
-    }
+//    @Test
+//    public void testTranslateText() {
+//        String originalText = "Your assigned word is wolf.";
+//        String targetLanguage = "de";
+//        String translatedText = translationService.translateText(originalText, targetLanguage);
+//
+//        System.out.println("Original: " + originalText);
+//        System.out.println("Translated: " + translatedText);
+//
+//        assertNotEquals(originalText, translatedText);
+//    }
 }

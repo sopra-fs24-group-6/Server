@@ -1,5 +1,5 @@
 package ch.uzh.ifi.hase.soprafs24.constant;
 
 public enum LobbyStatus {
-  WAITING, READY, IN_PROGRESS, FINISHED
+  OPEN, FULL, STARTING, IN_PROGRESS, FINISHED
 }

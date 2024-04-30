@@ -5,6 +5,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.Player;
 import ch.uzh.ifi.hase.soprafs24.entity.Theme;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyPostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
@@ -48,7 +49,8 @@ public interface LobbyDTOMapper {
   @Mapping(source = "name", target = "name")
   @Mapping(source = "host.userId", target = "lobbyAdmin")
   @Mapping(source = "isPrivate", target = "isPrivate")
-  @Mapping(source = "players", target = "players", qualifiedByName = "playersToNames")
+  @Mapping(source = "status", target = "status")
+  @Mapping(source = "players", target = "players", qualifiedByName = "playersToDTOs")
   @Mapping(source = "playerLimit", target = "playerLimit")
   @Mapping(source = "playerCount", target = "playerCount")
   @Mapping(source = "themes", target = "themes", qualifiedByName = "themesToNames")
@@ -56,7 +58,6 @@ public interface LobbyDTOMapper {
   @Mapping(source = "roundTimer", target = "roundTimer")
   @Mapping(source = "clueTimer", target = "clueTimer")
   @Mapping(source = "discussionTimer", target = "discussionTimer")
-  @Mapping(source = "password", target = "password")
   LobbyGetDTO convertEntityToLobbyGetDTO(Lobby lobby);
 
   // custom mapping for themes
@@ -75,18 +76,17 @@ public interface LobbyDTOMapper {
   }
 
   // custom mapping for players
-  @Named("playersToNames")
-  static List<String> playersToNames(List<Player> players) {
+  @Named("playersToDTOs")
+  static List<PlayerDTO> playersToDTOs(List<Player> players) {
     if (players == null) {
       return new ArrayList<>();
     }
 
-    List<String> playerNames = new ArrayList<>();
+    List<PlayerDTO> playerDTOS = new ArrayList<>();
     for (Player player : players) {
-      String playerName = player.getUsername();
-      playerNames.add(playerName);
+      playerDTOS.add(PlayerDTOMapper.INSTANCE.convertEntityToPlayerDTO(player));
     }
-    return playerNames;
+    return playerDTOS;
   }
 
 }
