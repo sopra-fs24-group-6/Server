@@ -28,6 +28,10 @@ public class TranslationServiceTest {
 //            System.out.println("GOOGLE_APPLICATION_CREDENTIALS is not set.");
 //        }
 //    }
+
+    /**
+     * To save cost for translation API, just ignores translation test.
+     */
 //    @Test
 //    public void testTranslateText() {
 //        String originalText = "Your assigned word is wolf.";
