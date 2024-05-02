@@ -61,17 +61,17 @@ public class LobbyController {
   }
 
 
-    @GetMapping("/lobbies/{lobbyId}/players")
-    @ResponseBody
-    public List<PlayerDTO> getPlayers(@PathVariable("lobbyId") Long lobbyId) {
-        // fetch lobby in the internal representation
-        List<Player> players = lobbyService.getPlayersById(lobbyId);
-        List<PlayerDTO> playerDTOS = new ArrayList<>();
-        for(Player player : players) {
-            playerDTOS.add(PlayerDTOMapper.INSTANCE.convertEntityToPlayerDTO(player));
-        }
-        return playerDTOS;
+  @GetMapping("/lobbies/{lobbyId}/players")
+  @ResponseBody
+  public List<PlayerDTO> getPlayers(@PathVariable("lobbyId") Long lobbyId) {
+    // fetch lobby in the internal representation
+    List<Player> players = lobbyService.getPlayersById(lobbyId);
+    List<PlayerDTO> playerDTOS = new ArrayList<>();
+    for(Player player : players) {
+        playerDTOS.add(PlayerDTOMapper.INSTANCE.convertEntityToPlayerDTO(player));
     }
+    return playerDTOS;
+  }
 
   @PutMapping("/lobbies/{lobbyId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -81,14 +81,8 @@ public class LobbyController {
     // update lobby
     Lobby updatedLobby = lobbyService.updateLobby(lobbyId, lobbyInput);
     // send Lobby info to client side:
-      LobbyGetDTO lobbyGetDTO = LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(updatedLobby);
-      lobbyService.sendLobbyInfoToLobby(lobbyId, lobbyGetDTO);
-      // send player list to client side:
-      List<PlayerDTO> playerDTOS = new ArrayList<>();
-      for(Player player : updatedLobby.getPlayers()) {
-          playerDTOS.add(PlayerDTOMapper.INSTANCE.convertEntityToPlayerDTO(player));
-      }
-      lobbyService.sendPlayerListToLobby(playerDTOS, lobbyId);
+    LobbyGetDTO lobbyGetDTO = LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(updatedLobby);
+    lobbyService.sendLobbyInfoToLobby(lobbyId, lobbyGetDTO);
   }
 
   @PostMapping("/lobbies/{lobbyId}/players")
@@ -97,11 +91,11 @@ public class LobbyController {
   public LobbyGetDTO joinLobby(@PathVariable("lobbyId") Long lobbyId, @RequestBody UserIdDTO userIdDTO) {
     // add player to lobby
     Lobby updatedLobby = lobbyService.addPlayerToLobby(lobbyId, userIdDTO.getUserId());
-      List<PlayerDTO> playerDTOS = new ArrayList<>();
-      for(Player player : updatedLobby.getPlayers()) {
-          playerDTOS.add(PlayerDTOMapper.INSTANCE.convertEntityToPlayerDTO(player));
-      }
-      lobbyService.sendPlayerListToLobby(playerDTOS, updatedLobby.getId());
+
+    // send lobby info to client
+    LobbyGetDTO lobbyGetDTO = LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(updatedLobby);
+    lobbyService.sendLobbyInfoToLobby(lobbyId, lobbyGetDTO);
+
     return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(updatedLobby);
   }
 
@@ -110,12 +104,11 @@ public class LobbyController {
   public void kickPlayer(@PathVariable("lobbyId") Long lobbyId,
                          @PathVariable("userId") Long targetUserId,
                          @RequestBody UserIdDTO requesterIdDTO) {
-    Lobby lobby = lobbyService.kickPlayerFromLobby(lobbyId, targetUserId, requesterIdDTO.getUserId());
-      List<PlayerDTO> playerDTOS = new ArrayList<>();
-      for(Player player : lobby.getPlayers()) {
-          playerDTOS.add(PlayerDTOMapper.INSTANCE.convertEntityToPlayerDTO(player));
-      }
-      lobbyService.sendPlayerListToLobby(playerDTOS, lobby.getId());
+    Lobby updatedLobby = lobbyService.kickPlayerFromLobby(lobbyId, targetUserId, requesterIdDTO.getUserId());
+
+    // send lobby info to client
+    LobbyGetDTO lobbyGetDTO = LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(updatedLobby);
+    lobbyService.sendLobbyInfoToLobby(lobbyId, lobbyGetDTO);
   }
 
   @PostMapping("/lobbies/{lobbyId}/authentication")

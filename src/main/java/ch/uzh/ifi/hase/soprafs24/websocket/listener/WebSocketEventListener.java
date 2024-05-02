@@ -26,27 +26,29 @@ public class WebSocketEventListener {
 
   @EventListener
   public void handleWebSocketConnectListener(SessionConnectEvent event) {
-      StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-      String sessionId = headerAccessor.getSessionId();
-      // Extract userId from headers, assuming it's sent under the key 'userId'
-      String userIdString = headerAccessor.getFirstNativeHeader("userId");
-      if (userIdString != null && !userIdString.isEmpty()) {
-          Long userId = Long.parseLong(userIdString);
-          sessionManager.addSession(sessionId, userId);
-      } else {
-          System.out.println("UserId is missing in the WebSocket connection headers");
-      }
-    int currentCount = connectedClients.incrementAndGet();
-    System.out.println("Received a new web socket connection. Total connections: " + currentCount);
+    StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+    String sessionId = headerAccessor.getSessionId();
+    // Extract userId from headers, assuming it's sent under the key 'userId'
+    String userIdString = headerAccessor.getFirstNativeHeader("userId");
+    if (userIdString != null && !userIdString.isEmpty()) {
+      Long userId = Long.parseLong(userIdString);
+      sessionManager.addSession(sessionId, userId);
+      int currentCount = connectedClients.incrementAndGet();
+      System.out.println("Received a new web socket connection with userId: " + userId + ". Total connections: " + currentCount);
+    } else {
+      System.out.println("UserId is missing in the WebSocket connection headers");
+    }
   }
 
   @EventListener
   public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
-      StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-      String sessionId = headerAccessor.getSessionId();
-      Long userId = sessionManager.removeSession(sessionId);
+    StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+    String sessionId = headerAccessor.getSessionId();
+    Long userId = sessionManager.removeSession(sessionId);
+    if (userId != null) {
       int currentCount = connectedClients.decrementAndGet();
-    System.out.println("A web socket connection was closed. Total connections: " + currentCount);
+      System.out.println("A web socket connection with userId: " + userId + " was closed. Total connections: " + currentCount);
+    }
 
     // leave game
     lobbyService.leaveLobby(userId);

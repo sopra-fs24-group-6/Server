@@ -13,6 +13,7 @@ import ch.uzh.ifi.hase.soprafs24.repository.ThemeRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.LobbyDTOMapper;
+import ch.uzh.ifi.hase.soprafs24.websocket.dto.EventNotification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,23 +59,23 @@ public class LobbyService {
     this.themeRepository = themeRepository;
   }
 
-    @PostConstruct
-    private void initializeDefaultLobby() {
-        defaultLobby = new Lobby();
-        defaultLobby.setName("Default Lobby");
-        defaultLobby.setPassword(null); // Assuming public by default
-        defaultLobby.setType(LobbyType.PUBLIC);
-        defaultLobby.setStatus(LobbyStatus.OPEN);
-        defaultLobby.setPlayerLimit(10);
-        defaultLobby.setPlayerCount(0);
-        defaultLobby.setRounds(3);
-        defaultLobby.setRoundTimer(60);
-        defaultLobby.setClueTimer(10);
-        defaultLobby.setDiscussionTimer(30);
-        defaultLobby.setThemes(themeRepository.findAll());
-        defaultLobby.setId(Long.MAX_VALUE);
-        // You might want to set a default theme or leave it empty
-    }
+  @PostConstruct
+  private void initializeDefaultLobby() {
+      defaultLobby = new Lobby();
+      defaultLobby.setName("Default Lobby");
+      defaultLobby.setPassword(null); // Assuming public by default
+      defaultLobby.setType(LobbyType.PUBLIC);
+      defaultLobby.setStatus(LobbyStatus.OPEN);
+      defaultLobby.setPlayerLimit(10);
+      defaultLobby.setPlayerCount(0);
+      defaultLobby.setRounds(3);
+      defaultLobby.setRoundTimer(60);
+      defaultLobby.setClueTimer(10);
+      defaultLobby.setDiscussionTimer(30);
+      defaultLobby.setThemes(themeRepository.findAll());
+      defaultLobby.setId(Long.MAX_VALUE);
+      // You might want to set a default theme or leave it empty
+  }
 
 
   public List<Lobby> getLobbies(String username, Long userId) {
@@ -134,22 +135,22 @@ public class LobbyService {
       return lobby;
   }
 
-    public List<Player> getPlayersById(Long lobbyId){
-      Lobby lobby = lobbyRepository.findById(lobbyId)
-              .orElseThrow(() -> new ResponseStatusException(
-                      HttpStatus.NOT_FOUND, "Lobby with id " + lobbyId + " could not be found."));
-      return lobby.getPlayers();
-    }
+  public List<Player> getPlayersById(Long lobbyId){
+    Lobby lobby = lobbyRepository.findById(lobbyId)
+            .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Lobby with id " + lobbyId + " could not be found."));
+    return lobby.getPlayers();
+  }
 
-    public void sendPlayerListToLobby(List<PlayerDTO> playerDTOS, long lobbyId) {
-        String destination = "/lobbies/" + lobbyId + "/players";
-        messagingTemplate.convertAndSend(destination, playerDTOS);
-    }
+  public void sendPlayerListToLobby(List<PlayerDTO> playerDTOS, long lobbyId) {
+      String destination = "/lobbies/" + lobbyId + "/players";
+      messagingTemplate.convertAndSend(destination, playerDTOS);
+  }
 
-    public void sendLobbyInfoToLobby(long lobbyId, LobbyGetDTO lobbyGetDTO) {
-        String destination = "/lobbies/" + lobbyId + "/lobby_info";
-        messagingTemplate.convertAndSend(destination, lobbyGetDTO);
-    }
+  public void sendLobbyInfoToLobby(long lobbyId, LobbyGetDTO lobbyGetDTO) {
+      String destination = "/lobbies/" + lobbyId + "/lobby_info";
+      messagingTemplate.convertAndSend(destination, lobbyGetDTO);
+  }
 
   public Lobby createLobby(Lobby newLobby) {
     // check if input name already exists
@@ -299,15 +300,23 @@ public class LobbyService {
         HttpStatus.UNAUTHORIZED, "Kicking player is only allowed by the host.");
     }
 
-    // TODO: notify kicked player
+    // remove player from lobby and update databases
+    Lobby updatedLobby = removePlayrFromLobby(lobby, targetPlayer);
 
-    return removePlayrFromLobby(lobby, targetPlayer);
+    // notify player
+    String destination = "/lobbies/" + lobbyId + "/lobby_event/" + targetId;
+    EventNotification eventNotification = new EventNotification();
+    eventNotification.setEventType("kickedByHost");
+    messagingTemplate.convertAndSend(destination, eventNotification);
+
+    return updatedLobby;
   }
 
   public void leaveLobby(Long userId) {
     // find player by userId
     Optional<Player> foundPlayer = playerRepository.findById(userId);
 
+    // if player exists, then remove from lobby
     if (foundPlayer.isPresent()) {
       Player player = foundPlayer.get();
 
@@ -319,19 +328,44 @@ public class LobbyService {
       Long lobbyId = player.getLobby().getId();
       Lobby lobby = findLobbyById(lobbyId);
 
-      // TODO: implement the case if host leaves
-
       // if lobby status is OPEN or FULL, then remove player
       if (lobby.getStatus() == LobbyStatus.OPEN || lobby.getStatus() == LobbyStatus.FULL) {
 
-        // remove player from lobby
-        Lobby updatedLobby = removePlayrFromLobby(lobby, player);
+        // if player is host, then delete lobby. Else, just remove player from lobby
+        if (player.getUserId().equals(lobby.getHost().getId())) {
+          deleteLobby(lobby);
 
-        // notify updated players
-        LobbyGetDTO lobbyGetDTO = LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(updatedLobby);
-        sendLobbyInfoToLobby(lobbyId, lobbyGetDTO);
+          // notify player
+          String destination = "/lobbies/" + lobbyId + "/lobby_event";
+          EventNotification eventNotification = new EventNotification();
+          eventNotification.setEventType("lobbyDeleted");
+          messagingTemplate.convertAndSend(destination, eventNotification);
+
+        } else {
+          // remove player from lobby
+          Lobby updatedLobby = removePlayrFromLobby(lobby, player);
+          // notify updated players
+          LobbyGetDTO lobbyGetDTO = LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(updatedLobby);
+          sendLobbyInfoToLobby(lobbyId, lobbyGetDTO);
+        }
       }
     }
+  }
+
+  private void deleteLobby(Lobby lobby) {
+    // delete relationship between user and player
+    for (Player player : lobby.getPlayers()) {
+      Optional<User> user = userRepository.findById(player.getUserId());
+      if (user.isPresent()) {
+        user.get().setPlayer(null);
+        userRepository.save(user.get());
+        userRepository.flush();
+      }
+    }
+
+    // delete lobby, and players by cascade setting
+    lobbyRepository.deleteById(lobby.getId());
+    lobbyRepository.flush();
   }
 
   public void authenticateLobby (Long lobbyId, String password) {
