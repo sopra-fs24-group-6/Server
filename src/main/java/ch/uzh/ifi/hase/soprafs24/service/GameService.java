@@ -43,10 +43,10 @@ public class GameService {
     public GameService(SimpMessagingTemplate messagingTemplate,
                        TimerService timerService,
                        TranslationService translationService,
-                       @Qualifier("lobbyRepository")LobbyRepository lobbyRepository,
-                       @Qualifier("wordPairRepository")WordPairRepository wordPairRepository,
-                       @Qualifier("playerRepository")PlayerRepository playerRepository,
-                       @Qualifier("userRepository")UserRepository userRepository) {
+                       @Qualifier("lobbyRepository") LobbyRepository lobbyRepository,
+                       @Qualifier("wordPairRepository") WordPairRepository wordPairRepository,
+                       @Qualifier("playerRepository") PlayerRepository playerRepository,
+                       @Qualifier("userRepository") UserRepository userRepository) {
         this.messagingTemplate = messagingTemplate;
         this.timerService = timerService;
         this.translationService = translationService;
@@ -57,90 +57,91 @@ public class GameService {
         this.random = new Random();
     }
 
-  public void startGame(Long lobbyId, Long userId) {
+    public void startGame(Long lobbyId, Long userId) {
 
-    // initialize game
-    Game game = initializeGame(lobbyId, userId);
-    activeGames.put(game.getLobbyId(), game);
+        // initialize game
+        Game game = initializeGame(lobbyId, userId);
+        activeGames.put(game.getLobbyId(), game);
 
-    // notify all players that the game has been started
-    notifyGameEvents(game, "startGame");
-    System.out.println("Stage 2 reached");
+        // notify all players that the game has been started
+        notifyGameEvents(game, "startGame");
+        System.out.println("Stage 2 reached");
 
-    // interval -> start round
-    // TODO: implement multiple rounds
-    timerService.startIntervalTimer(game, 3, () -> startRound(game));
-  }
-
-  public Game initializeGame(Long lobbyId, Long userId) {
-    // find lobby by lobbyId and verify host's userId
-    Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(() -> new ResponseStatusException(
-      HttpStatus.NOT_FOUND, "Lobby with id " + lobbyId + " could not be found."));
-    if (userId.equals(lobby.getHost().getUserId())) {
-      // initialize game (set theme, duration, players, etc. to game instance)
-      Game game = new Game();
-      game.setLobbyId(lobbyId);
-      game.setRoundTimer(lobby.getRoundTimer());
-      game.setClueTimer(lobby.getClueTimer());
-      game.setDiscussionTimer(lobby.getDiscussionTimer());
-      game.setPlayers(lobby.getPlayers());
-      game.setThemeNames(lobby.getThemeNames());
-      return game;
-    } else {
-      // Optionally, you could log this attempt, throw an exception, or return null
-      System.out.println("User is not the host of the lobby. No action taken.");
-      return null; // Indicates no game was initialized due to the condition not being met
+        // interval -> start round
+        // TODO: implement multiple rounds
+        timerService.startIntervalTimer(game, 3, () -> startRound(game));
     }
-  }
 
-  public void notifyGameEvents(Game game, String eventType) {
-    EventNotification eventNotification = new EventNotification();
-    eventNotification.setEventType(eventType);
-    messagingTemplate.convertAndSend("/topic/" + game.getLobbyId() + "/gameEvents", eventNotification);
-  }
-
-  public void startRound(Game game) {
-    // interval -> start assign phase
-    // timerService.startIntervalTimer(game, () -> startAssignPhase(game));
-    startAssignPhase(game);
-  }
-
-  public void startAssignPhase(Game game) {
-    // assign words and roles, and notify each player
-    assignWordsAndRoles(game);
-    // interval -> start clue phase
-    timerService.startIntervalTimer(game, 3, () -> startCluePhase(game));
-  }
-
-  public void startCluePhase(Game game) {
-    // shuffle players order
-    List<Long> shuffledPlayerIds = shufflePlayersOrder(game);
-
-    // start round timer -> when finished, then start discussion phase
-    timerService.startRoundTimer(game, () -> startDiscussionPhase(game));
-
-    // notification
-    notifyGameEvents(game, "clue");
-
-    // start clue turn, loop until roundTimer ends
-    game.setIsCluePhase(true);
-    Integer currentIndex = 0;
-    startClueTurn(game, shuffledPlayerIds, currentIndex);
-  }
-
-  private List<Long> shufflePlayersOrder(Game game) {
-    List<Player> players = game.getPlayers();
-    List<Long> shuffledPlayerIds = new ArrayList<>();
-    for (Player player : players) {
-      shuffledPlayerIds.add(player.getUserId());
+    public Game initializeGame(Long lobbyId, Long userId) {
+        // find lobby by lobbyId and verify host's userId
+        Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "Lobby with id " + lobbyId + " could not be found."));
+        if (userId.equals(lobby.getHost().getUserId())) {
+            // initialize game (set theme, duration, players, etc. to game instance)
+            Game game = new Game();
+            game.setLobbyId(lobbyId);
+            game.setRoundTimer(lobby.getRoundTimer());
+            game.setClueTimer(lobby.getClueTimer());
+            game.setDiscussionTimer(lobby.getDiscussionTimer());
+            game.setPlayers(lobby.getPlayers());
+            game.setThemeNames(lobby.getThemeNames());
+            return game;
+        }
+        else {
+            // Optionally, you could log this attempt, throw an exception, or return null
+            System.out.println("User is not the host of the lobby. No action taken.");
+            return null; // Indicates no game was initialized due to the condition not being met
+        }
     }
-    Collections.shuffle(shuffledPlayerIds);
-    return shuffledPlayerIds;
-  }
+
+    public void notifyGameEvents(Game game, String eventType) {
+        EventNotification eventNotification = new EventNotification();
+        eventNotification.setEventType(eventType);
+        messagingTemplate.convertAndSend("/topic/" + game.getLobbyId() + "/gameEvents", eventNotification);
+    }
+
+    public void startRound(Game game) {
+        // interval -> start assign phase
+        // timerService.startIntervalTimer(game, () -> startAssignPhase(game));
+        startAssignPhase(game);
+    }
+
+    public void startAssignPhase(Game game) {
+        // assign words and roles, and notify each player
+        assignWordsAndRoles(game);
+        // interval -> start clue phase
+        timerService.startIntervalTimer(game, 3, () -> startCluePhase(game));
+    }
+
+    public void startCluePhase(Game game) {
+        // shuffle players order
+        List<Long> shuffledPlayerIds = shufflePlayersOrder(game);
+
+        // start round timer -> when finished, then start discussion phase
+        timerService.startRoundTimer(game, () -> startDiscussionPhase(game));
+
+        // notification
+        notifyGameEvents(game, "clue");
+
+        // start clue turn, loop until roundTimer ends
+        game.setIsCluePhase(true);
+        Integer currentIndex = 0;
+        startClueTurn(game, shuffledPlayerIds, currentIndex);
+    }
+
+    private List<Long> shufflePlayersOrder(Game game) {
+        List<Player> players = game.getPlayers();
+        List<Long> shuffledPlayerIds = new ArrayList<>();
+        for (Player player : players) {
+            shuffledPlayerIds.add(player.getUserId());
+        }
+        Collections.shuffle(shuffledPlayerIds);
+        return shuffledPlayerIds;
+    }
 
     public void assignWordsAndRoles(Game game) {
         List<String> gameThemes = game.getThemeNames();
-        for(String theme : gameThemes) {
+        for (String theme : gameThemes) {
             System.out.println(theme);
         }
 
@@ -183,7 +184,8 @@ public class GameService {
                 villagerNotification.setWord(villager_word);
                 String destination = "/queue/" + villager.getUserId() + "/wordAssignment";
                 messagingTemplate.convertAndSend(destination, villagerNotification);
-            } else {
+            }
+            else {
                 Player wolf = players.get(i);
                 System.out.println("wolf has been selected");
                 wolf.setRole(Role.WOLF);
@@ -201,122 +203,126 @@ public class GameService {
         }
     }
 
-  private void startClueTurn(Game game, List<Long> playerIds, Integer currentIndex) {
-    Long currentPlayerId = playerIds.get(currentIndex);
-    TurnNotification turnNotification = new TurnNotification();
-    turnNotification.setUserId(currentPlayerId);
-    messagingTemplate.convertAndSend("/topic/" + game.getLobbyId() + "/clueTurn", turnNotification);
-    timerService.startClueTimer(game, () -> onEndClueTimer(game, playerIds, currentIndex));
-  }
-
-  public void onEndClueTimer(Game game, List<Long> playerIds, Integer currentIndex) {
-    if (game.getIsCluePhase()) {
-      Integer nextIndex = (currentIndex + 1) % playerIds.size();
-      startClueTurn(game, playerIds, nextIndex);
-    }
-  }
-
-  public void startDiscussionPhase(Game game) {
-    // stop clue timer
-    game.setIsCluePhase(false);
-    timerService.stopTimer(game.getLobbyId(), "clue");
-    // start discussion phase
-    notifyGameEvents(game, "discussion");
-    timerService.startDiscussionTimer(game, () -> startVotingPhase(game));
-  }
-
-  public void startVotingPhase(Game game) {
-    notifyGameEvents(game, "vote");
-
-    List<PlayerDTO> playerDTOS = new ArrayList<>();
-    for (Player player : game.getPlayers()) {
-      PlayerDTO playerDTO = new PlayerDTO();
-      playerDTO.setUserId(player.getUserId());
-      playerDTO.setUsername(player.getUsername());
-      playerDTOS.add(playerDTO);
-    }
-    messagingTemplate.convertAndSend("/topic/" + game.getLobbyId() + "/players", playerDTOS);
-  }
-
-  public void notifyResults(Long lobbyId, Result result) {
-    // winnerRole
-    String winnerRole = result.getWinnerRole().name();
-    // winners
-    List<PlayerDTO> winners = new ArrayList<>();
-    List<Player> winnerPlayers = result.getWinnerPlayers();
-    for (Player player : winnerPlayers) {
-      PlayerDTO playerDTO = new PlayerDTO();
-      playerDTO.setUserId(player.getUserId());
-      playerDTO.setUsername(player.getUsername());
-      winners.add(playerDTO);
-      // update user records
-        User user = userRepository.findById(player.getUserId())
-                .orElseThrow(() -> new NoSuchElementException("No user found with ID: " + player.getUserId()));
-        user.addWins();
-        userRepository.save(user); // Save the updated user record
-    }
-    // losers
-    List<PlayerDTO> losers = new ArrayList<>();
-    List<Player> loserPlayers = result.getLoserPlayers();
-    for (Player player : loserPlayers) {
-      PlayerDTO playerDTO = new PlayerDTO();
-      playerDTO.setUserId(player.getUserId());
-      playerDTO.setUsername(player.getUsername());
-      losers.add(playerDTO);
-        // update user records
-        User user = userRepository.findById(player.getUserId())
-                .orElseThrow(() -> new NoSuchElementException("No user found with ID: " + player.getUserId()));
-        user.addLosses();
-        userRepository.save(user); // Save the updated user record
-    }
-      userRepository.flush(); // Flush changes to the database
-
-    // set variables to resultNotification
-    ResultNotification resultNotification = new ResultNotification();
-    resultNotification.setWinnerRole(winnerRole);
-    resultNotification.setWinners(winners);
-    resultNotification.setLosers(losers);
-
-    // notify result
-    Game game = getActiveGameByLobbyId(lobbyId);
-    notifyGameEvents(game, "gameResult");
-    messagingTemplate.convertAndSend("/topic/" + lobbyId + "/result", resultNotification);
-
-    // interval -> end game
-    timerService.startIntervalTimer(game, 3, () -> endGame(lobbyId));
-  }
-
-  @Transactional
-  public void endGame(Long lobbyId) {
-    // notify end game
-    Game game = getActiveGameByLobbyId(lobbyId);
-    notifyGameEvents(game, "endGame");
-
-    // delete relationship between user and player
-    for (Player player : game.getPlayers()) {
-      Optional<User> user = userRepository.findById(player.getUserId());
-      if (user.isPresent()) {
-        user.get().setPlayer(null);
-        userRepository.save(user.get());
-        userRepository.flush();
-      }
+    private void startClueTurn(Game game, List<Long> playerIds, Integer currentIndex) {
+        Long currentPlayerId = playerIds.get(currentIndex);
+        TurnNotification turnNotification = new TurnNotification();
+        turnNotification.setUserId(currentPlayerId);
+        messagingTemplate.convertAndSend("/topic/" + game.getLobbyId() + "/clueTurn", turnNotification);
+        timerService.startClueTimer(game, () -> onEndClueTimer(game, playerIds, currentIndex));
     }
 
-    // delete lobby, and players by cascade setting
-    lobbyRepository.deleteById(lobbyId);
-    lobbyRepository.flush();
-  }
+    public void onEndClueTimer(Game game, List<Long> playerIds, Integer currentIndex) {
+        if (game.getIsCluePhase()) {
+            Integer nextIndex = (currentIndex + 1) % playerIds.size();
+            startClueTurn(game, playerIds, nextIndex);
+        }
+    }
 
-  public List<Player> getActivePlayers(Long lobbyId) {
-      return activeGames.get(lobbyId).getPlayers();
-  }
+    public void startDiscussionPhase(Game game) {
+        // stop clue timer
+        game.setIsCluePhase(false);
+        timerService.stopTimer(game.getLobbyId(), "clue");
+        // start discussion phase
+        notifyGameEvents(game, "discussion");
+        timerService.startDiscussionTimer(game, () -> startVotingPhase(game));
+    }
 
-  public Game getActiveGameByLobbyId(Long lobbyId) {
-      return activeGames.get(lobbyId);
-  }
+    public void startVotingPhase(Game game) {
+        notifyGameEvents(game, "vote");
 
-  public void setRandom(Random random) {
-    this. random = random;
-  }
+        List<PlayerDTO> playerDTOS = new ArrayList<>();
+        for (Player player : game.getPlayers()) {
+            PlayerDTO playerDTO = new PlayerDTO();
+            playerDTO.setUserId(player.getUserId());
+            playerDTO.setUsername(player.getUsername());
+            playerDTOS.add(playerDTO);
+        }
+        messagingTemplate.convertAndSend("/topic/" + game.getLobbyId() + "/players", playerDTOS);
+    }
+
+    public void notifyResults(Long lobbyId, Result result) {
+        // winnerRole
+        String winnerRole = result.getWinnerRole().name();
+        // winners
+        List<PlayerDTO> winners = new ArrayList<>();
+        List<Player> winnerPlayers = result.getWinnerPlayers();
+        for (Player player : winnerPlayers) {
+            PlayerDTO playerDTO = new PlayerDTO();
+            playerDTO.setUserId(player.getUserId());
+            playerDTO.setUsername(player.getUsername());
+            winners.add(playerDTO);
+            // update user records
+            User user = userRepository.findById(player.getUserId())
+                    .orElseThrow(() -> new NoSuchElementException("No user found with ID: " + player.getUserId()));
+            user.addWins();
+            userRepository.save(user); // Save the updated user record
+            // testing purposes
+            System.out.println(user);
+        }
+        // losers
+        List<PlayerDTO> losers = new ArrayList<>();
+        List<Player> loserPlayers = result.getLoserPlayers();
+        for (Player player : loserPlayers) {
+            PlayerDTO playerDTO = new PlayerDTO();
+            playerDTO.setUserId(player.getUserId());
+            playerDTO.setUsername(player.getUsername());
+            losers.add(playerDTO);
+            // update user records
+            User user = userRepository.findById(player.getUserId())
+                    .orElseThrow(() -> new NoSuchElementException("No user found with ID: " + player.getUserId()));
+            user.addLosses();
+            userRepository.save(user); // Save the updated user record
+            // testing purposes
+            System.out.println(user);
+        }
+        userRepository.flush(); // Flush changes to the database
+
+        // set variables to resultNotification
+        ResultNotification resultNotification = new ResultNotification();
+        resultNotification.setWinnerRole(winnerRole);
+        resultNotification.setWinners(winners);
+        resultNotification.setLosers(losers);
+
+        // notify result
+        Game game = getActiveGameByLobbyId(lobbyId);
+        notifyGameEvents(game, "gameResult");
+        messagingTemplate.convertAndSend("/topic/" + lobbyId + "/result", resultNotification);
+
+        // interval -> end game
+        timerService.startIntervalTimer(game, 3, () -> endGame(lobbyId));
+    }
+
+    @Transactional
+    public void endGame(Long lobbyId) {
+        // notify end game
+        Game game = getActiveGameByLobbyId(lobbyId);
+        notifyGameEvents(game, "endGame");
+
+        // delete relationship between user and player
+        for (Player player : game.getPlayers()) {
+            Optional<User> user = userRepository.findById(player.getUserId());
+            if (user.isPresent()) {
+                user.get().setPlayer(null);
+                userRepository.save(user.get());
+                userRepository.flush();
+            }
+        }
+
+        // delete lobby, and players by cascade setting
+        lobbyRepository.deleteById(lobbyId);
+        lobbyRepository.flush();
+    }
+
+    public List<Player> getActivePlayers(Long lobbyId) {
+        return activeGames.get(lobbyId).getPlayers();
+    }
+
+    public Game getActiveGameByLobbyId(Long lobbyId) {
+        return activeGames.get(lobbyId);
+    }
+
+    public void setRandom(Random random) {
+        this.random = random;
+    }
 
 }

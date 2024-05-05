@@ -56,6 +56,24 @@ public class User implements Serializable {
   @Column(nullable = false)
   private double winlossratio = 0.0;
 
+    // testing purposes
+    @Override
+    public String toString() {
+        return "User{" +
+                "\n\tid=" + id +
+                ", \n\tusername='" + username + '\'' +
+                ", \n\ttoken='" + token + '\'' +
+                ", \n\tstatus=" + status +
+                ", \n\tpassword='" + password + '\'' +
+                ", \n\tcreationDate=" + creationDate +
+                ", \n\tbirthDate=" + birthDate +
+                ", \n\tlanguage='" + language + '\'' +
+                ", \n\twins=" + wins +
+                ", \n\tlosses=" + losses +
+                ", \n\twinlossratio=" + winlossratio +
+                "\n}";
+    }
+
     public double getWinlossratio() {
         return winlossratio;
     }

@@ -41,7 +41,7 @@ public class ChatService {
             String sessionId = entry.getKey();
             Long userId = entry.getValue();
             User user = userService.getUser(userId);
-            if (checkRightlobby(lobbyId,userId)) {
+            if (checkRightlobby(lobbyId, userId)) {
                 String user_language = user.getLanguage();
                 String translatedMessage = translationService.translateText(chatMessage.getContent(), user_language);
                 chatMessage.setContent(translatedMessage);
@@ -61,7 +61,7 @@ public class ChatService {
             String sessionId = entry.getKey();
             Long userId = entry.getValue();
             User user = userService.getUser(userId);
-            if (checkRightlobby(lobbyId,userId)) {
+            if (checkRightlobby(lobbyId, userId)) {
                 String user_language = user.getLanguage();
                 String translatedMessage = translationService.translateText(chatMessage.getContent(), user_language);
                 chatMessage.setContent(translatedMessage);

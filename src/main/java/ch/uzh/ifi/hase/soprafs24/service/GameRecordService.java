@@ -39,9 +39,7 @@ public class GameRecordService {
         userRepository.flush();
 
         // Sort users based on their win-loss ratios
-        List<User> topUsers = allUsers.stream()
-                .sorted(Comparator.comparingDouble(User::getWinlossratio).reversed())
-                .limit(10) // Limit to top 10 users
+        List<User> topUsers = allUsers.stream().sorted(Comparator.comparingDouble(User::getWinlossratio).reversed()).limit(10) // Limit to top 10 users
                 .collect(Collectors.toList());
 
         return topUsers;
