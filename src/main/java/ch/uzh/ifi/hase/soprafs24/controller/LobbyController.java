@@ -102,6 +102,7 @@ public class LobbyController {
   @ResponseBody
   public LobbyGetDTO joinLobby(@PathVariable("lobbyId") Long lobbyId, @RequestBody UserIdDTO userIdDTO) {
     // add player to lobby
+
     Lobby updatedLobby = lobbyService.addPlayerToLobby(lobbyId, userIdDTO.getUserId());
       List<PlayerDTO> playerDTOS = new ArrayList<>();
       for(Player player : updatedLobby.getPlayers()) {

@@ -12,8 +12,37 @@ public class UserGetDTO {
   private Date creationDate;
   private Date birthDate;
   private String token;
-
   private String language;
+
+  private int wins;
+
+  private int losses;
+
+  private double winlossratio;
+
+    public int getWins() {
+        return wins;
+    }
+
+    public void setWins(int wins) {
+        this.wins = wins;
+    }
+
+    public int getLosses() {
+        return losses;
+    }
+
+    public void setLosses(int losses) {
+        this.losses = losses;
+    }
+
+    public double getWinlossratio() {
+        return winlossratio;
+    }
+
+    public void setWinlossratio(double winlossratio) {
+        this.winlossratio = winlossratio;
+    }
 
     public String getLanguage() {
         return language;

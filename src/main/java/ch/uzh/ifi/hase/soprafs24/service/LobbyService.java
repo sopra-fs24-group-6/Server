@@ -56,23 +56,23 @@ public class LobbyService {
     this.themeRepository = themeRepository;
   }
 
-    @PostConstruct
-    private void initializeDefaultLobby() {
-        defaultLobby = new Lobby();
-        defaultLobby.setName("Default Lobby");
-        defaultLobby.setPassword(null); // Assuming public by default
-        defaultLobby.setType(LobbyType.PUBLIC);
-        defaultLobby.setStatus(LobbyStatus.WAITING);
-        defaultLobby.setPlayerLimit(10);
-        defaultLobby.setPlayerCount(0);
-        defaultLobby.setRounds(3);
-        defaultLobby.setRoundTimer(60);
-        defaultLobby.setClueTimer(10);
-        defaultLobby.setDiscussionTimer(30);
-        defaultLobby.setThemes(themeRepository.findAll());
-        defaultLobby.setId(Long.MAX_VALUE);
-        // You might want to set a default theme or leave it empty
-    }
+//    @PostConstruct
+//    private void initializeDefaultLobby() {
+//        defaultLobby = new Lobby();
+//        defaultLobby.setName("Default Lobby");
+//        defaultLobby.setPassword(null); // Assuming public by default
+//        defaultLobby.setType(LobbyType.PUBLIC);
+//        defaultLobby.setStatus(LobbyStatus.WAITING);
+//        defaultLobby.setPlayerLimit(10);
+//        defaultLobby.setPlayerCount(0);
+//        defaultLobby.setRounds(3);
+//        defaultLobby.setRoundTimer(60);
+//        defaultLobby.setClueTimer(10);
+//        defaultLobby.setDiscussionTimer(30);
+//        defaultLobby.setThemes(themeRepository.findAll());
+//        defaultLobby.setId(Long.MAX_VALUE);
+//        // You might want to set a default theme or leave it empty
+//    }
 
 
   public List<Lobby> getLobbies(String username, Long userId) {
@@ -137,10 +137,11 @@ public class LobbyService {
 
   public Lobby getLobbyById(Long lobbyId) {
       Lobby lobby = findLobbyById(lobbyId);
-      if (lobby == null) {
-          // Return a copy of the default lobby to avoid modification of the original
-          return defaultLobby;
-      }
+//      if (lobby == null) {
+//          // Return a copy of the default lobby to avoid modification of the original
+//          System.out.println("default lobby id" + defaultLobby.getId());
+//          return defaultLobby;
+//      }
       return lobby;
   }
 
@@ -245,6 +246,7 @@ public class LobbyService {
   public Lobby addPlayerToLobby(Long lobbyId, Long userId){
     // find lobby by id
     Lobby lobby = findLobbyById(lobbyId);
+    System.out.println("default lobby id" + defaultLobby.getId());
 
     // find user by id
     // if not found, then throw exception
@@ -265,7 +267,6 @@ public class LobbyService {
       lobby.addPlayer(newPlayer);
       lobby = lobbyRepository.save(lobby);
       lobbyRepository.flush();
-        System.out.println(lobby);
 
       return lobby;
 
@@ -279,6 +280,9 @@ public class LobbyService {
     // find lobby by id
     // if not found, then throw exception
     Lobby lobby = findLobbyById(lobbyId);
+      System.out.println("kick lobby id" + lobbyId);
+      System.out.println("kick target id" + targetId);
+      System.out.println("kick admin id" + requesterId);
 
     // check if target player is in lobby
     Player targetPlayer = findUserById(targetId).getPlayer();

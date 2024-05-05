@@ -47,7 +47,48 @@ public class User implements Serializable {
   @Column(nullable = false)
   private String language;
 
-  public String getLanguage() {
+  @Column(nullable = false)
+  private int wins = 0;
+
+  @Column(nullable = false)
+  private int losses = 0;
+
+  @Column(nullable = false)
+  private double winlossratio = 0.0;
+
+    public double getWinlossratio() {
+        return winlossratio;
+    }
+
+    public void setWinlossratio(double winlossratio) {
+        this.winlossratio = winlossratio;
+    }
+
+    public int getWins() {
+        return wins;
+    }
+
+    public void setWins(int wins) {
+        this.wins = wins;
+    }
+
+    public void addWins() {
+        this.wins += 1;
+    }
+
+    public void addLosses() {
+        this.losses += 1;
+    }
+
+    public int getLosses() {
+        return losses;
+    }
+
+    public void setLosses(int lose) {
+        this.losses = lose;
+    }
+
+    public String getLanguage() {
       return language;
   }
 

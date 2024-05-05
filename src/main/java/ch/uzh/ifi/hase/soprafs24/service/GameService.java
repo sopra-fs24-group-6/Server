@@ -249,6 +249,11 @@ public class GameService {
       playerDTO.setUserId(player.getUserId());
       playerDTO.setUsername(player.getUsername());
       winners.add(playerDTO);
+      // update user records
+        User user = userRepository.findById(player.getUserId())
+                .orElseThrow(() -> new NoSuchElementException("No user found with ID: " + player.getUserId()));
+        user.addWins();
+        userRepository.save(user); // Save the updated user record
     }
     // losers
     List<PlayerDTO> losers = new ArrayList<>();
@@ -258,7 +263,13 @@ public class GameService {
       playerDTO.setUserId(player.getUserId());
       playerDTO.setUsername(player.getUsername());
       losers.add(playerDTO);
+        // update user records
+        User user = userRepository.findById(player.getUserId())
+                .orElseThrow(() -> new NoSuchElementException("No user found with ID: " + player.getUserId()));
+        user.addLosses();
+        userRepository.save(user); // Save the updated user record
     }
+      userRepository.flush(); // Flush changes to the database
 
     // set variables to resultNotification
     ResultNotification resultNotification = new ResultNotification();
