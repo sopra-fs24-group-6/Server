@@ -12,8 +12,9 @@ public class SessionManager {
         sessionMap.put(sessionId, userId);
     }
 
-    public void removeSession(String sessionId) {
-        sessionMap.remove(sessionId);
+    // return userId
+    public Long removeSession(String sessionId) {
+        return sessionMap.remove(sessionId);
     }
 
     public ConcurrentHashMap<String, Long> getSessionMap() {

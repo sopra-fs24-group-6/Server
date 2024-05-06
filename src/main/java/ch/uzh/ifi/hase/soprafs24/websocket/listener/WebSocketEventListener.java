@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.websocket.listener;
 
+import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
@@ -14,32 +15,42 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class WebSocketEventListener {
 
   private final AtomicInteger connectedClients = new AtomicInteger(0);
+  private final SessionManager sessionManager;
+  private final LobbyService lobbyService;
 
   @Autowired
-  private SessionManager sessionManager;
+  public WebSocketEventListener(LobbyService lobbyService, SessionManager sessionManager) {
+    this.lobbyService = lobbyService;
+    this.sessionManager = sessionManager;
+  }
 
   @EventListener
   public void handleWebSocketConnectListener(SessionConnectEvent event) {
-      StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-      String sessionId = headerAccessor.getSessionId();
-      // Extract userId from headers, assuming it's sent under the key 'userId'
-      String userIdString = headerAccessor.getFirstNativeHeader("userId");
-      if (userIdString != null && !userIdString.isEmpty()) {
-          Long userId = Long.parseLong(userIdString);
-          sessionManager.addSession(sessionId, userId);
-      } else {
-          System.out.println("UserId is missing in the WebSocket connection headers");
-      }
-    int currentCount = connectedClients.incrementAndGet();
-    System.out.println("Received a new web socket connection. Total connections: " + currentCount);
+    StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+    String sessionId = headerAccessor.getSessionId();
+    // Extract userId from headers, assuming it's sent under the key 'userId'
+    String userIdString = headerAccessor.getFirstNativeHeader("userId");
+    if (userIdString != null && !userIdString.isEmpty()) {
+      Long userId = Long.parseLong(userIdString);
+      sessionManager.addSession(sessionId, userId);
+      int currentCount = connectedClients.incrementAndGet();
+      System.out.println("Received a new web socket connection with userId: " + userId + ". Total connections: " + currentCount);
+    } else {
+      System.out.println("UserId is missing in the WebSocket connection headers");
+    }
   }
 
   @EventListener
   public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
-      StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-      String sessionId = headerAccessor.getSessionId();
-      sessionManager.removeSession(sessionId);
+    StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+    String sessionId = headerAccessor.getSessionId();
+    Long userId = sessionManager.removeSession(sessionId);
+    if (userId != null) {
       int currentCount = connectedClients.decrementAndGet();
-    System.out.println("A web socket connection was closed. Total connections: " + currentCount);
+      System.out.println("A web socket connection with userId: " + userId + " was closed. Total connections: " + currentCount);
+    }
+
+    // leave game
+    lobbyService.leaveLobby(userId);
   }
 }

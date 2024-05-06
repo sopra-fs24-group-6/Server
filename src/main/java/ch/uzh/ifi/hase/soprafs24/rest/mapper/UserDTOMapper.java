@@ -43,5 +43,8 @@ public interface UserDTOMapper {
   @Mapping(source = "birthDate", target = "birthDate")
   @Mapping(source = "token", target = "token")
   @Mapping(source = "language", target = "language")
+  @Mapping(source = "wins", target = "wins")
+  @Mapping(source = "losses", target = "losses")
+  @Mapping(source = "winlossratio", target = "winlossratio")
   UserGetDTO convertEntityToUserGetDTO(User user);
 }

@@ -74,7 +74,7 @@ public class LobbyServiceTest {
     testLobby.setRoundTimer(60);
     testLobby.setClueTimer(10);
     testLobby.setDiscussionTimer(30);
-    testLobby.setStatus(LobbyStatus.WAITING);
+    testLobby.setStatus(LobbyStatus.OPEN);
     testLobby.setThemes(new ArrayList<>(List.of(testTheme)));
 
     MockitoAnnotations.openMocks(this);
@@ -157,7 +157,7 @@ public class LobbyServiceTest {
     assertEquals(createdLobby.getId(), newLobby.getId());
     assertEquals(createdLobby.getName(), newLobby.getName());
     assertEquals(createdLobby.getPassword(), newLobby.getPassword());
-    assertEquals(createdLobby.getStatus(), LobbyStatus.WAITING);
+    assertEquals(createdLobby.getStatus(), LobbyStatus.OPEN);
     assertEquals(createdLobby.getType(), LobbyType.PRIVATE);
     assertEquals(createdLobby.getPlayers().get(0).getUserId(), hostPlayer.getUserId());
     assertEquals(createdLobby.getPlayerCount(), 1);

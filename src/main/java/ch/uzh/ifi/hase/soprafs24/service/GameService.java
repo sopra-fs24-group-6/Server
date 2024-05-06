@@ -29,46 +29,43 @@ import java.util.concurrent.ScheduledFuture;
 @Service
 @Transactional
 public class GameService {
-    private final SimpMessagingTemplate messagingTemplate;
-    private final TimerService timerService;
-    private final TranslationService translationService;
-    private final LobbyRepository lobbyRepository;
-    private final UserRepository userRepository;
-    private final WordPairRepository wordPairRepository;
-    private final PlayerRepository playerRepository;
-    private final Map<Long, Game> activeGames = new ConcurrentHashMap<>();
-    private Random random;
+  private final SimpMessagingTemplate messagingTemplate;
+  private final TimerService timerService;
+  private final TranslationService translationService;
+  private final LobbyRepository lobbyRepository;
+  private final UserRepository userRepository;
+  private final WordPairRepository wordPairRepository;
+  private final PlayerRepository playerRepository;
+  private final Map<Long, Game> activeGames = new ConcurrentHashMap<>();
+  private Random random;
 
-    @Autowired
-    public GameService(SimpMessagingTemplate messagingTemplate,
-                       TimerService timerService,
-                       TranslationService translationService,
-                       @Qualifier("lobbyRepository")LobbyRepository lobbyRepository,
-                       @Qualifier("wordPairRepository")WordPairRepository wordPairRepository,
-                       @Qualifier("playerRepository")PlayerRepository playerRepository,
-                       @Qualifier("userRepository")UserRepository userRepository) {
-        this.messagingTemplate = messagingTemplate;
-        this.timerService = timerService;
-        this.translationService = translationService;
-        this.lobbyRepository = lobbyRepository;
-        this.wordPairRepository = wordPairRepository;
-        this.playerRepository = playerRepository;
-        this.userRepository = userRepository;
-        this.random = new Random();
-    }
+  @Autowired
+  public GameService(SimpMessagingTemplate messagingTemplate,
+                     TimerService timerService,
+                     TranslationService translationService,
+                     @Qualifier("lobbyRepository") LobbyRepository lobbyRepository,
+                     @Qualifier("wordPairRepository") WordPairRepository wordPairRepository,
+                     @Qualifier("playerRepository") PlayerRepository playerRepository,
+                     @Qualifier("userRepository") UserRepository userRepository) {
+    this.messagingTemplate = messagingTemplate;
+    this.timerService = timerService;
+    this.translationService = translationService;
+    this.lobbyRepository = lobbyRepository;
+    this.wordPairRepository = wordPairRepository;
+    this.playerRepository = playerRepository;
+    this.userRepository = userRepository;
+    this.random = new Random();
+  }
 
   public void startGame(Long lobbyId, Long userId) {
-
     // initialize game
     Game game = initializeGame(lobbyId, userId);
     activeGames.put(game.getLobbyId(), game);
 
     // notify all players that the game has been started
     notifyGameEvents(game, "startGame");
-    System.out.println("Stage 2 reached");
 
     // interval -> start round
-    // TODO: implement multiple rounds
     timerService.startIntervalTimer(game, 3, () -> startRound(game));
   }
 
@@ -138,68 +135,63 @@ public class GameService {
     return shuffledPlayerIds;
   }
 
-    public void assignWordsAndRoles(Game game) {
-        List<String> gameThemes = game.getThemeNames();
-        for(String theme : gameThemes) {
-            System.out.println(theme);
-        }
+  public void assignWordsAndRoles(Game game) {
+    List<String> gameThemes = game.getThemeNames();
 
-        // select theme randomly
-        // Random random = new Random();
-        String randomTheme = gameThemes.stream()
-                .skip(random.nextInt(gameThemes.size())) // Skip a random number of elements
-                .findFirst() // This always succeeds unless the list is empty
-                .orElseThrow(() -> new NoSuchElementException("No themes available in the lobby")); // Throw if the list is empty
+    // select theme randomly
+    // Random random = new Random();
+    String randomTheme = gameThemes.stream()
+      .skip(random.nextInt(gameThemes.size())) // Skip a random number of elements
+      .findFirst() // This always succeeds unless the list is empty
+      .orElseThrow(() -> new NoSuchElementException("No themes available in the lobby")); // Throw if the list is empty
 
-        // Done: assign word randomly
-        List<WordPair> wordPairList = wordPairRepository.findByTheme_Name(randomTheme);
-        WordPair randomWordPair = wordPairList.stream()
-                .skip(random.nextInt(wordPairList.size())) // Skip a random number of elements
-                .findFirst() // This always succeeds unless the list is empty
-                .orElseThrow(() -> new NoSuchElementException("No word pairs available in the theme")); // Throw if the list is empty
-        boolean assignFirstAsWolf = random.nextBoolean();
-        String wolf_word = assignFirstAsWolf ? randomWordPair.getFirstWord() : randomWordPair.getSecondWord();
-        String villager_word = assignFirstAsWolf ? randomWordPair.getSecondWord() : randomWordPair.getFirstWord();
+    // Done: assign word randomly
+    List<WordPair> wordPairList = wordPairRepository.findByTheme_Name(randomTheme);
+    WordPair randomWordPair = wordPairList.stream()
+      .skip(random.nextInt(wordPairList.size())) // Skip a random number of elements
+      .findFirst() // This always succeeds unless the list is empty
+      .orElseThrow(() -> new NoSuchElementException("No word pairs available in the theme")); // Throw if the list is empty
+    boolean assignFirstAsWolf = random.nextBoolean();
+    String wolf_word = assignFirstAsWolf ? randomWordPair.getFirstWord() : randomWordPair.getSecondWord();
+    String villager_word = assignFirstAsWolf ? randomWordPair.getSecondWord() : randomWordPair.getFirstWord();
 
-        // Done: notify assigned word to each player "/queue/{userId}/wordAssignment"
-        List<Player> players = game.getPlayers();
-        if (players == null || players.isEmpty()) {
-            throw new IllegalStateException("No players available");
-        }
-        // Select a random player to be the wolf
-        int wolfIndex = random.nextInt(players.size());
-        for (int i = 0; i < players.size(); i++) {
-            if (i != wolfIndex) { // Skip the wolf
-                Player villager = players.get(i);
-                System.out.println("villager has been selected");
-                villager.setRole(Role.VILLAGER);
-                villager.setWord(villager_word);
-                Player updatedPlayer = playerRepository.save(villager);
-                playerRepository.flush();
-                WordNotification villagerNotification = new WordNotification();
-                //For cost concern, this function is commented
+    // Done: notify assigned word to each player "/queue/{userId}/wordAssignment"
+    List<Player> players = game.getPlayers();
+    if (players == null || players.isEmpty()) {
+        throw new IllegalStateException("No players available");
+    }
+    // Select a random player to be the wolf
+    int wolfIndex = random.nextInt(players.size());
+    for (int i = 0; i < players.size(); i++) {
+      if (i != wolfIndex) { // Skip the wolf
+        Player villager = players.get(i);
+        villager.setRole(Role.VILLAGER);
+        villager.setWord(villager_word);
+        Player updatedPlayer = playerRepository.save(villager);
+        playerRepository.flush();
+        WordNotification villagerNotification = new WordNotification();
+        //For cost concern, this function is commented
 //                 String Translated_text = translationService.translateText("your assigned word is: " + villager_word, villager.getLanguage());
 //                 villagerNotification.setWord(Translated_text);
-                villagerNotification.setWord(villager_word);
-                String destination = "/queue/" + villager.getUserId() + "/wordAssignment";
-                messagingTemplate.convertAndSend(destination, villagerNotification);
-            } else {
-                Player wolf = players.get(i);
-                System.out.println("wolf has been selected");
-                wolf.setRole(Role.WOLF);
-                wolf.setWord(wolf_word);
-                Player updatedPlayer = playerRepository.save(wolf);
-                playerRepository.flush();
-                WordNotification wolfNotification = new WordNotification();
-                //For cost concern, this function is commented
+        villagerNotification.setWord(villager_word);
+        String destination = "/queue/" + villager.getUserId() + "/wordAssignment";
+        messagingTemplate.convertAndSend(destination, villagerNotification);
+      } else {
+        Player wolf = players.get(i);
+        wolf.setRole(Role.WOLF);
+        wolf.setWord(wolf_word);
+        Player updatedPlayer = playerRepository.save(wolf);
+        playerRepository.flush();
+        WordNotification wolfNotification = new WordNotification();
+        //For cost concern, this function is commented
 //                 String wolfanouncement = translationService.translateText("Your role is wolf.",wolf.getLanguage());
 //                 wolfNotification.setWord(wolfanouncement);
-                wolfNotification.setWord(null);
-                String destination = "/queue/" + wolf.getUserId() + "/wordAssignment";
-                messagingTemplate.convertAndSend(destination, wolfNotification);
-            }
-        }
+        wolfNotification.setWord(null);
+        String destination = "/queue/" + wolf.getUserId() + "/wordAssignment";
+        messagingTemplate.convertAndSend(destination, wolfNotification);
+      }
     }
+  }
 
   private void startClueTurn(Game game, List<Long> playerIds, Integer currentIndex) {
     Long currentPlayerId = playerIds.get(currentIndex);
@@ -249,6 +241,11 @@ public class GameService {
       playerDTO.setUserId(player.getUserId());
       playerDTO.setUsername(player.getUsername());
       winners.add(playerDTO);
+      // update user records
+      User user = userRepository.findById(player.getUserId())
+        .orElseThrow(() -> new NoSuchElementException("No user found with ID: " + player.getUserId()));
+      user.addWins();
+      userRepository.save(user); // Save the updated user record
     }
     // losers
     List<PlayerDTO> losers = new ArrayList<>();
@@ -258,7 +255,13 @@ public class GameService {
       playerDTO.setUserId(player.getUserId());
       playerDTO.setUsername(player.getUsername());
       losers.add(playerDTO);
+      // update user records
+      User user = userRepository.findById(player.getUserId())
+        .orElseThrow(() -> new NoSuchElementException("No user found with ID: " + player.getUserId()));
+      user.addLosses();
+      userRepository.save(user); // Save the updated user record
     }
+    userRepository.flush(); // Flush changes to the database
 
     // set variables to resultNotification
     ResultNotification resultNotification = new ResultNotification();
@@ -297,15 +300,15 @@ public class GameService {
   }
 
   public List<Player> getActivePlayers(Long lobbyId) {
-      return activeGames.get(lobbyId).getPlayers();
+    return activeGames.get(lobbyId).getPlayers();
   }
 
   public Game getActiveGameByLobbyId(Long lobbyId) {
-      return activeGames.get(lobbyId);
+    return activeGames.get(lobbyId);
   }
 
   public void setRandom(Random random) {
-    this. random = random;
+    this.random = random;
   }
 
 }
