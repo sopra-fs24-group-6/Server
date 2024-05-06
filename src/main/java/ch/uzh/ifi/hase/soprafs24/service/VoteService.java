@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.constant.Role;
+import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Player;
 import ch.uzh.ifi.hase.soprafs24.entity.Result;
 import ch.uzh.ifi.hase.soprafs24.entity.Vote;
@@ -28,7 +29,7 @@ public class VoteService {
 
     public void saveVote(Vote vote) {
         // Check if the voter has already voted in this lobby
-        if (!hasVoted(vote.getVoterUserId(), vote.getLobbyId())) {
+        if (!hasVoted(vote)) {
             voteRepository.save(vote);
             voteRepository.flush();
         } else {
@@ -36,13 +37,16 @@ public class VoteService {
         }
     }
 
-    private boolean hasVoted(Long voterUserId, Long lobbyId) {
-        return voteRepository.findByVoterUserIdAndLobbyId(voterUserId, lobbyId).isPresent();
+    private boolean hasVoted(Vote vote) {
+        return voteRepository.findByVoterUserIdAndLobbyIdAndRound(
+          vote.getVoterUserId(), vote.getLobbyId(), vote.getRound()).isPresent();
     }
 
-    public Optional<Result> calculateResults(Long lobbyId, List<Player> players) {
+    public Optional<Result> calculateResults(Game game) {
         // get all votes by lobbyId
-        List<Vote> votes = voteRepository.findByLobbyId(lobbyId);
+        List<Vote> votes = voteRepository.findByLobbyIdAndRound(game.getLobbyId(), game.getCurrentRound());
+        // get active players
+        List<Player> players = game.getPlayers();
 
         // if all players voted, then calculate and return result
         if (votes.size() == players.size()) {
@@ -99,6 +103,10 @@ public class VoteService {
         result.setWinnerPlayers(winnerPlayers);
         result.setLoserPlayers(loserPlayers);
         return result;
+    }
+
+    public void deleteVotesByLobbyId(Long lobbyId) {
+        voteRepository.deleteByLobbyId(lobbyId);
     }
 }
 

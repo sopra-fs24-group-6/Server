@@ -16,5 +16,11 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
 
     List<Vote> findByLobbyId(Long lobbyId);
 
+    List<Vote> findByLobbyIdAndRound(Long lobbyId, Integer round);
+
     Optional<Object> findByVoterUserIdAndLobbyId(Long voterUserId, Long lobbyId);
+
+    Optional<Object> findByVoterUserIdAndLobbyIdAndRound(Long voterUserId, Long lobbyId, Integer round);
+
+    void deleteByLobbyId(Long lobbyId);
 }

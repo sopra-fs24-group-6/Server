@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
+import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Player;
 import ch.uzh.ifi.hase.soprafs24.entity.Result;
 import ch.uzh.ifi.hase.soprafs24.entity.Vote;
@@ -34,15 +35,17 @@ public class VoteController {
 
     @MessageMapping("/vote/{lobbyId}/sendVote")
     public void saveVoteAndNotifyResult(@DestinationVariable Long lobbyId, @Payload VoteDTO voteDTO) {
+        // get game
+        Game game = gameService.getActiveGameByLobbyId(lobbyId);
+
         // save vote
         Vote vote = VoteDTOMapper.INSTANCE.convertVoteDTOtoEntity(voteDTO);
         vote.setLobbyId(lobbyId);
+        vote.setRound(game.getCurrentRound());
         voteService.saveVote(vote);
 
-        // get active players
-        List<Player> players = gameService.getActivePlayers(lobbyId);
         // calculate result. if not all players have voted, then return Optional.empty()
-        Optional<Result> result = voteService.calculateResults(lobbyId, players);
+        Optional<Result> result = voteService.calculateResults(game);
 
         // if result is calculated, then notify players
         result.ifPresent(value -> gameService.notifyResults(lobbyId, value));

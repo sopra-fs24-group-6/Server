@@ -17,6 +17,9 @@ public class Vote implements Serializable {
     private Long lobbyId;
 
     @Column(nullable = false)
+    private Integer round;
+
+    @Column(nullable = false)
     private Long voterUserId;
 
     @Column(nullable = false)
@@ -25,8 +28,9 @@ public class Vote implements Serializable {
     // Constructors
     public Vote() {}
 
-    public Vote(Long lobbyId, Long voterUserId, Long votedUserId) {
+    public Vote(Long lobbyId, Integer round, Long voterUserId, Long votedUserId) {
         this.lobbyId = lobbyId;
+        this.round = round;
         this.voterUserId = voterUserId;
         this.votedUserId = votedUserId;
     }
@@ -46,6 +50,14 @@ public class Vote implements Serializable {
 
     public void setLobbyId(Long lobbyId) {
         this.lobbyId = lobbyId;
+    }
+
+    public Integer getRound() {
+        return round;
+    }
+
+    public void setRound(Integer round) {
+        this.round = round;
     }
 
     public Long getVoterUserId() {

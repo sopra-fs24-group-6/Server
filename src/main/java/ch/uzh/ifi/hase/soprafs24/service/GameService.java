@@ -3,10 +3,7 @@ package ch.uzh.ifi.hase.soprafs24.service;
 import ch.uzh.ifi.hase.soprafs24.constant.Role;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
-import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
-import ch.uzh.ifi.hase.soprafs24.repository.PlayerRepository;
-import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
-import ch.uzh.ifi.hase.soprafs24.repository.WordPairRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.*;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.EventNotification;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.ResultNotification;
@@ -31,8 +28,9 @@ import java.util.concurrent.ScheduledFuture;
 public class GameService {
   private final SimpMessagingTemplate messagingTemplate;
   private final TimerService timerService;
+  private final LobbyService lobbyService;
+  private final VoteService voteService;
   private final TranslationService translationService;
-  private final LobbyRepository lobbyRepository;
   private final UserRepository userRepository;
   private final WordPairRepository wordPairRepository;
   private final PlayerRepository playerRepository;
@@ -42,15 +40,17 @@ public class GameService {
   @Autowired
   public GameService(SimpMessagingTemplate messagingTemplate,
                      TimerService timerService,
+                     LobbyService lobbyService,
+                     VoteService voteService,
                      TranslationService translationService,
-                     @Qualifier("lobbyRepository") LobbyRepository lobbyRepository,
                      @Qualifier("wordPairRepository") WordPairRepository wordPairRepository,
                      @Qualifier("playerRepository") PlayerRepository playerRepository,
                      @Qualifier("userRepository") UserRepository userRepository) {
     this.messagingTemplate = messagingTemplate;
     this.timerService = timerService;
+    this.lobbyService = lobbyService;
+    this.voteService = voteService;
     this.translationService = translationService;
-    this.lobbyRepository = lobbyRepository;
     this.wordPairRepository = wordPairRepository;
     this.playerRepository = playerRepository;
     this.userRepository = userRepository;
@@ -70,9 +70,10 @@ public class GameService {
   }
 
   public Game initializeGame(Long lobbyId, Long userId) {
-    // find lobby by lobbyId and verify host's userId
-    Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(() -> new ResponseStatusException(
-      HttpStatus.NOT_FOUND, "Lobby with id " + lobbyId + " could not be found."));
+    // find lobby by lobbyId
+    Lobby lobby = lobbyService.getLobbyById(lobbyId);
+
+    // check if requester is host
     if (userId.equals(lobby.getHost().getUserId())) {
       // initialize game (set theme, duration, players, etc. to game instance)
       Game game = new Game();
@@ -82,6 +83,7 @@ public class GameService {
       game.setDiscussionTimer(lobby.getDiscussionTimer());
       game.setPlayers(lobby.getPlayers());
       game.setThemeNames(lobby.getThemeNames());
+      game.setRounds(lobby.getRounds());
       return game;
     } else {
       // Optionally, you could log this attempt, throw an exception, or return null
@@ -93,12 +95,16 @@ public class GameService {
   public void notifyGameEvents(Game game, String eventType) {
     EventNotification eventNotification = new EventNotification();
     eventNotification.setEventType(eventType);
+    eventNotification.setCurrentRound(game.getCurrentRound());
+    eventNotification.setMaxRound(game.getRounds());
     messagingTemplate.convertAndSend("/topic/" + game.getLobbyId() + "/gameEvents", eventNotification);
   }
 
   public void startRound(Game game) {
-    // interval -> start assign phase
-    // timerService.startIntervalTimer(game, () -> startAssignPhase(game));
+    // notify all players that the game has been started
+    notifyGameEvents(game, "startRound");
+
+    // start assign phase
     startAssignPhase(game);
   }
 
@@ -271,32 +277,38 @@ public class GameService {
 
     // notify result
     Game game = getActiveGameByLobbyId(lobbyId);
-    notifyGameEvents(game, "gameResult");
+    notifyGameEvents(game, "roundResult");
     messagingTemplate.convertAndSend("/topic/" + lobbyId + "/result", resultNotification);
 
     // interval -> end game
-    timerService.startIntervalTimer(game, 3, () -> endGame(lobbyId));
+    timerService.startIntervalTimer(game, 5, () -> endRound(game));
+  }
+
+  public void endRound(Game game) {
+    // start round again or end game
+    if (game.getCurrentRound() < game.getRounds()) {
+      // update currentRound and start round
+      game.incrementAndSetCurrentRound();
+      startRound(game);
+    } else {
+      endGame(game);
+    }
   }
 
   @Transactional
-  public void endGame(Long lobbyId) {
+  public void endGame(Game game) {
     // notify end game
-    Game game = getActiveGameByLobbyId(lobbyId);
     notifyGameEvents(game, "endGame");
 
-    // delete relationship between user and player
-    for (Player player : game.getPlayers()) {
-      Optional<User> user = userRepository.findById(player.getUserId());
-      if (user.isPresent()) {
-        user.get().setPlayer(null);
-        userRepository.save(user.get());
-        userRepository.flush();
-      }
-    }
+    // delete lobby
+    Lobby lobby = lobbyService.getLobbyById(game.getLobbyId());
+    lobbyService.deleteLobby(lobby);
 
-    // delete lobby, and players by cascade setting
-    lobbyRepository.deleteById(lobbyId);
-    lobbyRepository.flush();
+    // delete votes
+    voteService.deleteVotesByLobbyId(game.getLobbyId());
+
+    // delete game
+    activeGames.remove(game.getLobbyId());
   }
 
   public List<Player> getActivePlayers(Long lobbyId) {

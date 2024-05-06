@@ -322,7 +322,7 @@ public class LobbyService {
     }
   }
 
-  private void deleteLobby(Lobby lobby) {
+  public void deleteLobby(Lobby lobby) {
     // delete relationship between user and player
     for (Player player : lobby.getPlayers()) {
       Optional<User> user = userRepository.findById(player.getUserId());
