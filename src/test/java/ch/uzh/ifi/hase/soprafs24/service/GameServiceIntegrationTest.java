@@ -186,7 +186,7 @@ public class GameServiceIntegrationTest {
     roundTimerCallback.run();
 
     // then: notify event of startGame, clue, discussion, vote
-    verify(messagingTemplate, times(4))
+    verify(messagingTemplate, times(5))
       .convertAndSend(eq("/topic/" + testLobby.getId() + "/gameEvents"), any(EventNotification.class));
   }
 

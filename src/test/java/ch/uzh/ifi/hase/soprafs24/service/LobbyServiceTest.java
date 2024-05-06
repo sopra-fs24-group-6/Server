@@ -63,6 +63,7 @@ public class LobbyServiceTest {
     hostPlayer.setHost(true);
 
     testLobby = new Lobby();
+    testLobby.setId(1L);
     testLobby.setName("lobbyName");
     testLobby.setPassword("password");
     testLobby.setHost(hostPlayer);
@@ -76,21 +77,11 @@ public class LobbyServiceTest {
     testLobby.setDiscussionTimer(30);
     testLobby.setStatus(LobbyStatus.OPEN);
     testLobby.setThemes(new ArrayList<>(List.of(testTheme)));
+    hostPlayer.setLobby(testLobby);
 
     MockitoAnnotations.openMocks(this);
   }
 
-//    @AfterEach
-//    public void afterEachTest(TestInfo testInfo) {
-//        System.out.println("AfterLobbyServiceTest: " + testInfo.getDisplayName());
-//        System.out.println("Current Environment Variables:");
-//        String googleCredentials = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
-//        if (googleCredentials != null) {
-//            System.out.println("GOOGLE_APPLICATION_CREDENTIALS = " + googleCredentials);
-//        } else {
-//            System.out.println("GOOGLE_APPLICATION_CREDENTIALS is not set.");
-//        }
-//    }
   @Test
   public void getAllLobbies_success() {
     // given
@@ -127,6 +118,72 @@ public class LobbyServiceTest {
     // when/ then
     ResponseStatusException exception = assertThrows(
       ResponseStatusException.class, () -> lobbyService.getLobbyById(lobbyId));
+    assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+  }
+
+  @Test
+  public void getLobbies_withoutParameters() {
+    // given
+    List<Lobby> lobbyList = List.of(testLobby);
+    Mockito.when(lobbyRepository.findAll()).thenReturn(lobbyList);
+
+    // when
+    List<Lobby> result = lobbyService.getLobbies(null, null);
+
+    // then
+    assertEquals(1, result.size());
+    assertEquals(lobbyList, result);
+  }
+
+  @Test
+  public void getLobbies_validUsername() {
+    // given
+    List<Lobby> lobbyList = List.of(testLobby);
+    Mockito.when(playerRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(hostPlayer));
+
+    // when
+    List<Lobby> result = lobbyService.getLobbies("hostUsername", null);
+
+    // then
+    assertEquals(1, result.size());
+    assertEquals(lobbyList, result);
+  }
+
+  @Test
+  public void getLobbies_validUsernameAndNotJoinedLobby() {
+    // given
+    Player player = new Player();
+    Mockito.when(playerRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(player));
+
+    // when/ then
+    ResponseStatusException exception = assertThrows(
+      ResponseStatusException.class, () -> lobbyService.getLobbies("username", null));
+    assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+  }
+
+  @Test
+  public void getLobbies_validUserId() {
+    // given
+    List<Lobby> lobbyList = List.of(testLobby);
+    Mockito.when(playerRepository.findById(Mockito.any())).thenReturn(Optional.of(hostPlayer));
+
+    // when
+    List<Lobby> result = lobbyService.getLobbies(null, 1L);
+
+    // then
+    assertEquals(1, result.size());
+    assertEquals(lobbyList, result);
+  }
+
+  @Test
+  public void getLobbies_validUserIdAndNotJoinedLobby() {
+    // given
+    Player player = new Player();
+    Mockito.when(playerRepository.findById(Mockito.any())).thenReturn(Optional.of(player));
+
+    // when/ then
+    ResponseStatusException exception = assertThrows(
+      ResponseStatusException.class, () -> lobbyService.getLobbies(null, 2L));
     assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
   }
 
