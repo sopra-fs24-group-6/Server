@@ -12,20 +12,17 @@ public class UserGetDTO {
   private Date creationDate;
   private Date birthDate;
   private String token;
-
   private String language;
 
-    public String getLanguage() {
-        return language;
-    }
+  private int wins;
 
-    public void setLanguage(String language) {
-        this.language = language;
-    }
+  private int losses;
 
-    public Long getId() {
-    return id;
-  }
+  private double winlossratio;
+
+  public Long getId() {
+  return id;
+}
 
   public void setId(Long id) {
     this.id = id;
@@ -61,5 +58,37 @@ public class UserGetDTO {
 
   public void setToken(String token) {
     this.token = token;
+  }
+
+  public int getWins() {
+    return wins;
+  }
+
+  public void setWins(int wins) {
+    this.wins = wins;
+  }
+
+  public int getLosses() {
+    return losses;
+  }
+
+  public void setLosses(int losses) {
+    this.losses = losses;
+  }
+
+  public double getWinlossratio() {
+    return winlossratio;
+  }
+
+  public void setWinlossratio(double winlossratio) {
+    this.winlossratio = winlossratio;
+  }
+
+  public String getLanguage() {
+    return language;
+  }
+
+  public void setLanguage(String language) {
+    this.language = language;
   }
 }

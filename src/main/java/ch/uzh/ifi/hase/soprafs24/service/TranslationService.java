@@ -7,20 +7,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class TranslationService {
 
-    private final Translate translate;
+  private final Translate translate;
 
-    public TranslationService() {
-        // Instantiates a client for Translate
-        this.translate = TranslateOptions.getDefaultInstance().getService();
-    }
+  public TranslationService() {
+    // Instantiates a client for Translate
+    this.translate = TranslateOptions.getDefaultInstance().getService();
+  }
 
-    public String translateText(String originalText, String targetLanguage) {
-        /**
-         * To save cost for translation API, just returns originalText for now.
-         */
-        return originalText;
+  public String translateText(String originalText, String targetLanguage) {
+    /**
+     * To save cost for translation API, just returns originalText for now.
+     */
+    return originalText;
 
-        // Translates some text into the target language
+    // Translates some text into the target language
 //        Translation translation = translate.translate(
 //                originalText,
 //                Translate.TranslateOption.targetLanguage(targetLanguage),
@@ -29,5 +29,5 @@ public class TranslationService {
 //                Translate.TranslateOption.model("base")
 //        );
 //        return translation.getTranslatedText();
-    }
+  }
 }

@@ -47,15 +47,34 @@ public class User implements Serializable {
   @Column(nullable = false)
   private String language;
 
-  public String getLanguage() {
-      return language;
+  @Column(nullable = false)
+  private int wins = 0;
+
+  @Column(nullable = false)
+  private int losses = 0;
+
+  @Column(nullable = false)
+  private double winlossratio = 0.0;
+
+  // testing purposes
+  @Override
+  public String toString() {
+    return "User{" +
+            "\n\tid=" + id +
+            ", \n\tusername='" + username + '\'' +
+            ", \n\ttoken='" + token + '\'' +
+            ", \n\tstatus=" + status +
+            ", \n\tpassword='" + password + '\'' +
+            ", \n\tcreationDate=" + creationDate +
+            ", \n\tbirthDate=" + birthDate +
+            ", \n\tlanguage='" + language + '\'' +
+            ", \n\twins=" + wins +
+            ", \n\tlosses=" + losses +
+            ", \n\twinlossratio=" + winlossratio +
+            "\n}";
   }
 
-    public void setLanguage(String language) {
-        this.language = language;
-    }
-
-    @OneToOne
+  @OneToOne
   @JoinColumn(name = "player_id")
   private Player player;
 
@@ -114,5 +133,45 @@ public class User implements Serializable {
 
   public void setPlayer(Player player) {
     this.player = player;
+  }
+
+  public double getWinlossratio() {
+    return winlossratio;
+  }
+
+  public void setWinlossratio(double winlossratio) {
+    this.winlossratio = winlossratio;
+  }
+
+  public int getWins() {
+    return wins;
+  }
+
+  public void setWins(int wins) {
+    this.wins = wins;
+  }
+
+  public void addWins() {
+    this.wins += 1;
+  }
+
+  public void addLosses() {
+    this.losses += 1;
+  }
+
+  public int getLosses() {
+    return losses;
+  }
+
+  public void setLosses(int lose) {
+    this.losses = lose;
+  }
+
+  public String getLanguage() {
+    return language;
+  }
+
+  public void setLanguage(String language) {
+    this.language = language;
   }
 }

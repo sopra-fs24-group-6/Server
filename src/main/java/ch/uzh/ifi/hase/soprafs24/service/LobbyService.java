@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,17 +33,13 @@ import java.util.Optional;
 @Service
 @Transactional
 public class LobbyService {
-
   private final Logger log = LoggerFactory.getLogger(LobbyService.class);
-
   private final UserRepository userRepository;
   private final PlayerRepository playerRepository;
   private final LobbyRepository lobbyRepository;
   private final ThemeRepository themeRepository;
-
   private final SimpMessagingTemplate messagingTemplate;
 
-  private Lobby defaultLobby = new Lobby();
 
   @Autowired
   public LobbyService(SimpMessagingTemplate messagingTemplate,
@@ -59,43 +54,23 @@ public class LobbyService {
     this.themeRepository = themeRepository;
   }
 
-  @PostConstruct
-  private void initializeDefaultLobby() {
-      defaultLobby = new Lobby();
-      defaultLobby.setName("Default Lobby");
-      defaultLobby.setPassword(null); // Assuming public by default
-      defaultLobby.setType(LobbyType.PUBLIC);
-      defaultLobby.setStatus(LobbyStatus.OPEN);
-      defaultLobby.setPlayerLimit(10);
-      defaultLobby.setPlayerCount(0);
-      defaultLobby.setRounds(3);
-      defaultLobby.setRoundTimer(60);
-      defaultLobby.setClueTimer(10);
-      defaultLobby.setDiscussionTimer(30);
-      defaultLobby.setThemes(themeRepository.findAll());
-      defaultLobby.setId(Long.MAX_VALUE);
-      // You might want to set a default theme or leave it empty
-  }
-
-
   public List<Lobby> getLobbies(String username, Long userId) {
     // if username is specified
     if (username != null) {
-      Lobby lobbyByUsername = getLobbyByUsername(username);
-      return Collections.singletonList(lobbyByUsername);
+        Lobby lobbyByUsername = getLobbyByUsername(username);
+        return Collections.singletonList(lobbyByUsername);
     }
     // if userId is specified
     if (userId != null) {
-      Lobby lobbyByUserId = getLobbyByUserId(userId);
-      return Collections.singletonList(lobbyByUserId);
+        Lobby lobbyByUserId = getLobbyByUserId(userId);
+        return Collections.singletonList(lobbyByUserId);
     }
-
     // if no parameters, then return all lobbies
     return getAllLobbies();
   }
 
   public List<Lobby> getAllLobbies() {
-      return this.lobbyRepository.findAll();
+    return this.lobbyRepository.findAll();
   }
 
   public Lobby getLobbyByUsername(String username) {
@@ -106,8 +81,8 @@ public class LobbyService {
 
     // Check if the player is associated with a lobby
     if (player.getLobby() == null) {
-      throw new ResponseStatusException(
-        HttpStatus.NOT_FOUND, "Player is not in any lobby.");
+        throw new ResponseStatusException(
+          HttpStatus.NOT_FOUND, "Player is not in any lobby.");
     }
     return player.getLobby();
   }
@@ -120,36 +95,30 @@ public class LobbyService {
 
     // Check if the player is associated with a lobby
     if (player.getLobby() == null) {
-      throw new ResponseStatusException(
-        HttpStatus.NOT_FOUND, "Player is not in any lobby.");
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Player is not in any lobby.");
     }
     return player.getLobby();
   }
 
   public Lobby getLobbyById(Long lobbyId) {
-      Lobby lobby = findLobbyById(lobbyId);
-      if (lobby == null) {
-          // Return a copy of the default lobby to avoid modification of the original
-          return defaultLobby;
-      }
-      return lobby;
+    return findLobbyById(lobbyId);
   }
 
-  public List<Player> getPlayersById(Long lobbyId){
+  public List<Player> getPlayersById(Long lobbyId) {
     Lobby lobby = lobbyRepository.findById(lobbyId)
-            .orElseThrow(() -> new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Lobby with id " + lobbyId + " could not be found."));
+      .orElseThrow(() -> new ResponseStatusException(
+        HttpStatus.NOT_FOUND, "Lobby with id " + lobbyId + " could not be found."));
     return lobby.getPlayers();
   }
 
   public void sendPlayerListToLobby(List<PlayerDTO> playerDTOS, long lobbyId) {
-      String destination = "/lobbies/" + lobbyId + "/players";
-      messagingTemplate.convertAndSend(destination, playerDTOS);
+    String destination = "/lobbies/" + lobbyId + "/players";
+    messagingTemplate.convertAndSend(destination, playerDTOS);
   }
 
   public void sendLobbyInfoToLobby(long lobbyId, LobbyGetDTO lobbyGetDTO) {
-      String destination = "/lobbies/" + lobbyId + "/lobby_info";
-      messagingTemplate.convertAndSend(destination, lobbyGetDTO);
+    String destination = "/lobbies/" + lobbyId + "/lobby_info";
+    messagingTemplate.convertAndSend(destination, lobbyGetDTO);
   }
 
   public Lobby createLobby(Lobby newLobby) {
@@ -162,6 +131,7 @@ public class LobbyService {
     LobbyType type = determineLobbyType(newLobby.getPassword());
     newLobby.setType(type);
     newLobby.setIsPrivate(type == LobbyType.PRIVATE);
+
 
     // set status
     newLobby.setStatus(LobbyStatus.OPEN);
@@ -368,7 +338,7 @@ public class LobbyService {
     lobbyRepository.flush();
   }
 
-  public void authenticateLobby (Long lobbyId, String password) {
+  public void authenticateLobby(Long lobbyId, String password) {
     // find lobby by id
     // if not found, then throw exception
     Lobby lobby = findLobbyById(lobbyId);
@@ -376,15 +346,14 @@ public class LobbyService {
     // check password
     // if incorrect password, then throw exception
     if (!lobby.getPassword().equals(password)) {
-      throw new ResponseStatusException(
-        HttpStatus.UNAUTHORIZED, "Incorrect password for lobby with id " + lobbyId + ".");
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Incorrect password for lobby with id " + lobbyId + ".");
     }
   }
 
-  public List<String> getThemes () {
+  public List<String> getThemes() {
     List<Theme> themes = themeRepository.findAll();
     List<String> themeNames = new ArrayList<>();
-    for (Theme theme: themes) {
+    for (Theme theme : themes) {
       themeNames.add(theme.getName());
     }
     return themeNames;
