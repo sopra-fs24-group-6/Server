@@ -18,12 +18,14 @@ import java.util.List;
 @Controller
 public class GameRecordController {
 
+
     private final GameRecordService gameRecordService;
 
     GameRecordController(GameRecordService gameRecordService)
     {
         this.gameRecordService = gameRecordService;
     }
+
 
     @GetMapping("/leaderboard")
     @ResponseStatus(HttpStatus.OK)
