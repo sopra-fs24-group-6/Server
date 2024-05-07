@@ -76,17 +76,21 @@
 | Aiqi Shuai | [#95](https://github.com/sopra-fs24-group-6/Server/issues/95) | Handle word choice given a certain theme & storage of the chosen word |
 
 
+## Week 4 & 5
 
-## Week 4
-
-| Name       | Issue                                                        | Description (optional)                                       |
-| ---------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| Aiqi Shuai | [#173](https://github.com/sopra-fs24-group-6/Server/issues/173) | Sending all players information to the client side when someone create the lobby. |
-| Aiqi Shuai | [#172](https://github.com/sopra-fs24-group-6/Server/issues/172) | Sending all players information to the client side when someone was kicked out of the lobby. |
-| Aiqi Shuai | [#171](https://github.com/sopra-fs24-group-6/Server/issues/171) | Send initialized lobby info or play info to client side, when they first entered the lobby |
-| Aiqi Shuai | [#170](https://github.com/sopra-fs24-group-6/Server/issues/170) | Sending the lobby information to all players when there is a change |
-| Aiqi Shuai | [#169](https://github.com/sopra-fs24-group-6/Server/issues/169) | Sending all players information to the client side when someone join the lobby. |
-| Aiqi Shuai | [#166](https://github.com/sopra-fs24-group-6/Server/issues/166) | Implement game initialization function                       |
-
-
+| Name         | Issue                                                           | Description (optional)                                                                       |
+|--------------|-----------------------------------------------------------------|----------------------------------------------------------------------------------------------|
+| Aiqi Shuai   | [#173](https://github.com/sopra-fs24-group-6/Server/issues/173) | Sending all players information to the client side when someone create the lobby.            |
+| Aiqi Shuai   | [#172](https://github.com/sopra-fs24-group-6/Server/issues/172) | Sending all players information to the client side when someone was kicked out of the lobby. |
+| Aiqi Shuai   | [#171](https://github.com/sopra-fs24-group-6/Server/issues/171) | Send initialized lobby info or play info to client side, when they first entered the lobby   |
+| Aiqi Shuai   | [#170](https://github.com/sopra-fs24-group-6/Server/issues/170) | Sending the lobby information to all players when there is a change                          |
+| Aiqi Shuai   | [#169](https://github.com/sopra-fs24-group-6/Server/issues/169) | Sending all players information to the client side when someone join the lobby.              |
+| Aiqi Shuai   | [#166](https://github.com/sopra-fs24-group-6/Server/issues/166) | Implement game initialization function                                                       |
+| Kei Murakami | [#183](https://github.com/sopra-fs24-group-6/Server/issues/183) | Remove player in case of disconnecting                                                       |
+| Kei Murakami | [#184](https://github.com/sopra-fs24-group-6/Server/issues/184) | Implement kicking player by host                                                             |
+| Kei Murakami | [#185](https://github.com/sopra-fs24-group-6/Server/issues/185) | Add lobby status to handle join and leave lobby                                              |
+| Kei Murakami | [#186](https://github.com/sopra-fs24-group-6/Server/issues/186) | Update DTO mappings for lobby                                                                |
+| Kei Murakami | [#114](https://github.com/sopra-fs24-group-6/Client/issues/114) | Modify lobby and browser view with real-time update                                          |
+| Kei Murakami | [#115](https://github.com/sopra-fs24-group-6/Client/issues/115) | Navigate to appropriate view when disconnecting                                              |
+| Kei Murakami | [#116](https://github.com/sopra-fs24-group-6/Client/issues/116) | Show pop-up when create/join/delete lobby and start game                                     |
 
