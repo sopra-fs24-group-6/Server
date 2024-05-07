@@ -1,7 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.constant.Role;
-import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
@@ -11,16 +10,12 @@ import ch.uzh.ifi.hase.soprafs24.websocket.dto.TurnNotification;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.WordNotification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledFuture;
 
 
 @Service
@@ -35,7 +30,6 @@ public class GameService {
   private final WordPairRepository wordPairRepository;
   private final PlayerRepository playerRepository;
   private final Map<Long, Game> activeGames = new ConcurrentHashMap<>();
-  private Random random;
 
   @Autowired
   public GameService(SimpMessagingTemplate messagingTemplate,
@@ -54,7 +48,6 @@ public class GameService {
     this.wordPairRepository = wordPairRepository;
     this.playerRepository = playerRepository;
     this.userRepository = userRepository;
-    this.random = new Random();
   }
 
   public void startGame(Long lobbyId, Long userId) {
@@ -142,10 +135,11 @@ public class GameService {
   }
 
   public void assignWordsAndRoles(Game game) {
-    List<String> gameThemes = game.getThemeNames();
+    // initialize random
+    Random random = new Random();
 
     // select theme randomly
-    // Random random = new Random();
+    List<String> gameThemes = game.getThemeNames();
     String randomTheme = gameThemes.stream()
       .skip(random.nextInt(gameThemes.size())) // Skip a random number of elements
       .findFirst() // This always succeeds unless the list is empty
@@ -311,10 +305,6 @@ public class GameService {
     activeGames.remove(game.getLobbyId());
   }
 
-  public List<Player> getActivePlayers(Long lobbyId) {
-    return activeGames.get(lobbyId).getPlayers();
-  }
-
   public Game getActiveGameByLobbyId(Long lobbyId) {
     return activeGames.get(lobbyId);
   }
@@ -322,9 +312,4 @@ public class GameService {
   public void putActiveGame(Long lobbyId, Game game) {
     activeGames.put(lobbyId, game);
   }
-
-  public void setRandom(Random random) {
-    this.random = random;
-  }
-
 }

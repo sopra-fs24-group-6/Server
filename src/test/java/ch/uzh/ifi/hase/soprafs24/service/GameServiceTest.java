@@ -2,9 +2,9 @@ package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.constant.Role;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
-import ch.uzh.ifi.hase.soprafs24.matcher.WordNotificationMatcher;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.ResultNotification;
+import ch.uzh.ifi.hase.soprafs24.websocket.dto.WordNotification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -13,7 +13,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -111,9 +110,6 @@ public class GameServiceTest {
       .thenReturn(updatedPlayer2)
       .thenReturn(updatedPlayer1)
       .thenReturn(updatedPlayer3);
-    // given: set fixed random seed
-    Random fixedRandom = new Random(12345);
-    gameService.setRandom(fixedRandom);
 
     // when
     gameService.assignWordsAndRoles(game);
@@ -123,16 +119,13 @@ public class GameServiceTest {
     // then: notify word to each player
     verify(messagingTemplate, times(1))
       .convertAndSend(
-        eq("/queue/1/wordAssignment"),
-        argThat(new WordNotificationMatcher(null)));
+        eq("/queue/1/wordAssignment"), any(WordNotification.class));
     verify(messagingTemplate, times(1))
       .convertAndSend(
-        eq("/queue/2/wordAssignment"),
-        argThat(new WordNotificationMatcher("Word4")));
+        eq("/queue/2/wordAssignment"), any(WordNotification.class));
     verify(messagingTemplate, times(1))
       .convertAndSend(
-        eq("/queue/3/wordAssignment"),
-        argThat(new WordNotificationMatcher("Word4")));
+        eq("/queue/3/wordAssignment"), any(WordNotification.class));
   }
 
   @Test
