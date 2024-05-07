@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
+import ch.uzh.ifi.hase.soprafs24.entity.Player;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -227,6 +228,25 @@ public class LobbyControllerTest {
     mockMvc.perform(getRequest).andExpect(status().isOk())
       .andExpect(jsonPath("$", hasSize(1)))
       .andExpect(jsonPath("$[0]", is(themeName)));
+  }
+
+  @Test
+  public void getPlayers_validLobbyId() throws Exception{
+    // given
+    Player player1 = new Player();
+    player1.setUserId(1L);
+    player1.setUsername("user1");
+    List<Player> playerList = List.of(player1);
+
+    testLobby.setPlayers(playerList);
+    when(lobbyService.getPlayersById(anyLong())).thenReturn(playerList);
+
+    // when/then
+    MockHttpServletRequestBuilder getRequest = get("/lobbies/{lobbyId}/players", testLobby.getId());
+    mockMvc.perform(getRequest).andExpect(status().isOk())
+      .andExpect(jsonPath("$", hasSize(1)))
+      .andExpect(jsonPath("$[0].userId", is(player1.getUserId().intValue())))
+      .andExpect(jsonPath("$[0].username", is(player1.getUsername())));
   }
 
 
