@@ -14,6 +14,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -30,6 +31,7 @@ public class GameService {
   private final WordPairRepository wordPairRepository;
   private final PlayerRepository playerRepository;
   private final Map<Long, Game> activeGames = new ConcurrentHashMap<>();
+  private final SecureRandom random = new SecureRandom();
 
   @Autowired
   public GameService(SimpMessagingTemplate messagingTemplate,
@@ -135,9 +137,6 @@ public class GameService {
   }
 
   public void assignWordsAndRoles(Game game) {
-    // initialize random
-    Random random = new Random();
-
     // select theme randomly
     List<String> gameThemes = game.getThemeNames();
     String randomTheme = gameThemes.stream()
