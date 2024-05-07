@@ -10,12 +10,15 @@ import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.PlayerRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.ThemeRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyGetDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.mockito.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -24,6 +27,11 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 public class LobbyServiceTest {
 
@@ -38,6 +46,9 @@ public class LobbyServiceTest {
 
   @Mock
   private PlayerRepository playerRepository;
+
+  @Mock
+  private SimpMessagingTemplate messagingTemplate;
 
   @InjectMocks
   private LobbyService lobbyService;
@@ -56,7 +67,6 @@ public class LobbyServiceTest {
     hostUser = new User();
     hostUser.setId(1L);
     hostUser.setUsername("hostUsername");
-
     hostPlayer = new Player();
     hostPlayer.setUserId(hostUser.getId());
     hostPlayer.setUsername(hostUser.getUsername());
@@ -185,6 +195,46 @@ public class LobbyServiceTest {
     ResponseStatusException exception = assertThrows(
       ResponseStatusException.class, () -> lobbyService.getLobbies(null, 2L));
     assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+  }
+
+  @Test
+  public void getPlayers_validLobbyId() {
+    // given
+    List<Player> playerList = List.of(hostPlayer);
+    Mockito.when(lobbyRepository.findById(Mockito.any())).thenReturn(Optional.of(testLobby));
+
+    // when
+    List<Player> result = lobbyService.getPlayersById(1L);
+
+    // then
+    assertEquals(1, result.size());
+    assertEquals(hostPlayer, result.get(0));
+  }
+
+  @Test
+  public void sendPlayerListToLobby_success() {
+    // given
+    List<PlayerDTO> playerDTOS = new ArrayList<PlayerDTO>();
+
+    // when
+    lobbyService.sendPlayerListToLobby(playerDTOS, 1L);
+
+    // then
+    verify(messagingTemplate, times(1))
+      .convertAndSend(eq("/lobbies/1/players"), eq(playerDTOS));
+  }
+
+  @Test
+  public void sendLobbyInfoToLobby_success() {
+    // given
+    LobbyGetDTO lobbyGetDTO = new LobbyGetDTO();
+
+    // when
+    lobbyService.sendLobbyInfoToLobby(1L, lobbyGetDTO);
+
+    // then
+    verify(messagingTemplate, times(1))
+      .convertAndSend(eq("/lobbies/1/lobby_info"), eq(lobbyGetDTO));
   }
 
   @Test
@@ -368,6 +418,17 @@ public class LobbyServiceTest {
     ResponseStatusException exception = assertThrows(
       ResponseStatusException.class, () -> lobbyService.addPlayerToLobby(testLobby.getId(), newUser.getId()));
     assertEquals(HttpStatus.CONFLICT, exception.getStatus());
+  }
+
+  @Test
+  public void authenticateLobby_invalidPassword() {
+    // given
+    Mockito.when(lobbyRepository.findById(Mockito.any())).thenReturn(Optional.of(testLobby));
+
+    // when/then
+    ResponseStatusException exception = assertThrows(
+      ResponseStatusException.class, () -> lobbyService.authenticateLobby(1L, "wrongPassword"));
+    assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
   }
 
   @Test

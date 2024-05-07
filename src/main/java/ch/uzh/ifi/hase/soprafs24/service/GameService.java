@@ -319,6 +319,10 @@ public class GameService {
     return activeGames.get(lobbyId);
   }
 
+  public void putActiveGame(Long lobbyId, Game game) {
+    activeGames.put(lobbyId, game);
+  }
+
   public void setRandom(Random random) {
     this.random = random;
   }

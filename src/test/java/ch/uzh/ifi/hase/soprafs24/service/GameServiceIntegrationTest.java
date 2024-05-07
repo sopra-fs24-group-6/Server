@@ -189,21 +189,4 @@ public class GameServiceIntegrationTest {
     verify(messagingTemplate, times(5))
       .convertAndSend(eq("/topic/" + testLobby.getId() + "/gameEvents"), any(EventNotification.class));
   }
-
-
-//  @Test
-//  public void testEndGame_success() {
-//    // given
-//    // Game game = gameService.initializeGame(testLobby.getId(), player1.getUserId());
-//
-//    // when
-//    // gameService.endGame(testLobby.getId());
-//
-//    // then: lobby and all players should be deleted
-//    // Optional<Lobby> deletedLobby = lobbyRepository.findById(testLobby.getId());
-//    // assertThat(deletedLobby.isEmpty()).isTrue();
-//    // assertThat(playerRepository.findAll().isEmpty()).isTrue();
-//  }
-//}
-
 }

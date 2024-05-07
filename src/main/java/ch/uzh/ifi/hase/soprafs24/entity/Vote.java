@@ -25,15 +25,6 @@ public class Vote implements Serializable {
     @Column(nullable = false)
     private Long votedUserId;
 
-    // Constructors
-    public Vote() {}
-
-    public Vote(Long lobbyId, Integer round, Long voterUserId, Long votedUserId) {
-        this.lobbyId = lobbyId;
-        this.round = round;
-        this.voterUserId = voterUserId;
-        this.votedUserId = votedUserId;
-    }
 
     // Getters and Setters
     public Long getId() {
