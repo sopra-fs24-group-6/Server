@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class GameRecordService {
+        
 
   private final UserRepository userRepository;
 
