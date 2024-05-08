@@ -55,7 +55,6 @@ public class UserController {
     return UserDTOMapper.INSTANCE.convertEntityToUserAvatarDTO(user);
   }
 
-
   @PutMapping("/users/{userId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void updateUser(@PathVariable("userId") Long userId, @RequestBody UserPutDTO userPutDTO) {

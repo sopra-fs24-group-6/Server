@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -64,20 +65,28 @@ public class UserService {
     if (!Files.exists(uploadDir)) {
       Files.createDirectories(uploadDir);
     }
-    // Initialize variables
-    String baseFileName = "avatar";
-    String extension = ".png";
-    int index = 1;
-    // Construct the initial file name without a number suffix
-    Path targetPath = uploadDir.resolve(baseFileName + "_" + index + extension);
-    // Check if the file already exists; increment index until a unique name is found
-    while (Files.exists(targetPath)) {
-      index++;
-      targetPath = uploadDir.resolve(baseFileName + "_" + index + extension);
+
+    // Set up the two possible avatar file paths
+    Path posPath = uploadDir.resolve("avatar_pos.png");
+    Path negPath = uploadDir.resolve("avatar_neg.png");
+    Path targetPath;
+
+    // Determine which file to use
+    if (Files.exists(posPath)) {
+      // `avatar_pos.png` exists, switch to `avatar_neg.png`
+      Files.delete(posPath);
+      targetPath = negPath;
+    } else if (Files.exists(negPath)) {
+      // `avatar_neg.png` exists, switch to `avatar_pos.png`
+      Files.delete(negPath);
+      targetPath = posPath;
+    } else {
+      // Neither file exists, start with `avatar_pos.png`
+      targetPath = posPath;
     }
 
     Files.write(targetPath, file.getBytes());
-    String avatarUrl = "/images/users/user" + userId + "/" + baseFileName + "_" + index + extension;
+    String avatarUrl = "/images/users/user" + userId + "/" + targetPath.getFileName().toString();
 
     // Update the user's avatar field in the database
     User user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with ID: " + userId + " is not found"));
@@ -87,6 +96,7 @@ public class UserService {
     // Return the URL or path to the stored avatar (adjust as needed)
     return user;
   }
+
 
   public User createUser(User newUser) {
     // set properties to newUser
