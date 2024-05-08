@@ -59,23 +59,17 @@ public class UserService {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "file is empty");
     }
     String user_file = AVATAR_DIR + "/user" + userId;
-
     // Ensure the directory exists
     Path uploadDir = Paths.get(user_file);
     if (!Files.exists(uploadDir)) {
       Files.createDirectories(uploadDir);
     }
-
     // Initialize variables
     String baseFileName = "avatar";
     String extension = ".png";
     int index = 1;
-
     // Construct the initial file name without a number suffix
     Path targetPath = uploadDir.resolve(baseFileName + "_" + index + extension);
-
-
-
     // Check if the file already exists; increment index until a unique name is found
     while (Files.exists(targetPath)) {
       index++;
@@ -105,11 +99,12 @@ public class UserService {
     // flush() is called
     // Load images as byte arrays
     String villagerAvatar = "/images/avatar/villager.png";
-    String wolfAvatar = "/images/avatar/villager.png";
+    String wolfAvatar = "/images/avatar/wolf.png";
 
     // Randomly select one of the avatars
     Random random = new Random();
     String selectedAvatar = random.nextBoolean() ? villagerAvatar : wolfAvatar;
+    System.out.println(selectedAvatar);
 
     // Assign selected avatar to the newUser
     newUser.setAvatarUrl(selectedAvatar);
