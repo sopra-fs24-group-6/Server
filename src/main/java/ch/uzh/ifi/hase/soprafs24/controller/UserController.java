@@ -4,11 +4,18 @@ import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.UserDTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * User Controller
@@ -39,6 +46,15 @@ public class UserController {
     }
     return userGetDTOs;
   }
+
+  @PostMapping("/{userId}/avatar")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public UserAvatarDTO UpdateAvatar(@PathVariable Long userId,@RequestParam("avatar") MultipartFile file) throws IOException {
+
+    User user = userService.updateUserAvatar(userId, file);
+    return UserDTOMapper.INSTANCE.convertEntityToUserAvatarDTO(user);
+  }
+
 
   @PutMapping("/users/{userId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)

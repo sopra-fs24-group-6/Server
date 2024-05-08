@@ -20,7 +20,17 @@ public class UserGetDTO {
 
   private double winlossratio;
 
-    public int getWins() {
+  private String avatarUrl;
+
+  public String getAvatarUrl() {
+    return avatarUrl;
+  }
+
+  public void setAvatarUrl(String avatarUrl) {
+    this.avatarUrl = avatarUrl;
+  }
+
+  public int getWins() {
         return wins;
     }
 

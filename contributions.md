@@ -90,3 +90,8 @@
 
 
 ## Week 5
+
+| Name       | Issue                                                        | Description (optional)                                 |
+| ---------- | ------------------------------------------------------------ | ------------------------------------------------------ |
+| Aiqi Shuai | [#129](https://github.com/sopra-fs24-group-6/Server/issues/129) | Endpoint to retrieve leaderboard data                  |
+| Aiqi Shuai | [#55](https://github.com/sopra-fs24-group-6/Client/issues/55) | Implement a leaderboard view and a button to access it |

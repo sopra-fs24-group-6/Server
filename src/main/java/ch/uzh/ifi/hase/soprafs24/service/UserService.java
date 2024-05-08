@@ -10,9 +10,15 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 import java.util.Date;
 
@@ -31,6 +37,9 @@ public class UserService {
 
   private final UserRepository userRepository;
 
+  // Path where we store the avatar images
+  private static final String AVATAR_DIR = "src/main/images/users";
+
   @Autowired
   public UserService(@Qualifier("userRepository") UserRepository userRepository) {
     this.userRepository = userRepository;
@@ -44,6 +53,47 @@ public class UserService {
     return findUserById(userId);
   }
 
+  public User updateUserAvatar(Long userId, MultipartFile file) throws IOException {
+    // Validate the file
+    if (file == null || file.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "file is empty");
+    }
+    String user_file = AVATAR_DIR + "/user" + userId;
+
+    // Ensure the directory exists
+    Path uploadDir = Paths.get(user_file);
+    if (!Files.exists(uploadDir)) {
+      Files.createDirectories(uploadDir);
+    }
+
+    // Initialize variables
+    String baseFileName = "avatar";
+    String extension = ".png";
+    int index = 1;
+
+    // Construct the initial file name without a number suffix
+    Path targetPath = uploadDir.resolve(baseFileName + "_" + index + extension);
+
+
+
+    // Check if the file already exists; increment index until a unique name is found
+    while (Files.exists(targetPath)) {
+      index++;
+      targetPath = uploadDir.resolve(baseFileName + "_" + index + extension);
+    }
+
+    Files.write(targetPath, file.getBytes());
+    String avatarUrl = "/images/users/user" + userId + "/" + baseFileName + "_" + index + extension;
+
+    // Update the user's avatar field in the database
+    User user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with ID: " + userId + " is not found"));
+    user.setAvatarUrl(avatarUrl);
+    userRepository.save(user);
+    userRepository.flush();
+    // Return the URL or path to the stored avatar (adjust as needed)
+    return user;
+  }
+
   public User createUser(User newUser) {
     // set properties to newUser
     newUser.setToken(UUID.randomUUID().toString());
@@ -53,6 +103,17 @@ public class UserService {
     checkIfUsernameExists(newUser.getUsername());
     // saves the given entity but data is only persisted in the database once
     // flush() is called
+    // Load images as byte arrays
+    String villagerAvatar = "/images/avatar/villager.png";
+    String wolfAvatar = "/images/avatar/villager.png";
+
+    // Randomly select one of the avatars
+    Random random = new Random();
+    String selectedAvatar = random.nextBoolean() ? villagerAvatar : wolfAvatar;
+
+    // Assign selected avatar to the newUser
+    newUser.setAvatarUrl(selectedAvatar);
+
     newUser = userRepository.save(newUser);
     userRepository.flush();
 
