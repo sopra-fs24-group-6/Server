@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +15,19 @@ import java.util.Optional;
 public class FriendService {
     @Autowired
     private FriendRepository friendRepository;
+
+    public List<Friend> getFriendsOf(Long userId) {
+        List<Friend> friends = new ArrayList<>();
+
+        friends.addAll(friendRepository.findByReceiverUserId(userId));
+        friends.addAll(friendRepository.findBySenderUserId(userId));
+
+        return friends;
+    }
+
+    public List<Friend> getFriendRequestsOf(Long receiverUserId) {
+        return friendRepository.findByReceiverUserId(receiverUserId);
+    }
 
     // Send a friend request
     public void sendFriendRequest(Long senderUserId, Long receiverUserId) {
@@ -29,9 +43,9 @@ public class FriendService {
     }
 
     // Accept a friend request (add friends mutually)
-    public void acceptFriendRequest(Long userId, Long requesterId) {
+    public void acceptFriendRequest(Long requesterId) {
         // Retrieve the friend request to ensure it exists and is not yet approved
-        Optional<Friend> friendRequestOpt = friendRepository.findBySenderUserIdAndReceiverUserId(requesterId, userId);
+        Optional<Friend> friendRequestOpt = friendRepository.findById(requesterId);
         if (!friendRequestOpt.isPresent()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Friend request not found.");
         }
@@ -45,27 +59,17 @@ public class FriendService {
         friendRequest.setIsApproved(true);
         friendRepository.save(friendRequest);
 
-        // Check if the reverse friendship exists; if not, create it
-        Optional<Friend> reverseFriendOpt = friendRepository.findBySenderUserIdAndReceiverUserId(userId, requesterId);
-        if (!reverseFriendOpt.isPresent() || !reverseFriendOpt.get().getIsApproved()) {
-            Friend newFriend = new Friend();
-            newFriend.setSenderUserId(userId);
-            newFriend.setReceiverUserId(requesterId);
-            newFriend.setIsApproved(true);
-            friendRepository.save(newFriend);
-        }
     }
 
 
-    public void deleteFriendRequest(Long userId, Long requesterId) {
-        Optional<Friend> friendRequest = friendRepository.findBySenderUserIdAndReceiverUserId(requesterId, userId);
+    public void deleteFriendRequest(Long requesterId) {
+        Optional<Friend> friendRequest = friendRepository.findById(requesterId);
         if (friendRequest.isPresent() && !friendRequest.get().getIsApproved()) {
             friendRepository.delete(friendRequest.get());
-        } else {
+        }
+        else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot delete an approved friendship or non-existing request.");
         }
     }
 
 }
-
-
