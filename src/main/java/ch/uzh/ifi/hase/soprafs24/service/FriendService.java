@@ -10,6 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class FriendService {
@@ -26,8 +27,12 @@ public class FriendService {
     }
 
     public List<Friend> getFriendRequestsOf(Long receiverUserId) {
-        return friendRepository.findByReceiverUserId(receiverUserId);
+        // Retrieve all friend requests for the user but filter out the ones that are already approved.
+        return friendRepository.findByReceiverUserId(receiverUserId).stream()
+                .filter(request -> !request.getIsApproved())
+                .collect(Collectors.toList());
     }
+
 
     // Send a friend request
     public void sendFriendRequest(Long senderUserId, Long receiverUserId) {
