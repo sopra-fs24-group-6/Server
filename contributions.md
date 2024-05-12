@@ -44,8 +44,8 @@
 
 ## Week 3
 
-| Name            | Issue                                                            | Description (optional) |
-|-----------------|------------------------------------------------------------------| ---------------------- |
+| Name            | Issue                                                           | Description (optional) |
+|-----------------|-----------------------------------------------------------------| ---------------------- |
 | Nico Plüss      | [#82](https://github.com/sopra-fs24-group-6/Client/issues/82)   | Logic to make a GET request to server for retrieving available lobbies |
 | Nico Plüss      | [#81](https://github.com/sopra-fs24-group-6/Client/issues/81)   | Displaying info for available lobbies currently uses placeholder data|
 | Nico Plüss      | [#80](https://github.com/sopra-fs24-group-6/Client/issues/80)   | ability to refresh lobby data |
@@ -73,19 +73,23 @@
 | Kei Murakami    | [#102](https://github.com/sopra-fs24-group-6/Server/issues/102) | Track the round timer to update player state                                                                                                                                   |
 | Aiqi Shuai | [#149](https://github.com/sopra-fs24-group-6/Server/issues/149) | Adding a session manager |
 | Aiqi Shuai | [#100](https://github.com/sopra-fs24-group-6/Server/issues/100) | Set up away for the api to know what languages should be |
-| Aiqi Shuai | [#95](https://github.com/sopra-fs24-group-6/Server/issues/95) | Handle word choice given a certain theme & storage of the chosen word |
+| Aiqi Shuai | [#95](https://github.com/sopra-fs24-group-6/Server/issues/95)   | Handle word choice given a certain theme & storage of the chosen word |
+| Alisher Dauysbekov | [#112](https://github.com/sopra-fs24-group-6/Server/issues/112) |Endpoint to search for the user|
+| Alisher Dauysbekov | [#113](https://github.com/sopra-fs24-group-6/Server/issues/113) |Endpoint to allow for friends to be added & make sure not multiple requests can be sent|
 
 
 ## Week 4
 
-| Name       | Issue                                                        | Description (optional)                                       |
-| ---------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Name       | Issue                                                           | Description (optional)                                       |
+| ---------- |-----------------------------------------------------------------| ------------------------------------------------------------ |
 | Aiqi Shuai | [#173](https://github.com/sopra-fs24-group-6/Server/issues/173) | Sending all players information to the client side when someone create the lobby. |
 | Aiqi Shuai | [#172](https://github.com/sopra-fs24-group-6/Server/issues/172) | Sending all players information to the client side when someone was kicked out of the lobby. |
 | Aiqi Shuai | [#171](https://github.com/sopra-fs24-group-6/Server/issues/171) | Send initialized lobby info or play info to client side, when they first entered the lobby |
 | Aiqi Shuai | [#170](https://github.com/sopra-fs24-group-6/Server/issues/170) | Sending the lobby information to all players when there is a change |
 | Aiqi Shuai | [#169](https://github.com/sopra-fs24-group-6/Server/issues/169) | Sending all players information to the client side when someone join the lobby. |
 | Aiqi Shuai | [#166](https://github.com/sopra-fs24-group-6/Server/issues/166) | Implement game initialization function                       |
+| Alisher Dauysbekov | [#114](https://github.com/sopra-fs24-group-6/Server/issues/114) |Endpoint to retrieve the list of current friends|
+| Alisher Dauysbekov | [#115](https://github.com/sopra-fs24-group-6/Server/issues/115) |Tracking of current friends and update in case a new friend is added|
 
 
 ## Week 5 & 6
