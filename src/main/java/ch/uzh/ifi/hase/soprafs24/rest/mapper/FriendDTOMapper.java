@@ -5,9 +5,10 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.FriendPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.FriendGetDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface FriendDTOMapper {
     FriendDTOMapper INSTANCE = Mappers.getMapper(FriendDTOMapper.class);
 
