@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs24.service;
 import ch.uzh.ifi.hase.soprafs24.entity.Friend;
 import ch.uzh.ifi.hase.soprafs24.repository.FriendRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -14,8 +15,13 @@ import java.util.stream.Collectors;
 
 @Service
 public class FriendService {
+
+    private final FriendRepository friendRepository;
+
     @Autowired
-    private FriendRepository friendRepository;
+    public FriendService(@Qualifier("friendRepository") FriendRepository friendRepository) {
+        this.friendRepository = friendRepository;
+    }
 
     public List<Friend> getFriendsOf(Long userId) {
         List<Friend> friends = new ArrayList<>();

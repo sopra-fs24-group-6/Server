@@ -18,6 +18,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -40,6 +41,8 @@ public class UserService {
 
   // Path where we store the avatar images
   private static final String AVATAR_DIR = "src/main/images/users";
+
+  private final SecureRandom random = new SecureRandom();
 
   @Autowired
   public UserService(@Qualifier("userRepository") UserRepository userRepository) {
@@ -112,7 +115,6 @@ public class UserService {
     String wolfAvatar = "/images/avatar/wolf.png";
 
     // Randomly select one of the avatars
-    Random random = new Random();
     String selectedAvatar = random.nextBoolean() ? villagerAvatar : wolfAvatar;
     System.out.println(selectedAvatar);
 
