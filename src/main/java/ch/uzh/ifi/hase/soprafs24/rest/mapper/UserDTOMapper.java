@@ -46,5 +46,10 @@ public interface UserDTOMapper {
   @Mapping(source = "wins", target = "wins")
   @Mapping(source = "losses", target = "losses")
   @Mapping(source = "winlossratio", target = "winlossratio")
+  @Mapping(source = "avatarUrl", target = "avatarUrl")
   UserGetDTO convertEntityToUserGetDTO(User user);
+
+  @Mapping(source = "id", target = "id")
+  @Mapping(source = "avatarUrl", target = "avatarUrl")
+  UserAvatarDTO convertEntityToUserAvatarDTO(User user);
 }

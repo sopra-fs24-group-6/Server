@@ -56,6 +56,17 @@ public class User implements Serializable {
   @Column(nullable = false)
   private double winlossratio = 0.0;
 
+  @Column(nullable = true)
+  private String avatarUrl;
+
+  public String getAvatarUrl() {
+    return avatarUrl;
+  }
+
+  public void setAvatarUrl(String avatarUrl) {
+    this.avatarUrl = avatarUrl;
+  }
+
   // testing purposes
   @Override
   public String toString() {
@@ -71,6 +82,7 @@ public class User implements Serializable {
             ", \n\twins=" + wins +
             ", \n\tlosses=" + losses +
             ", \n\twinlossratio=" + winlossratio +
+            ", \n\tavatarUrl=" + avatarUrl +
             "\n}";
   }
 
