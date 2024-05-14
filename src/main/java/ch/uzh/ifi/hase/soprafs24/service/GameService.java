@@ -255,6 +255,7 @@ public class GameService {
             User user = userRepository.findById(player.getUserId())
                     .orElseThrow(() -> new NoSuchElementException("No user found with ID: " + player.getUserId()));
             user.addWins();
+            user.updateWeightedWinLossRatio();
             userRepository.save(user); // Save the updated user record
             // testing purposes
             System.out.println(user);
@@ -271,6 +272,7 @@ public class GameService {
             User user = userRepository.findById(player.getUserId())
                     .orElseThrow(() -> new NoSuchElementException("No user found with ID: " + player.getUserId()));
             user.addLosses();
+            user.updateWeightedWinLossRatio();
             userRepository.save(user); // Save the updated user record
             // testing purposes
             System.out.println(user);

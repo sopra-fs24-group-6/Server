@@ -5,6 +5,8 @@ import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -24,43 +26,21 @@ public class GameRecordService {
         this.userRepository = userRepository;
     }
 
-    public List<User> getTopUsers_10() {
+    public List<User> getTopUsers(int page) {
         // Retrieve all users from the repository
+      // Define the page size
+      int pageSize = 10;
+
+      // Create a Pageable object with the given page number and page size
         List<User> allUsers = userRepository.findAll();
 
-        // Calculate win-loss ratio for each user
-        allUsers.forEach(user -> {
-            int wins = user.getWins();
-            int losses = user.getLosses();
-            double winLossRatio = weightedWinLossRatio(wins, losses);
-            user.setWinlossratio(winLossRatio);
-            userRepository.save(user);
-        });
-
-        userRepository.flush();
-
         // Sort users based on their win-loss ratios
-        List<User> topUsers = allUsers.stream().sorted(Comparator.comparingDouble(User::getWinlossratio).reversed()).limit(10) // Limit to top 10 users
+        List<User> topUsers = allUsers.stream().sorted(Comparator.comparingDouble(User::getWinlossratio).reversed())
                 .collect(Collectors.toList());
 
-        return topUsers;
-    }
+      int start = (page - 1) * pageSize;
+      int end = Math.min(start + pageSize, topUsers.size());
 
-    public static double calculateWinLossRatio(int wins, int losses) {
-        if (wins + losses == 0) {
-            return 0; // Avoid division by zero
-        }
-        return (double) wins / (wins + losses);
+      return topUsers.subList(start, end);
     }
-
-    public static double weightedWinLossRatio(int wins, int losses) {
-        int gamesPlayed = wins + losses;
-        if (gamesPlayed == 0) {
-            return 0; // Avoid division by zero
-        }
-        // Adjusted with a weighting factor based on the number of games played
-        double weight = 1 + Math.log10(gamesPlayed); // You can adjust this weighting factor as needed
-        return calculateWinLossRatio(wins, losses) * weight;
-    }
-
 }

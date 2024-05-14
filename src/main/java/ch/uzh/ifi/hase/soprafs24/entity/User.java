@@ -85,6 +85,14 @@ public class User implements Serializable {
                 ", \n\tavatarUrl=" + avatarUrl +
                 "\n}";
     }
+  public void updateWeightedWinLossRatio() {
+    int gamesPlayed = wins + losses;
+    if (gamesPlayed != 0) {
+      double weight = 1 + Math.log10(gamesPlayed); // You can adjust this weighting factor as needed
+      double ratio = (double) wins / (wins + losses);
+      winlossratio = weight * ratio;
+    }
+  }
 
 
   public double getWinlossratio() {

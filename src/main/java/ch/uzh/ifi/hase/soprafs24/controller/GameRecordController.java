@@ -9,6 +9,7 @@ import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -27,12 +28,12 @@ public class GameRecordController {
     }
 
 
-    @GetMapping("/leaderboard")
+    @GetMapping("/leaderboard/page={page_id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<UserGetDTO> getTopPlayers() {
+    public List<UserGetDTO> getTopPlayers(@PathVariable int page_id) {
         // fetch all users in the internal representation
-        List<User> users = gameRecordService.getTopUsers_10();
+        List<User> users = gameRecordService.getTopUsers(page_id);
         List<UserGetDTO> userGetDTOs = new ArrayList<>();
         // convert each user to the API representation
         for (User user : users) {
