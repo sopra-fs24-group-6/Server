@@ -1,3 +1,5 @@
+
+# Sprint 1
 ## Week 1
 
 | Name         | Issue                                                         | Description (optional)                             |
@@ -80,18 +82,25 @@
 
 ## Week 4
 
-| Name       | Issue                                                           | Description (optional)                                       |
-| ---------- |-----------------------------------------------------------------| ------------------------------------------------------------ |
-| Aiqi Shuai | [#173](https://github.com/sopra-fs24-group-6/Server/issues/173) | Sending all players information to the client side when someone create the lobby. |
-| Aiqi Shuai | [#172](https://github.com/sopra-fs24-group-6/Server/issues/172) | Sending all players information to the client side when someone was kicked out of the lobby. |
-| Aiqi Shuai | [#171](https://github.com/sopra-fs24-group-6/Server/issues/171) | Send initialized lobby info or play info to client side, when they first entered the lobby |
-| Aiqi Shuai | [#170](https://github.com/sopra-fs24-group-6/Server/issues/170) | Sending the lobby information to all players when there is a change |
-| Aiqi Shuai | [#169](https://github.com/sopra-fs24-group-6/Server/issues/169) | Sending all players information to the client side when someone join the lobby. |
-| Aiqi Shuai | [#166](https://github.com/sopra-fs24-group-6/Server/issues/166) | Implement game initialization function                       |
-| Alisher Dauysbekov | [#114](https://github.com/sopra-fs24-group-6/Server/issues/114) |Endpoint to retrieve the list of current friends|
-| Alisher Dauysbekov | [#115](https://github.com/sopra-fs24-group-6/Server/issues/115) |Tracking of current friends and update in case a new friend is added|
+| Name               | Issue                                                           | Description (optional)                                                                       |
+|--------------------|-----------------------------------------------------------------|----------------------------------------------------------------------------------------------|
+| Aiqi Shuai         | [#173](https://github.com/sopra-fs24-group-6/Server/issues/173) | Sending all players information to the client side when someone create the lobby.            |
+| Aiqi Shuai         | [#172](https://github.com/sopra-fs24-group-6/Server/issues/172) | Sending all players information to the client side when someone was kicked out of the lobby. |
+| Aiqi Shuai         | [#171](https://github.com/sopra-fs24-group-6/Server/issues/171) | Send initialized lobby info or play info to client side, when they first entered the lobby   |
+| Aiqi Shuai         | [#170](https://github.com/sopra-fs24-group-6/Server/issues/170) | Sending the lobby information to all players when there is a change                          |
+| Aiqi Shuai         | [#169](https://github.com/sopra-fs24-group-6/Server/issues/169) | Sending all players information to the client side when someone join the lobby.              |
+| Aiqi Shuai         | [#166](https://github.com/sopra-fs24-group-6/Server/issues/166) | Implement game initialization function                                                       |
+| Alisher Dauysbekov | [#114](https://github.com/sopra-fs24-group-6/Server/issues/114) | Endpoint to retrieve the list of current friends                                             |
+| Alisher Dauysbekov | [#115](https://github.com/sopra-fs24-group-6/Server/issues/115) | Tracking of current friends and update in case a new friend is added                         |
+| Kei Murakami       | [#163](https://github.com/sopra-fs24-group-6/Server/issues/163) | Integrate voting function to game logic                                                      |
+| Kei Murakami       | [#164](https://github.com/sopra-fs24-group-6/Server/issues/164) | Add interval timer between game events                                                       |
+| Kei Murakami       | [#165](https://github.com/sopra-fs24-group-6/Server/issues/165) | Implement trigger for clue phase                                                             |
+| Kei Murakami       | [#167](https://github.com/sopra-fs24-group-6/Server/issues/167) | Implement transition from lobby to game when game starts                                     |
+| Kei Murakami       | [#168](https://github.com/sopra-fs24-group-6/Server/issues/168) | Connect game events sequence to work correctly with client                                   |
 
 
+
+# Sprint 2
 ## Week 5 & 6
 
 | Name         | Issue                                                        | Description (optional)                                 |
@@ -105,4 +114,13 @@
 | Kei Murakami | [#114](https://github.com/sopra-fs24-group-6/Client/issues/114) | Modify lobby and browser view with real-time update                                          |
 | Kei Murakami | [#115](https://github.com/sopra-fs24-group-6/Client/issues/115) | Navigate to appropriate view when disconnecting                                              |
 | Kei Murakami | [#116](https://github.com/sopra-fs24-group-6/Client/issues/116) | Show pop-up when create/join/delete lobby and start game                                     |
+
+
+## Week 7
+
+| Name         | Issue                                                           | Description (optional)                                                |
+|--------------|-----------------------------------------------------------------|-----------------------------------------------------------------------|
+| Kei Murakami | [#188](https://github.com/sopra-fs24-group-6/Server/issues/188) | Add multiple-rounds game process                                      |
+| Kei Murakami | [#189](https://github.com/sopra-fs24-group-6/Server/issues/189) | Add round field to vote entity and modify controller and service      |
+| Kei Murakami | [#190](https://github.com/sopra-fs24-group-6/Client/issues/190) | Add currentRound and maxRound so that client can use this information |
 
