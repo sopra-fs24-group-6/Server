@@ -7,19 +7,29 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
 
 public class UserServiceTest {
 
@@ -29,22 +39,160 @@ public class UserServiceTest {
   @InjectMocks
   private UserService userService;
 
+  private static final String AVATAR_DIR = "src/main/images/users";
+
+  User testUser;
+
+  @TempDir
+  Path tempDir;
+
+  private String dateString;
+
   @BeforeEach
   public void setup() {
+
     MockitoAnnotations.openMocks(this);
+    testUser = new User();
+    testUser.setId(1L);
+    testUser.setUsername("username");
+    testUser.setToken("token");
+    testUser.setStatus(UserStatus.OFFLINE);
+    testUser.setPassword("password");
+    dateString = "2024-01-01T00:00:00.000+00:00";
+    Date date = Date.from(Instant.parse(dateString));
+    testUser.setCreationDate(date);
+    testUser.setBirthDate(date);
+    testUser.setLanguage("en");
+    testUser.setWins(20);
+    testUser.setLosses(13);
+    testUser.setWinlossratio(1.335);
+    testUser.setAvatarUrl("images/avatar/default");
+    userService = new UserService(userRepository);
   }
 
-//    @AfterEach
-//    public void afterEachTest(TestInfo testInfo) {
-//        System.out.println("AfterUserServiceTest: " + testInfo.getDisplayName());
-//        System.out.println("Current Environment Variables:");
-//        String googleCredentials = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
-//        if (googleCredentials != null) {
-//            System.out.println("GOOGLE_APPLICATION_CREDENTIALS = " + googleCredentials);
-//        } else {
-//            System.out.println("GOOGLE_APPLICATION_CREDENTIALS is not set.");
-//        }
-//    }
+  @Test
+  void updateUserAvatar_validInput() throws IOException {
+    // Given
+    MockMultipartFile mockFile = new MockMultipartFile(
+            "avatar",
+            "avatar.png",
+            "image/png",
+            "test image content".getBytes()
+    );
+
+    // Ensure the initial state: neither file exists
+    Path userDir = Paths.get(tempDir.toString(), "user1");
+    Files.createDirectories(userDir);
+    Files.deleteIfExists(userDir.resolve("avatar_pos.png"));
+    Files.deleteIfExists(userDir.resolve("avatar_neg.png"));
+
+    when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
+
+    // When
+    User updatedUser = userService.updateUserAvatar(testUser.getId(), mockFile);
+
+    // Then
+    assertNotNull(updatedUser);
+    assertEquals("/images/users/user1/avatar_pos.png", updatedUser.getAvatarUrl());
+    verify(userRepository, times(1)).save(testUser);
+  }
+
+  @Test
+  void updateUserAvatar_validInput_switchToNeg() throws IOException {
+    // Given
+    MockMultipartFile mockFile = new MockMultipartFile(
+            "avatar",
+            "avatar.png",
+            "image/png",
+            "test image content".getBytes()
+    );
+
+    // Ensure the initial state: avatar_pos.png exists
+    Path userDir = Paths.get(tempDir.toString(), "user1");
+    Files.createDirectories(userDir);
+    Files.deleteIfExists(userDir.resolve("avatar_pos.png"));
+    Files.deleteIfExists(userDir.resolve("avatar_neg.png"));
+    Files.createFile(userDir.resolve("avatar_pos.png"));
+
+    when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
+
+    // When
+    User updatedUser = userService.updateUserAvatar(testUser.getId(), mockFile);
+
+    // Then
+    assertNotNull(updatedUser);
+    assertEquals("/images/users/user1/avatar_neg.png", updatedUser.getAvatarUrl());
+    verify(userRepository, times(1)).save(testUser);
+  }
+
+  @Test
+  void updateUserAvatar_validInput_switchToPos() throws IOException {
+    // Given
+    MockMultipartFile mockFile = new MockMultipartFile(
+            "avatar",
+            "avatar.png",
+            "image/png",
+            "test image content".getBytes()
+    );
+
+    // Ensure the initial state: avatar_pos.png exists
+    Path userDir = Paths.get(tempDir.toString(), "user1");
+    Files.createDirectories(userDir);
+    Files.deleteIfExists(userDir.resolve("avatar_pos.png"));
+    Files.deleteIfExists(userDir.resolve("avatar_neg.png"));
+    Files.createFile(userDir.resolve("avatar_neg.png"));
+
+    when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
+
+    // When
+    User updatedUser = userService.updateUserAvatar(testUser.getId(), mockFile);
+
+    // Then
+    assertNotNull(updatedUser);
+    assertEquals("/images/users/user1/avatar_pos.png", updatedUser.getAvatarUrl());
+    verify(userRepository, times(1)).save(testUser);
+  }
+
+  @Test
+  void updateUserAvatar_userNotFound() throws IOException {
+    // Given
+    MockMultipartFile mockFile = new MockMultipartFile(
+            "avatar",
+            "avatar.png",
+            "image/png",
+            "test image content".getBytes()
+    );
+
+    when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+    // When/Then
+    ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+      userService.updateUserAvatar(999L, mockFile);
+    });
+
+    assertEquals("404 NOT_FOUND \"User with ID: 999 is not found\"", exception.getMessage());
+    verify(userRepository, times(0)).save(any(User.class));
+  }
+
+  @Test
+  void updateUserAvatar_emptyFile() {
+    // Given
+    MockMultipartFile mockFile = new MockMultipartFile(
+            "avatar",
+            "avatar.png",
+            "image/png",
+            new byte[0]
+    );
+
+    // When/Then
+    ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+      userService.updateUserAvatar(testUser.getId(), mockFile);
+    });
+
+    assertEquals("400 BAD_REQUEST \"file is empty\"", exception.getMessage());
+    verify(userRepository, times(0)).save(any(User.class));
+  }
+
 
   @Test
   public void createUser_validInputs_success() {
@@ -53,14 +201,14 @@ public class UserServiceTest {
     newUser.setUsername("newUsername");
     newUser.setPassword("password");
 
-    Mockito.when(userRepository.save(Mockito.any())).thenReturn(newUser);
-    Mockito.when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.empty());
+    when(userRepository.save(Mockito.any())).thenReturn(newUser);
+    when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.empty());
 
     // when
     User createdUser = userService.createUser(newUser);
 
     // then
-    Mockito.verify(userRepository, Mockito.times(1)).save(Mockito.any());
+    verify(userRepository, times(1)).save(Mockito.any());
     assertEquals(newUser.getId(), createdUser.getId());
     assertEquals(newUser.getUsername(), createdUser.getUsername());
     assertNotNull(createdUser.getToken());
@@ -76,7 +224,7 @@ public class UserServiceTest {
     newUser.setPassword("password");
 
     userService.createUser(newUser);
-    Mockito.when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(newUser));
+    when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(newUser));
 
     // when/then
     ResponseStatusException exception = assertThrows(
@@ -92,7 +240,7 @@ public class UserServiceTest {
     User user2 = new User();
     user2.setUsername("username2");
     List<User> userList = List.of(user1, user2);
-    Mockito.when(userRepository.findAll()).thenReturn(userList);
+    when(userRepository.findAll()).thenReturn(userList);
 
     // when
     List<User> result = userService.getUsers();
@@ -107,7 +255,7 @@ public class UserServiceTest {
     // given
     User user = new User();
     user.setUsername("username");
-    Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(user));
+    when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(user));
 
     // when
     User result = userService.getUser(user.getId());
@@ -121,7 +269,7 @@ public class UserServiceTest {
   public void getUser_invalidUserId_throwsException() {
     // given
     Long userId = 1L;
-    Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.empty());
+    when(userRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
     // when/ then
     ResponseStatusException exception = assertThrows(
@@ -141,15 +289,15 @@ public class UserServiceTest {
     userInput.setUsername("newUsername");
     userInput.setBirthDate(new Date());
 
-    Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(existingUser));
-    Mockito.when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.empty());
-    Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(userInput);
+    when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(existingUser));
+    when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.empty());
+    when(userRepository.save(Mockito.any(User.class))).thenReturn(userInput);
 
     // when
     userService.updateUser(userId, userInput);
 
     // then
-    Mockito.verify(userRepository, Mockito.times(1)).save(Mockito.any());
+    verify(userRepository, times(1)).save(Mockito.any());
   }
 
   @Test
@@ -164,7 +312,7 @@ public class UserServiceTest {
     userInput.setUsername("newUsername");
     userInput.setBirthDate(new Date());
 
-    Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.empty());
+    when(userRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
     // when/ then
     ResponseStatusException exception = assertThrows(
@@ -184,8 +332,8 @@ public class UserServiceTest {
     userInput.setUsername("newUsername");
     userInput.setBirthDate(new Date());
 
-    Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(existingUser));
-    Mockito.when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(userInput));
+    when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(existingUser));
+    when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(userInput));
 
     // when/ then
     ResponseStatusException exception = assertThrows(
@@ -204,14 +352,14 @@ public class UserServiceTest {
     userInput.setUsername("username");
     userInput.setPassword("password");
 
-    Mockito.when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(existingUser));
-    Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(existingUser);
+    when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(existingUser));
+    when(userRepository.save(Mockito.any(User.class))).thenReturn(existingUser);
 
     // when
     User loggedInUser = userService.loginUser(userInput);
 
     // then
-    Mockito.verify(userRepository, Mockito.times(1)).save(Mockito.any());
+    verify(userRepository, times(1)).save(Mockito.any());
     assertEquals(userInput.getUsername(), loggedInUser.getUsername());
     assertEquals(UserStatus.ONLINE, loggedInUser.getStatus());
   }
@@ -223,7 +371,7 @@ public class UserServiceTest {
     userInput.setUsername("username");
     userInput.setPassword("password");
 
-    Mockito.when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.empty());
+    when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.empty());
 
     // when/then
     ResponseStatusException exception = assertThrows(
@@ -242,7 +390,7 @@ public class UserServiceTest {
     userInput.setUsername("username");
     userInput.setPassword("invalidPassword");
 
-    Mockito.when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(existingUser));
+    when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(existingUser));
 
     // when/ then
     ResponseStatusException exception = assertThrows(
@@ -257,14 +405,14 @@ public class UserServiceTest {
     existingUser.setUsername("username");
     existingUser.setPassword("password");
 
-    Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(existingUser));
-    Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(existingUser);
+    when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(existingUser));
+    when(userRepository.save(Mockito.any(User.class))).thenReturn(existingUser);
 
     // when
     userService.logoutUser(existingUser.getId());
 
     // then
-    Mockito.verify(userRepository, Mockito.times(1)).save(Mockito.any());
+    verify(userRepository, times(1)).save(Mockito.any());
     assertEquals(UserStatus.OFFLINE, existingUser.getStatus());
   }
 
@@ -275,7 +423,7 @@ public class UserServiceTest {
     existingUser.setUsername("username");
     existingUser.setPassword("password");
 
-    Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.empty());
+    when(userRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
     // when/then
     ResponseStatusException exception = assertThrows(
