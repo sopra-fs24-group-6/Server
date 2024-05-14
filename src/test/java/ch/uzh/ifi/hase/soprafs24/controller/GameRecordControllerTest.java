@@ -39,11 +39,18 @@ class GameRecordControllerTest {
     userGetDTOs.add(new UserGetDTO());
     userGetDTOs.add(new UserGetDTO());
 
-    // Mock behavior
-    when(gameRecordService.getTopUsers_10()).thenReturn(users);
+    // Mock behavior for page 1
+    when(gameRecordService.getTopUsers(1)).thenReturn(users);
 
-    // Perform GET request and verify status
-    mockMvc.perform(get("/leaderboard"))
+    // Perform GET request for page 1 and verify status
+    mockMvc.perform(get("/leaderboard/page=1"))
+            .andExpect(status().isOk());
+
+    // Mock behavior for page 2
+    when(gameRecordService.getTopUsers(2)).thenReturn(users);
+
+    // Perform GET request for page 2 and verify status
+    mockMvc.perform(get("/leaderboard/page=2"))
             .andExpect(status().isOk());
   }
 }
