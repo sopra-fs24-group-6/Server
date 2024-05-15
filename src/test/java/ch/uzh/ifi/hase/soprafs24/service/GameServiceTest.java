@@ -2,8 +2,9 @@ package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.constant.Role;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
-import ch.uzh.ifi.hase.soprafs24.matcher.WordNotificationMatcher;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
+import ch.uzh.ifi.hase.soprafs24.websocket.dto.ResultNotification;
+import ch.uzh.ifi.hase.soprafs24.websocket.dto.WordNotification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -11,16 +12,18 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class GameServiceTest {
+
+  @Mock
+  private UserRepository userRepository;
 
   @Mock
   private WordPairRepository wordPairRepository;
@@ -31,12 +34,24 @@ public class GameServiceTest {
   @Mock
   private SimpMessagingTemplate messagingTemplate;
 
+  @Mock
+  private TimerService timerService;
+
+  @Mock
+  private LobbyService lobbyService;
+
+  @Mock
+  private VoteService voteService;
+
   @InjectMocks
+  @Spy
   private GameService gameService;
 
 
   @BeforeEach
-  public void setup() { MockitoAnnotations.openMocks(this); }
+  public void setup() {
+    MockitoAnnotations.openMocks(this);
+  }
 
 
   @Test
@@ -95,9 +110,6 @@ public class GameServiceTest {
       .thenReturn(updatedPlayer2)
       .thenReturn(updatedPlayer1)
       .thenReturn(updatedPlayer3);
-    // given: set fixed random seed
-    Random fixedRandom = new Random(12345);
-    gameService.setRandom(fixedRandom);
 
     // when
     gameService.assignWordsAndRoles(game);
@@ -107,15 +119,88 @@ public class GameServiceTest {
     // then: notify word to each player
     verify(messagingTemplate, times(1))
       .convertAndSend(
-        eq("/queue/1/wordAssignment"),
-        argThat(new WordNotificationMatcher(null)));
+        eq("/queue/1/wordAssignment"), any(WordNotification.class));
     verify(messagingTemplate, times(1))
       .convertAndSend(
-        eq("/queue/2/wordAssignment"),
-        argThat(new WordNotificationMatcher("Word4")));
+        eq("/queue/2/wordAssignment"), any(WordNotification.class));
     verify(messagingTemplate, times(1))
       .convertAndSend(
-        eq("/queue/3/wordAssignment"),
-        argThat(new WordNotificationMatcher("Word4")));
+        eq("/queue/3/wordAssignment"), any(WordNotification.class));
+  }
+
+  @Test
+  public void notifyResult_success() {
+    // given
+    User user = new User();
+
+    Player winnerPlayer = new Player();
+    winnerPlayer.setUserId(1L);
+    winnerPlayer.setUsername("player1");
+    Player loserPlayer = new Player();
+    loserPlayer.setUserId(2L);
+    loserPlayer.setUsername("player2");
+
+    Result result = new Result();
+    result.setWinnerRole(Role.WOLF);
+    result.setWinnerPlayers(List.of(winnerPlayer));
+    result.setLoserPlayers(List.of(loserPlayer));
+
+    Game game = new Game();
+    game.setCurrentRound(1);
+    game.setRounds(1);
+    gameService.putActiveGame(1L, game);
+
+    when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+    when(userRepository.save(any(User.class))).thenReturn(user);
+    doNothing().when(timerService).startIntervalTimer(any(Game.class), anyInt(), any());
+
+    // when
+    gameService.notifyResults(1L, result);
+
+    // then
+    verify(userRepository, times(2)).findById(anyLong());
+    verify(userRepository, times(2)).save(any(User.class));
+    verify(messagingTemplate, times(1))
+      .convertAndSend(eq("/topic/1/result"),any(ResultNotification.class));
+  }
+
+  @Test
+  public void endRound_underMaxRound_thenStartNewRound() {
+    // given
+    Game game = new Game();
+    game.setCurrentRound(1);
+    game.setRounds(3);
+    doNothing().when(gameService).startRound(any(Game.class));
+
+    // when
+    gameService.endRound(game);
+
+    // then
+    assertEquals(2, game.getCurrentRound());
+    verify(gameService, times(1)).startRound(eq(game));
+  }
+
+  @Test
+  public void endRound_reachMaxRound_thenEndGame() {
+    // given
+    Game game = new Game();
+    game.setLobbyId(1L);
+    game.setCurrentRound(3);
+    game.setRounds(3);
+    gameService.putActiveGame(1L, game);
+
+    Lobby lobby = new Lobby();
+    when(lobbyService.getLobbyById(anyLong())).thenReturn(lobby);
+    doNothing().when(lobbyService).deleteLobby(any(Lobby.class));
+    doNothing().when(voteService).deleteVotesByLobbyId(anyLong());
+
+    // when
+    gameService.endRound(game);
+
+    // then
+    assertEquals(3, game.getCurrentRound());
+    verify(lobbyService, times(1)).getLobbyById(1L);
+    verify(lobbyService, times(1)).deleteLobby(lobby);
+    assertNull(gameService.getActiveGameByLobbyId(1L), "The game in activeGames should be null.");
   }
 }

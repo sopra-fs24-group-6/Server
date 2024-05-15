@@ -10,6 +10,8 @@ public class Game {
   private Boolean isCluePhase;
   private List<Player> players;
   private List<String> themeNames;
+  private Integer rounds;
+  private Integer currentRound = 1;
 
   //For testing
     @Override
@@ -21,6 +23,10 @@ public class Game {
                 "\tdiscussionTimer=" + discussionTimer + "\n" +
                 '}';
     }
+
+  public void incrementAndSetCurrentRound() {
+    this.currentRound += 1;
+  }
 
   public Long getLobbyId() {
     return lobbyId;
@@ -76,5 +82,21 @@ public class Game {
 
   public void setThemeNames(List<String> themeNames) {
     this.themeNames = themeNames;
+  }
+
+  public Integer getRounds() {
+    return rounds;
+  }
+
+  public void setRounds(Integer rounds) {
+    this.rounds = rounds;
+  }
+
+  public Integer getCurrentRound() {
+    return currentRound;
+  }
+
+  public void setCurrentRound(Integer currentRound) {
+    this.currentRound = currentRound;
   }
 }

@@ -17,19 +17,14 @@ public class Vote implements Serializable {
     private Long lobbyId;
 
     @Column(nullable = false)
+    private Integer round;
+
+    @Column(nullable = false)
     private Long voterUserId;
 
     @Column(nullable = false)
     private Long votedUserId;
 
-    // Constructors
-    public Vote() {}
-
-    public Vote(Long lobbyId, Long voterUserId, Long votedUserId) {
-        this.lobbyId = lobbyId;
-        this.voterUserId = voterUserId;
-        this.votedUserId = votedUserId;
-    }
 
     // Getters and Setters
     public Long getId() {
@@ -46,6 +41,14 @@ public class Vote implements Serializable {
 
     public void setLobbyId(Long lobbyId) {
         this.lobbyId = lobbyId;
+    }
+
+    public Integer getRound() {
+        return round;
+    }
+
+    public void setRound(Integer round) {
+        this.round = round;
     }
 
     public Long getVoterUserId() {

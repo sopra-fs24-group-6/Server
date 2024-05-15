@@ -19,12 +19,13 @@ import java.util.stream.Collectors;
 public class GameRecordService {
         
 
-    private final UserRepository userRepository;
+  private final UserRepository userRepository;
 
-    @Autowired
-    public GameRecordService(@Qualifier("userRepository") UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+  @Autowired
+  public GameRecordService(@Qualifier("userRepository") UserRepository userRepository) {
+    this.userRepository = userRepository;
+  }
+
 
     public List<User> getTopUsers(int page) {
         // Retrieve all users from the repository
@@ -43,4 +44,5 @@ public class GameRecordService {
 
       return topUsers.subList(start, end);
     }
+
 }

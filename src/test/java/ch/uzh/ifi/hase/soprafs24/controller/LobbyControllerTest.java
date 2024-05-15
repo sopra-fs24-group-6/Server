@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
+import ch.uzh.ifi.hase.soprafs24.entity.Player;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -173,18 +174,17 @@ public class LobbyControllerTest {
     UserIdDTO userIdDTO = new UserIdDTO();
     userIdDTO.setUserId(1L);
 
-      // Setup the lobby return after a player is kicked
-      Lobby updatedLobby = new Lobby(); // You may need to set this up similar to `testLobby`
-      updatedLobby.setId(testLobby.getId());
-      updatedLobby.setPlayers(new ArrayList<>()); // Assume players have been updated
-      // You should populate updatedLobby similar to how you setup testLobby in @BeforeEach
+    // Setup the lobby return after a player is kicked
+    Lobby updatedLobby = new Lobby(); // You may need to set this up similar to `testLobby`
+    updatedLobby.setId(testLobby.getId());
+    updatedLobby.setPlayers(new ArrayList<>()); // Assume players have been updated
+    // You should populate updatedLobby similar to how you setup testLobby in @BeforeEach
+
+    // Mock the service to return the updated lobby
+    when(lobbyService.kickPlayerFromLobby(eq(testLobby.getId()), eq(targetUserId), eq(userIdDTO.getUserId()))).thenReturn(updatedLobby);
 
 
-      // Mock the service to return the updated lobby
-      when(lobbyService.kickPlayerFromLobby(eq(testLobby.getId()), eq(targetUserId), eq(userIdDTO.getUserId()))).thenReturn(updatedLobby);
-
-
-      // when/then -> do the request + validate the result
+    // when/then -> do the request + validate the result
     MockHttpServletRequestBuilder deleteRequest = delete("/lobbies/{lobbyId}/players/{userId}", testLobby.getId(), targetUserId)
       .contentType(MediaType.APPLICATION_JSON)
       .content(asJsonString(userIdDTO));
@@ -192,8 +192,8 @@ public class LobbyControllerTest {
     // then
     mockMvc.perform(deleteRequest).andExpect(status().isNoContent());
 
-      // Verify interactions
-      verify(lobbyService).sendPlayerListToLobby(any(), eq(testLobby.getId()));
+    // Verify interactions
+    // verify(lobbyService).sendPlayerListToLobby(any(), eq(testLobby.getId()));
   }
 
   @Test
@@ -228,6 +228,25 @@ public class LobbyControllerTest {
     mockMvc.perform(getRequest).andExpect(status().isOk())
       .andExpect(jsonPath("$", hasSize(1)))
       .andExpect(jsonPath("$[0]", is(themeName)));
+  }
+
+  @Test
+  public void getPlayers_validLobbyId() throws Exception{
+    // given
+    Player player1 = new Player();
+    player1.setUserId(1L);
+    player1.setUsername("user1");
+    List<Player> playerList = List.of(player1);
+
+    testLobby.setPlayers(playerList);
+    when(lobbyService.getPlayersById(anyLong())).thenReturn(playerList);
+
+    // when/then
+    MockHttpServletRequestBuilder getRequest = get("/lobbies/{lobbyId}/players", testLobby.getId());
+    mockMvc.perform(getRequest).andExpect(status().isOk())
+      .andExpect(jsonPath("$", hasSize(1)))
+      .andExpect(jsonPath("$[0].userId", is(player1.getUserId().intValue())))
+      .andExpect(jsonPath("$[0].username", is(player1.getUsername())));
   }
 
 

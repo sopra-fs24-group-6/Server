@@ -44,18 +44,6 @@ class ChatServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-//    @AfterEach
-//    public void afterEachTest(TestInfo testInfo) {
-//        System.out.println("After ChatServiceTest: " + testInfo.getDisplayName());
-//        System.out.println("Current Environment Variables:");
-//        String googleCredentials = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
-//        if (googleCredentials != null) {
-//            System.out.println("GOOGLE_APPLICATION_CREDENTIALS = " + googleCredentials);
-//        } else {
-//            System.out.println("GOOGLE_APPLICATION_CREDENTIALS is not set.");
-//        }
-//    }
-
     @Test
     void testSendTranslatedMessagesToUsers() {
         // Arrange
@@ -66,12 +54,8 @@ class ChatServiceTest {
         originalMessage.setContent("HelloWorld");
         originalMessage.setUserId(3L);
         SessionManager fakesessionManager = new SessionManager();
-//        ConcurrentHashMap<String, Long> fakeSessionMap = new ConcurrentHashMap<>();
         fakesessionManager.addSession("session1", 1L);
         fakesessionManager.addSession("session2", 2L);
-//        fakeSessionMap.put("session1", 1L);
-//        fakeSessionMap.put("session2", 2L);
-
 
         when(sessionManager.getSessionMap()).thenReturn(fakesessionManager.getSessionMap());
         User user1 = new User();
@@ -97,15 +81,50 @@ class ChatServiceTest {
         chatService.sendTranslatedMessagesToUsers(lobby1Id, originalMessage);
 
         // Assert
-//        ChatMessage chatMessage1 = new ChatMessage();
-//        ChatMessage chatMessage2 = new ChatMessage();
-//
-//        chatMessage1.setContent("Hello World Translated");
-//        chatMessage2.setContent("你好，世界");
-//        verify(messagingTemplate).convertAndSendToUser("session1", "/topic/1/chat", chatMessage1);
-//        verify(messagingTemplate).convertAndSendToUser("session2", "/topic/1/chat", chatMessage2);
         verify(messagingTemplate).convertAndSend(eq("/queue/1/chat"), any(ChatMessage.class));
         verify(messagingTemplate).convertAndSend(eq("/queue/2/chat"), any(ChatMessage.class));
+        verifyNoMoreInteractions(messagingTemplate);
+    }
+
+    @Test
+    void testSendTranslatedClueMessagesToUsers() {
+        // Arrange
+        Long lobby1Id = 1L;
+        Lobby lobby1 = new Lobby();
+        lobby1.setId(lobby1Id);
+        ChatMessage originalMessage = new ChatMessage();
+        originalMessage.setContent("HelloWorld");
+        originalMessage.setUserId(3L);
+        SessionManager fakesessionManager = new SessionManager();
+        fakesessionManager.addSession("session1", 1L);
+        fakesessionManager.addSession("session2", 2L);
+
+        when(sessionManager.getSessionMap()).thenReturn(fakesessionManager.getSessionMap());
+        User user1 = new User();
+        User user2 = new User();
+        User sender = new User();
+        user1.setId(1L);
+        user1.setUsername("user1");
+        user1.setLanguage("en");
+        user2.setId(2L);
+        user2.setUsername("user2");
+        user2.setLanguage("zh");
+        sender.setId(3L);
+        sender.setUsername("user3");
+        when(userService.getUser(1L)).thenReturn(user1);
+        when(userService.getUser(2L)).thenReturn(user2);
+        when(userService.getUser(3L)).thenReturn(sender);
+        when(translationService.translateText("Hello World", "en")).thenReturn("Hello World Translated");
+        when(translationService.translateText("Hello World", "zh")).thenReturn("你好，世界");
+        when(lobbyService.getLobbyByUserId(user1.getId())).thenReturn(lobby1);
+        when(lobbyService.getLobbyByUserId(user2.getId())).thenReturn(lobby1);
+
+        // Act
+        chatService.sendTranslatedClueMessagesToUsers(lobby1Id, originalMessage);
+
+        // Assert
+        verify(messagingTemplate).convertAndSend(eq("/queue/1/clue"), any(ChatMessage.class));
+        verify(messagingTemplate).convertAndSend(eq("/queue/2/clue"), any(ChatMessage.class));
         verifyNoMoreInteractions(messagingTemplate);
     }
 }

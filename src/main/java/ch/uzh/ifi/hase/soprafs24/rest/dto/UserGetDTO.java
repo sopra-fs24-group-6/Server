@@ -20,6 +20,7 @@ public class UserGetDTO {
 
   private double winlossratio;
 
+
   private String avatarUrl;
 
   public String getAvatarUrl() {
@@ -30,39 +31,7 @@ public class UserGetDTO {
     this.avatarUrl = avatarUrl;
   }
 
-  public int getWins() {
-        return wins;
-    }
-
-    public void setWins(int wins) {
-        this.wins = wins;
-    }
-
-    public int getLosses() {
-        return losses;
-    }
-
-    public void setLosses(int losses) {
-        this.losses = losses;
-    }
-
-    public double getWinlossratio() {
-        return winlossratio;
-    }
-
-    public void setWinlossratio(double winlossratio) {
-        this.winlossratio = winlossratio;
-    }
-
-    public String getLanguage() {
-        return language;
-    }
-
-    public void setLanguage(String language) {
-        this.language = language;
-    }
-
-    public Long getId() {
+  public Long getId() {
     return id;
   }
 
@@ -100,5 +69,37 @@ public class UserGetDTO {
 
   public void setToken(String token) {
     this.token = token;
+  }
+
+  public int getWins() {
+    return wins;
+  }
+
+  public void setWins(int wins) {
+    this.wins = wins;
+  }
+
+  public int getLosses() {
+    return losses;
+  }
+
+  public void setLosses(int losses) {
+    this.losses = losses;
+  }
+
+  public double getWinlossratio() {
+    return winlossratio;
+  }
+
+  public void setWinlossratio(double winlossratio) {
+    this.winlossratio = winlossratio;
+  }
+
+  public String getLanguage() {
+    return language;
+  }
+
+  public void setLanguage(String language) {
+    this.language = language;
   }
 }

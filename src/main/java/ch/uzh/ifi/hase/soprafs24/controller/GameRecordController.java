@@ -19,13 +19,13 @@ import java.util.List;
 @Controller
 public class GameRecordController {
 
+  private final GameRecordService gameRecordService;
 
-    private final GameRecordService gameRecordService;
+  GameRecordController(GameRecordService gameRecordService)
+  {
+      this.gameRecordService = gameRecordService;
+  }
 
-    GameRecordController(GameRecordService gameRecordService)
-    {
-        this.gameRecordService = gameRecordService;
-    }
 
 
     @GetMapping("/leaderboard/page={page_id}")

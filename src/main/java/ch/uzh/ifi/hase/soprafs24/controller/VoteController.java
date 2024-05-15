@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
+import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Player;
 import ch.uzh.ifi.hase.soprafs24.entity.Result;
 import ch.uzh.ifi.hase.soprafs24.entity.Vote;
@@ -23,51 +24,30 @@ import java.util.stream.Collectors;
 @RestController
 public class VoteController {
 
-    private final VoteService voteService;
-    private final GameService gameService;
+  private final VoteService voteService;
+  private final GameService gameService;
 
-    @Autowired
-    public VoteController(VoteService voteService, GameService gameService) {
-        this.voteService = voteService;
-        this.gameService = gameService;
-    }
+  @Autowired
+  public VoteController(VoteService voteService, GameService gameService) {
+    this.voteService = voteService;
+    this.gameService = gameService;
+  }
 
-    @MessageMapping("/vote/{lobbyId}/sendVote")
-    public void saveVoteAndNotifyResult(@DestinationVariable Long lobbyId, @Payload VoteDTO voteDTO) {
-        // save vote
-        Vote vote = VoteDTOMapper.INSTANCE.convertVoteDTOtoEntity(voteDTO);
-        vote.setLobbyId(lobbyId);
-        voteService.saveVote(vote);
+  @MessageMapping("/vote/{lobbyId}/sendVote")
+  public void saveVoteAndNotifyResult(@DestinationVariable Long lobbyId, @Payload VoteDTO voteDTO) {
+    // get game
+    Game game = gameService.getActiveGameByLobbyId(lobbyId);
 
-        // get active players
-        List<Player> players = gameService.getActivePlayers(lobbyId);
-        // calculate result. if not all players have voted, then return Optional.empty()
-        Optional<Result> result = voteService.calculateResults(lobbyId, players);
+    // save vote
+    Vote vote = VoteDTOMapper.INSTANCE.convertVoteDTOtoEntity(voteDTO);
+    vote.setLobbyId(lobbyId);
+    vote.setRound(game.getCurrentRound());
+    voteService.saveVote(vote);
 
-        // if result is calculated, then notify players
-        result.ifPresent(value -> gameService.notifyResults(lobbyId, value));
-    }
+    // calculate result. if not all players have voted, then return Optional.empty()
+    Optional<Result> result = voteService.calculateResults(game);
 
-//    @PostMapping("/vote/{lobbyId}/sendVote")
-//    @ResponseStatus(HttpStatus.CREATED)
-//    public void sendVote(@PathVariable("lobbyId") Long lobbyId, @RequestBody VoteDTO voteDTO) {
-//        Vote vote = VoteDTOMapper.INSTANCE.convertVoteDTOtoEntity(voteDTO);
-//        vote.setLobbyId(lobbyId);
-//        voteService.saveVote(vote);
-//    }
-//
-//    @GetMapping("/vote/{lobbyId}/getVotes")
-//    @ResponseStatus(HttpStatus.OK)
-//    public List<Object> getVotesByLobby(@PathVariable("lobbyId") Long lobbyId) {
-//        List<Vote> votes = voteService.getVotesByLobbyId(lobbyId);
-//        return votes.stream()
-//                .map(VoteDTOMapper.INSTANCE::convertEntityToVoteDTO)
-//                .collect(Collectors.toList());
-//    }
-//
-//    @GetMapping("/vote/{lobbyId}/results")
-//    @ResponseStatus(HttpStatus.OK)
-//    public Map<String, Object> getVotingResults(@PathVariable("lobbyId") Long lobbyId) {
-//        return voteService.calculateResults(lobbyId);
-//    }
+    // if result is calculated, then notify players
+    result.ifPresent(value -> gameService.notifyResults(lobbyId, value));
+  }
 }

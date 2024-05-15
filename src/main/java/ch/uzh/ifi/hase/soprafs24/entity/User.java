@@ -128,14 +128,9 @@ public class User implements Serializable {
     }
 
     public String getLanguage() {
-      return language;
-  }
+      return language;}
 
-    public void setLanguage(String language) {
-        this.language = language;
-    }
-
-    @OneToOne
+  @OneToOne
   @JoinColumn(name = "player_id")
   private Player player;
 
@@ -194,5 +189,9 @@ public class User implements Serializable {
 
   public void setPlayer(Player player) {
     this.player = player;
+  }
+
+  public void setLanguage(String language) {
+    this.language = language;
   }
 }
