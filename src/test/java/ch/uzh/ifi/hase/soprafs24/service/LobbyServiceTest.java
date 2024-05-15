@@ -250,6 +250,7 @@ public class LobbyServiceTest {
     newLobby.setPassword("password");
     newLobby.setThemes(List.of(inputTheme));
     newLobby.setHost(inputHost);
+    newLobby.setIsPrivate(true);
 
     Mockito.when(lobbyRepository.findByName(Mockito.any())).thenReturn(Optional.empty());
     Mockito.when(themeRepository.findByName(Mockito.any())).thenReturn(Optional.of(testTheme));
@@ -265,7 +266,7 @@ public class LobbyServiceTest {
     assertEquals(createdLobby.getName(), newLobby.getName());
     assertEquals(createdLobby.getPassword(), newLobby.getPassword());
     assertEquals(createdLobby.getStatus(), LobbyStatus.OPEN);
-    assertEquals(createdLobby.getType(), LobbyType.PRIVATE);
+    assertEquals(createdLobby.getIsPrivate(), true);
     assertEquals(createdLobby.getPlayers().get(0).getUserId(), hostPlayer.getUserId());
     assertEquals(createdLobby.getPlayerCount(), 1);
   }

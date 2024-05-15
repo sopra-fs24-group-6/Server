@@ -229,39 +229,45 @@ public class GameService {
     messagingTemplate.convertAndSend("/topic/" + game.getLobbyId() + "/players", playerDTOS);
   }
 
-  public void notifyResults(Long lobbyId, Result result) {
-    // winnerRole
-    String winnerRole = result.getWinnerRole().name();
-    // winners
-    List<PlayerDTO> winners = new ArrayList<>();
-    List<Player> winnerPlayers = result.getWinnerPlayers();
-    for (Player player : winnerPlayers) {
-      PlayerDTO playerDTO = new PlayerDTO();
-      playerDTO.setUserId(player.getUserId());
-      playerDTO.setUsername(player.getUsername());
-      winners.add(playerDTO);
-      // update user records
-      User user = userRepository.findById(player.getUserId())
-        .orElseThrow(() -> new NoSuchElementException("No user found with ID: " + player.getUserId()));
-      user.addWins();
-      userRepository.save(user); // Save the updated user record
-    }
-    // losers
-    List<PlayerDTO> losers = new ArrayList<>();
-    List<Player> loserPlayers = result.getLoserPlayers();
-    for (Player player : loserPlayers) {
-      PlayerDTO playerDTO = new PlayerDTO();
-      playerDTO.setUserId(player.getUserId());
-      playerDTO.setUsername(player.getUsername());
-      losers.add(playerDTO);
-      // update user records
-      User user = userRepository.findById(player.getUserId())
-        .orElseThrow(() -> new NoSuchElementException("No user found with ID: " + player.getUserId()));
-      user.addLosses();
-      userRepository.save(user); // Save the updated user record
-    }
-    userRepository.flush(); // Flush changes to the database
 
+    public void notifyResults(Long lobbyId, Result result) {
+        // winnerRole
+        String winnerRole = result.getWinnerRole().name();
+        // winners
+        List<PlayerDTO> winners = new ArrayList<>();
+        List<Player> winnerPlayers = result.getWinnerPlayers();
+        for (Player player : winnerPlayers) {
+            PlayerDTO playerDTO = new PlayerDTO();
+            playerDTO.setUserId(player.getUserId());
+            playerDTO.setUsername(player.getUsername());
+            winners.add(playerDTO);
+            // update user records
+            User user = userRepository.findById(player.getUserId())
+                    .orElseThrow(() -> new NoSuchElementException("No user found with ID: " + player.getUserId()));
+            user.addWins();
+            user.updateWeightedWinLossRatio();
+            userRepository.save(user); // Save the updated user record
+            // testing purposes
+            System.out.println(user);
+        }
+        // losers
+        List<PlayerDTO> losers = new ArrayList<>();
+        List<Player> loserPlayers = result.getLoserPlayers();
+        for (Player player : loserPlayers) {
+            PlayerDTO playerDTO = new PlayerDTO();
+            playerDTO.setUserId(player.getUserId());
+            playerDTO.setUsername(player.getUsername());
+            losers.add(playerDTO);
+            // update user records
+            User user = userRepository.findById(player.getUserId())
+                    .orElseThrow(() -> new NoSuchElementException("No user found with ID: " + player.getUserId()));
+            user.addLosses();
+            user.updateWeightedWinLossRatio();
+            userRepository.save(user); // Save the updated user record
+            // testing purposes
+            System.out.println(user);
+        }
+        userRepository.flush(); // Flush changes to the database
     // set variables to resultNotification
     ResultNotification resultNotification = new ResultNotification();
     resultNotification.setWinnerRole(winnerRole);

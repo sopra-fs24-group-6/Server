@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.UserAvatarDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserIdDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPutDTO;
@@ -18,8 +19,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
@@ -31,11 +34,8 @@ import java.util.Map;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -56,6 +56,7 @@ public class UserControllerTest {
 
   private User testUser;
   private String dateString;
+
   @BeforeEach
   public void setup() {
     testUser = new User();
@@ -68,6 +69,11 @@ public class UserControllerTest {
     Date date = Date.from(Instant.parse(dateString));
     testUser.setCreationDate(date);
     testUser.setBirthDate(date);
+    testUser.setLanguage("en");
+    testUser.setWins(20);
+    testUser.setLosses(13);
+    testUser.setWinlossratio(1.335);
+    testUser.setAvatarUrl("images/avatar/default");
   }
 
 //    @AfterEach
@@ -102,7 +108,12 @@ public class UserControllerTest {
       .andExpect(jsonPath("$[0].token", is(testUser.getToken())))
       .andExpect(jsonPath("$[0].status", is(testUser.getStatus().toString())))
       .andExpect(jsonPath("$[0].creationDate", is(dateString)))
-      .andExpect(jsonPath("$[0].birthDate", is(dateString)));
+      .andExpect(jsonPath("$[0].birthDate", is(dateString)))
+      .andExpect(jsonPath("$[0].language", is(testUser.getLanguage())))
+            .andExpect(jsonPath("$[0].wins", is(testUser.getWins())))
+            .andExpect(jsonPath("$[0].losses", is(testUser.getLosses())))
+            .andExpect(jsonPath("$[0].winlossratio", is(testUser.getWinlossratio())))
+            .andExpect(jsonPath("$[0].avatarUrl", is(testUser.getAvatarUrl())));
   }
 
   @Test
@@ -127,6 +138,27 @@ public class UserControllerTest {
       .andExpect(jsonPath("$.status", is(UserStatus.ONLINE.toString())))
       .andExpect(jsonPath("$.token").exists())
       .andExpect(jsonPath("$.creationDate").exists());
+  }
+
+  @Test
+  void testUpdateAvatar_validInput() throws Exception {
+    Long userId = 1L;
+    // Mock MultipartFile
+    MockMultipartFile mockFile = new MockMultipartFile(
+            "avatar", // name of the file parameter in the request
+            "avatar.png", // original filename
+            MediaType.IMAGE_PNG_VALUE, // content type
+            "test image content".getBytes() // file content
+    );
+
+    // Mock the behavior of userService.updateUserAvatar
+    when(userService.updateUserAvatar(anyLong(), any(MultipartFile.class))).thenReturn(testUser);
+
+    // Perform the POST request
+    mockMvc.perform(multipart("/{userId}/avatar", testUser.getId())
+                    .file(mockFile)
+                    .contentType(MediaType.MULTIPART_FORM_DATA))
+            .andExpect(status().isNoContent());
   }
 
   @Test
@@ -158,13 +190,19 @@ public class UserControllerTest {
       .contentType(MediaType.APPLICATION_JSON);
 
     // then
-    mockMvc.perform(getRequest).andExpect(status().isOk())
-      .andExpect(jsonPath("$.id", is(testUser.getId().intValue())))
-      .andExpect(jsonPath("$.username", is(testUser.getUsername())))
-      .andExpect(jsonPath("$.token", is(testUser.getToken())))
-      .andExpect(jsonPath("$.status", is(testUser.getStatus().toString())))
-      .andExpect(jsonPath("$.creationDate", is(dateString)))
-      .andExpect(jsonPath("$.birthDate", is(dateString)));
+    mockMvc.perform(getRequest)
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is(testUser.getId().intValue())))
+            .andExpect(jsonPath("$.username", is(testUser.getUsername())))
+            .andExpect(jsonPath("$.token", is(testUser.getToken())))
+            .andExpect(jsonPath("$.status", is(testUser.getStatus().toString())))
+            .andExpect(jsonPath("$.creationDate", is(dateString)))
+            .andExpect(jsonPath("$.birthDate", is(dateString)))
+            .andExpect(jsonPath("$.language", is(testUser.getLanguage())))
+            .andExpect(jsonPath("$.wins", is(testUser.getWins())))
+            .andExpect(jsonPath("$.losses", is(testUser.getLosses())))
+            .andExpect(jsonPath("$.winlossratio", is(testUser.getWinlossratio())))
+            .andExpect(jsonPath("$.avatarUrl", is(testUser.getAvatarUrl())));
   }
 
   @Test

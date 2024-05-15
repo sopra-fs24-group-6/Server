@@ -95,7 +95,6 @@
 | Kei Murakami       | [#168](https://github.com/sopra-fs24-group-6/Server/issues/168) | Connect game events sequence to work correctly with client                                   |
 | Alisher Dauysbekov | [#107](https://github.com/sopra-fs24-group-6/Server/issues/107) | Calculate winners and losers based on vote result                                            |
 | Alisher Dauysbekov | [#108](https://github.com/sopra-fs24-group-6/Server/issues/108) | Implement end of the game functionalities (Who won the game)                                 |
-
 | Nico Plüss, Joao Sacramento | [#14](https://github.com/sopra-fs24-group-6/Server/issues/14) | Allow the player to join the lobby if there is space |
 | Nico Plüss, Joao Sacramento| [#9](https://github.com/sopra-fs24-group-6/Server/issues/9) | Update View when lobby is created |
 | Nico Plüss, Joao Sacramento| [#104](https://github.com/sopra-fs24-group-6/Server/issues/104) | Implementation of lobby web socket |
@@ -163,3 +162,4 @@
 | Nico Plüss         | No specific Issue                                               | fixed automatic lobby update functionality                                 |
 | Nico Plüss         | 7340ac0                                                         | added player stats on profile view                                         |
 | Nico Plüss         | d01580c                                                         | added restriction so that players cannot send the clue word itself as clue |
+
