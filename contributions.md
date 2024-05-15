@@ -117,6 +117,6 @@
 | Aiqi Shuai | [#58](https://github.com/sopra-fs24-group-6/Client/issues/58) | Display the avatar in the profile page                       |
 | Aiqi Shuai | [#59](https://github.com/sopra-fs24-group-6/Client/issues/59) | allow users to change the avatar                             |
 | Aiqi Shuai | [#60](https://github.com/sopra-fs24-group-6/Client/issues/60) | Display avatar in the leaderboard page (Along with special effect) |
-|            |                                                              |                                                              |
+| Aiqi Shuai | [#62](https://github.com/sopra-fs24-group-6/Client/issues/62) | Make sure the cache problem won't affect the display of the avatar |
 |            |                                                              |                                                              |
 
