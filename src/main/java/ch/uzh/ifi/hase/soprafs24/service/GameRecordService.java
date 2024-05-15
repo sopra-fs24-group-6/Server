@@ -44,6 +44,5 @@ public class GameRecordService {
 
       return topUsers.subList(start, end);
     }
-
     
 }
