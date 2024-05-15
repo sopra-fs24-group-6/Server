@@ -7,6 +7,8 @@ public class LobbyBaseDTO {
 
   private String name;
 
+  private Boolean isPrivate;
+
   private Integer playerLimit;
 
   private List<String> themes;
@@ -25,6 +27,14 @@ public class LobbyBaseDTO {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public Boolean getIsPrivate() {
+    return isPrivate;
+  }
+
+  public void setIsPrivate(Boolean aPrivate) {
+    isPrivate = aPrivate;
   }
 
   public Integer getPlayerLimit() {
