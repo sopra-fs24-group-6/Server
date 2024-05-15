@@ -26,6 +26,8 @@ public class GameRecordService {
     this.userRepository = userRepository;
   }
 
+
+  
     public List<User> getTopUsers(int page) {
         // Retrieve all users from the repository
       // Define the page size
