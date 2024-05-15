@@ -38,8 +38,9 @@
 | Joao Sacramento| [#94](https://github.com/sopra-fs24-group-6/Client/issues/94) | Import containers from NES style |
 | Joao Sacramento| [#95](https://github.com/sopra-fs24-group-6/Client/issues/95) | Creation of Sliders for lobby setting |
 | Joao Sacramento| [#97](https://github.com/sopra-fs24-group-6/Client/issues/97) | Import of radio buttons from NES style |
-| Alisher Dauysbekov | [#105](https://github.com/sopra-fs24-group-6/Server/issues/105) | Implement endpoint for the votes of each player and make sure a player has only voted once   |
-| Alisher Dauysbekov | [#106](https://github.com/sopra-fs24-group-6/Server/issues/106) | Implement endpoit for the outcome of the voting |
+| Alisher Dauysbekov | [#87](https://github.com/sopra-fs24-group-6/Server/issues/87) | Implement correct handling of the birthdate   |
+| Alisher Dauysbekov | [#91](https://github.com/sopra-fs24-group-6/Server/issues/91) | Implement the ability to search for a given game by the criteria given(Username or gameID)   |
+| Alisher Dauysbekov | [#92](https://github.com/sopra-fs24-group-6/Server/issues/92) | Ability to return a list of games matching the parameters   |
 | Aiqi Shuai | [#94](https://github.com/sopra-fs24-group-6/Server/issues/94) | Accomodate(store) for language selection by the player |
 | Aiqi Shuai | [#9](https://github.com/sopra-fs24-group-6/Server/issues/9) | Chat translation |
 
@@ -76,8 +77,8 @@
 | Aiqi Shuai | [#149](https://github.com/sopra-fs24-group-6/Server/issues/149) | Adding a session manager |
 | Aiqi Shuai | [#100](https://github.com/sopra-fs24-group-6/Server/issues/100) | Set up away for the api to know what languages should be |
 | Aiqi Shuai | [#95](https://github.com/sopra-fs24-group-6/Server/issues/95)   | Handle word choice given a certain theme & storage of the chosen word |
-| Alisher Dauysbekov | [#112](https://github.com/sopra-fs24-group-6/Server/issues/112) |Endpoint to search for the user|
-| Alisher Dauysbekov | [#113](https://github.com/sopra-fs24-group-6/Server/issues/113) |Endpoint to allow for friends to be added & make sure not multiple requests can be sent|
+| Alisher Dauysbekov | [#105](https://github.com/sopra-fs24-group-6/Server/issues/105) | Implement endpoint for the votes of each player and make sure a player has only voted once   |
+| Alisher Dauysbekov | [#106](https://github.com/sopra-fs24-group-6/Server/issues/106) | Implement endpoit for the outcome of the voting |
 
 
 ## Week 4
@@ -90,13 +91,14 @@
 | Aiqi Shuai         | [#170](https://github.com/sopra-fs24-group-6/Server/issues/170) | Sending the lobby information to all players when there is a change                          |
 | Aiqi Shuai         | [#169](https://github.com/sopra-fs24-group-6/Server/issues/169) | Sending all players information to the client side when someone join the lobby.              |
 | Aiqi Shuai         | [#166](https://github.com/sopra-fs24-group-6/Server/issues/166) | Implement game initialization function                                                       |
-| Alisher Dauysbekov | [#114](https://github.com/sopra-fs24-group-6/Server/issues/114) | Endpoint to retrieve the list of current friends                                             |
-| Alisher Dauysbekov | [#115](https://github.com/sopra-fs24-group-6/Server/issues/115) | Tracking of current friends and update in case a new friend is added                         |
 | Kei Murakami       | [#163](https://github.com/sopra-fs24-group-6/Server/issues/163) | Integrate voting function to game logic                                                      |
 | Kei Murakami       | [#164](https://github.com/sopra-fs24-group-6/Server/issues/164) | Add interval timer between game events                                                       |
 | Kei Murakami       | [#165](https://github.com/sopra-fs24-group-6/Server/issues/165) | Implement trigger for clue phase                                                             |
 | Kei Murakami       | [#167](https://github.com/sopra-fs24-group-6/Server/issues/167) | Implement transition from lobby to game when game starts                                     |
 | Kei Murakami       | [#168](https://github.com/sopra-fs24-group-6/Server/issues/168) | Connect game events sequence to work correctly with client                                   |
+| Alisher Dauysbekov | [#107](https://github.com/sopra-fs24-group-6/Server/issues/107) | Calculate winners and losers based on vote result |
+| Alisher Dauysbekov | [#108](https://github.com/sopra-fs24-group-6/Server/issues/108) | Implement end of the game functionalities (Who won the game) |
+
 
 
 
@@ -124,6 +126,10 @@
 | Joao Sacramento | [#32](https://github.com/sopra-fs24-group-6/Client/issues/32) | Create the vote button and its functionality                                                |
 | Joao Sacramento | [#33](https://github.com/sopra-fs24-group-6/Client/issues/33) | Confirmation component that confirm who was voted out by showing the results or making the player wait until everyone has voted                               |
 | Joao Sacramento | [#38](https://github.com/sopra-fs24-group-6/Client/issues/38) | Crearte visual component to showcase the winners                                            |
+| Alisher Dauysbekov | [#114](https://github.com/sopra-fs24-group-6/Server/issues/114) | Endpoint to retrieve the list of current friends                                             |
+| Alisher Dauysbekov | [#115](https://github.com/sopra-fs24-group-6/Server/issues/115) | Tracking of current friends and update in case a new friend is added                         |
+| Alisher Dauysbekov | [#112](https://github.com/sopra-fs24-group-6/Server/issues/112) | Endpoint to search for the user |
+| Alisher Dauysbekov | [#113](https://github.com/sopra-fs24-group-6/Server/issues/113) | Endpoint to allow for friends to be added & make sure not multiple requests can be sent |
 
 
 
@@ -145,3 +151,5 @@
 | Aiqi Shuai | [#59](https://github.com/sopra-fs24-group-6/Client/issues/59) | allow users to change the avatar                             |
 | Aiqi Shuai | [#60](https://github.com/sopra-fs24-group-6/Client/issues/60) | Display avatar in the leaderboard page (Along with special effect) |
 | Aiqi Shuai | [#62](https://github.com/sopra-fs24-group-6/Client/issues/62) | Make sure the cache problem won't affect the display of the avatar |
+| Alisher Dauysbekov | [#43](https://github.com/sopra-fs24-group-6/Server/issues/43) | Allow to accept or refuse requests |
+| Alisher Dauysbekov | [#192](https://github.com/sopra-fs24-group-6/Server/issues/192) | Add Test Cases for REST API Endpoints for FriendController |
