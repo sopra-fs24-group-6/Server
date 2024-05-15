@@ -96,10 +96,10 @@
 | Alisher Dauysbekov | [#107](https://github.com/sopra-fs24-group-6/Server/issues/107) | Calculate winners and losers based on vote result                                            |
 | Alisher Dauysbekov | [#108](https://github.com/sopra-fs24-group-6/Server/issues/108) | Implement end of the game functionalities (Who won the game)                                 |
 
-| Nico Plüss & Joao Sacramento | [#14](https://github.com/sopra-fs24-group-6/Server/issues/14) | Allow the player to join the lobby if there is space |
-| Nico Plüss & Joao Sacramento| [#9](https://github.com/sopra-fs24-group-6/Server/issues/9) | Update View when lobby is created |
-| Nico Plüss & Joao Sacramento| [#104](https://github.com/sopra-fs24-group-6/Server/issues/104) | Implementation of lobby web socket |
-| Nico Plüss & Joao Sacramento| [#106](https://github.com/sopra-fs24-group-6/Server/issues/106) | Subscribe to lobby web socket when joining a lobby |
+| Nico Plüss, Joao Sacramento | [#14](https://github.com/sopra-fs24-group-6/Server/issues/14) | Allow the player to join the lobby if there is space |
+| Nico Plüss, Joao Sacramento| [#9](https://github.com/sopra-fs24-group-6/Server/issues/9) | Update View when lobby is created |
+| Nico Plüss, Joao Sacramento| [#104](https://github.com/sopra-fs24-group-6/Server/issues/104) | Implementation of lobby web socket |
+| Nico Plüss, Joao Sacramento| [#106](https://github.com/sopra-fs24-group-6/Server/issues/106) | Subscribe to lobby web socket when joining a lobby |
 
 # Sprint 2
 
@@ -140,21 +140,26 @@
 
 ## Week 7
 
-| Name               | Issue                                                           | Description (optional)                                                |
-| ------------------ | --------------------------------------------------------------- | --------------------------------------------------------------------- |
-| Kei Murakami       | [#188](https://github.com/sopra-fs24-group-6/Server/issues/188) | Add multiple-rounds game process                                      |
-| Kei Murakami       | [#189](https://github.com/sopra-fs24-group-6/Server/issues/189) | Add round field to vote entity and modify controller and service      |
-| Kei Murakami       | [#190](https://github.com/sopra-fs24-group-6/Client/issues/190) | Add currentRound and maxRound so that client can use this information |
-| Joao Sacramento    | [#124](https://github.com/sopra-fs24-group-6/Client/issues/124) | Generate/ find backgrounds to apply to the application                |
-| Joao Sacramento    | [#125](https://github.com/sopra-fs24-group-6/Client/issues/125) | Apply backgrounds to the different views                              |
-| Joao Sacramento    | [#126](https://github.com/sopra-fs24-group-6/Client/issues/126) | Adapt the style to the different background                           |
-| Aiqi Shuai         | [#122](https://github.com/sopra-fs24-group-6/Server/issues/122) | add avatar attribute                                                  |
-| Aiqi Shuai         | [#123](https://github.com/sopra-fs24-group-6/Server/issues/123) | find a way to initialize avatar for users who just register           |
-| Aiqi Shuai         | [#124](https://github.com/sopra-fs24-group-6/Server/issues/124) | allowing updating the avatar and store them in the server             |
-| Aiqi Shuai         | [#127](https://github.com/sopra-fs24-group-6/Server/issues/127) | Allow leaderboard to show players in different pages                  |
-| Aiqi Shuai         | [#58](https://github.com/sopra-fs24-group-6/Client/issues/58)   | Display the avatar in the profile page                                |
-| Aiqi Shuai         | [#59](https://github.com/sopra-fs24-group-6/Client/issues/59)   | allow users to change the avatar                                      |
-| Aiqi Shuai         | [#60](https://github.com/sopra-fs24-group-6/Client/issues/60)   | Display avatar in the leaderboard page (Along with special effect)    |
-| Aiqi Shuai         | [#62](https://github.com/sopra-fs24-group-6/Client/issues/62)   | Make sure the cache problem won't affect the display of the avatar    |
-| Alisher Dauysbekov | [#43](https://github.com/sopra-fs24-group-6/Server/issues/43)   | Allow to accept or refuse requests                                    |
-| Alisher Dauysbekov | [#192](https://github.com/sopra-fs24-group-6/Server/issues/192) | Add Test Cases for REST API Endpoints for FriendController            |
+| Name               | Issue                                                           | Description (optional)                                                     |
+| ------------------ | --------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Kei Murakami       | [#188](https://github.com/sopra-fs24-group-6/Server/issues/188) | Add multiple-rounds game process                                           |
+| Kei Murakami       | [#189](https://github.com/sopra-fs24-group-6/Server/issues/189) | Add round field to vote entity and modify controller and service           |
+| Kei Murakami       | [#190](https://github.com/sopra-fs24-group-6/Client/issues/190) | Add currentRound and maxRound so that client can use this information      |
+| Joao Sacramento    | [#124](https://github.com/sopra-fs24-group-6/Client/issues/124) | Generate/ find backgrounds to apply to the application                     |
+| Joao Sacramento    | [#125](https://github.com/sopra-fs24-group-6/Client/issues/125) | Apply backgrounds to the different views                                   |
+| Joao Sacramento    | [#126](https://github.com/sopra-fs24-group-6/Client/issues/126) | Adapt the style to the different background                                |
+| Aiqi Shuai         | [#122](https://github.com/sopra-fs24-group-6/Server/issues/122) | add avatar attribute                                                       |
+| Aiqi Shuai         | [#123](https://github.com/sopra-fs24-group-6/Server/issues/123) | find a way to initialize avatar for users who just register                |
+| Aiqi Shuai         | [#124](https://github.com/sopra-fs24-group-6/Server/issues/124) | allowing updating the avatar and store them in the server                  |
+| Aiqi Shuai         | [#127](https://github.com/sopra-fs24-group-6/Server/issues/127) | Allow leaderboard to show players in different pages                       |
+| Aiqi Shuai         | [#58](https://github.com/sopra-fs24-group-6/Client/issues/58)   | Display the avatar in the profile page                                     |
+| Aiqi Shuai         | [#59](https://github.com/sopra-fs24-group-6/Client/issues/59)   | allow users to change the avatar                                           |
+| Aiqi Shuai         | [#60](https://github.com/sopra-fs24-group-6/Client/issues/60)   | Display avatar in the leaderboard page (Along with special effect)         |
+| Aiqi Shuai         | [#62](https://github.com/sopra-fs24-group-6/Client/issues/62)   | Make sure the cache problem won't affect the display of the avatar         |
+| Alisher Dauysbekov | [#43](https://github.com/sopra-fs24-group-6/Server/issues/43)   | Allow to accept or refuse requests                                         |
+| Alisher Dauysbekov | [#192](https://github.com/sopra-fs24-group-6/Server/issues/192) | Add Test Cases for REST API Endpoints for FriendController                 |
+| Nico Plüss         | 7340ac0                                                         | Fixed Date Formating on profile view                                       |
+| Nico Plüss         | e7dc1e5                                                         | Made usernames clickable and link to respective profile                    |
+| Nico Plüss         | No specific Issue                                               | fixed automatic lobby update functionality                                 |
+| Nico Plüss         | 7340ac0                                                         | added player stats on profile view                                         |
+| Nico Plüss         | d01580c                                                         | added restriction so that players cannot send the clue word itself as clue |
