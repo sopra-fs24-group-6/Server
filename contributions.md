@@ -114,6 +114,17 @@
 | Kei Murakami | [#114](https://github.com/sopra-fs24-group-6/Client/issues/114) | Modify lobby and browser view with real-time update                                          |
 | Kei Murakami | [#115](https://github.com/sopra-fs24-group-6/Client/issues/115) | Navigate to appropriate view when disconnecting                                              |
 | Kei Murakami | [#116](https://github.com/sopra-fs24-group-6/Client/issues/116) | Show pop-up when create/join/delete lobby and start game                                     |
+| Joao Sacramento | [#19](https://github.com/sopra-fs24-group-6/Client/issues/19) | Create the necessary component for a chat functionality                                     |
+| Joao Sacramento | [#15](https://github.com/sopra-fs24-group-6/Client/issues/15) | Create/revamp the game view                                                                 |
+| Joao Sacramento | [#20](https://github.com/sopra-fs24-group-6/Client/issues/20) | Send chats through button                                                                   |
+| Joao Sacramento | [#21](https://github.com/sopra-fs24-group-6/Client/issues/21) | Display chats in a scroll box component                                                     |
+| Joao Sacramento | [#29](https://github.com/sopra-fs24-group-6/Client/issues/29) | Voting overlay                                                                              |
+| Joao Sacramento | [#30](https://github.com/sopra-fs24-group-6/Client/issues/30) | Correct chat transitions between phases                                                     |
+| Joao Sacramento | [#31](https://github.com/sopra-fs24-group-6/Client/issues/31) | Ability to select a player to vote out                                                      |
+| Joao Sacramento | [#32](https://github.com/sopra-fs24-group-6/Client/issues/32) | Create the vote button and its functionality                                                |
+| Joao Sacramento | [#33](https://github.com/sopra-fs24-group-6/Client/issues/33) | Confirmation component that confirm who was voted out by showing the results or making the player wait until everyone has voted                               |
+| Joao Sacramento | [#38](https://github.com/sopra-fs24-group-6/Client/issues/38) | Crearte visual component to showcase the winners                                            |
+
 
 
 ## Week 7
