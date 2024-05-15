@@ -96,10 +96,10 @@
 | Alisher Dauysbekov | [#107](https://github.com/sopra-fs24-group-6/Server/issues/107) | Calculate winners and losers based on vote result                                            |
 | Alisher Dauysbekov | [#108](https://github.com/sopra-fs24-group-6/Server/issues/108) | Implement end of the game functionalities (Who won the game)                                 |
 
-| Nico Plüss & Joao Sacramento | [#14](https://github.com/sopra-fs24-group-6/Server/issues/14) | Allow the player to join the lobby if there is space |
-| Nico Plüss & Joao Sacramento| [#9](https://github.com/sopra-fs24-group-6/Server/issues/9) | Update View when lobby is created |
-| Nico Plüss & Joao Sacramento| [#104](https://github.com/sopra-fs24-group-6/Server/issues/104) | Implementation of lobby web socket |
-| Nico Plüss & Joao Sacramento| [#106](https://github.com/sopra-fs24-group-6/Server/issues/106) | Subscribe to lobby web socket when joining a lobby |
+| Nico Plüss, Joao Sacramento | [#14](https://github.com/sopra-fs24-group-6/Server/issues/14) | Allow the player to join the lobby if there is space |
+| Nico Plüss, Joao Sacramento| [#9](https://github.com/sopra-fs24-group-6/Server/issues/9) | Update View when lobby is created |
+| Nico Plüss, Joao Sacramento| [#104](https://github.com/sopra-fs24-group-6/Server/issues/104) | Implementation of lobby web socket |
+| Nico Plüss, Joao Sacramento| [#106](https://github.com/sopra-fs24-group-6/Server/issues/106) | Subscribe to lobby web socket when joining a lobby |
 
 # Sprint 2
 
