@@ -29,30 +29,28 @@ public class GameRecordServiceTest {
   }
 
   @Test
-  void testGetTopUsers_10() {
+  void testGetTopUsers() {
     List<User> testUsers = new ArrayList<>();
-    User user1 = new User();
-    User user2 = new User();
-    User user3 = new User();
-    user1.setUsername("user1");
-    user1.setWins(10);
-    user1.setLosses(5);
-    user2.setUsername("user2");
-    user2.setWins(20);
-    user2.setLosses(15);
-    user3.setUsername("user3");
-    user3.setWins(5);
-    user3.setLosses(10);
-    testUsers.add(user1);
-    testUsers.add(user2);
-    testUsers.add(user3);
+    for (int i = 1; i <= 15; i++) {
+      User user = new User();
+      user.setUsername("user" + i);
+      user.setWins(i * 10);
+      user.setLosses(i);
+      user.updateWeightedWinLossRatio();
+      testUsers.add(user);
+    }
 
     when(userRepository.findAll()).thenReturn(testUsers);
 
-    List<User> topUsers = gameRecordService.getTopUsers_10();
+    List<User> topUsersPage1 = gameRecordService.getTopUsers(1);
+    List<User> topUsersPage2 = gameRecordService.getTopUsers(2);
 
-    assertEquals(3, topUsers.size());
-    assertEquals("user2", topUsers.get(0).getUsername());
-    assertEquals("user1", topUsers.get(1).getUsername());
+    assertEquals(10, topUsersPage1.size());
+    assertEquals("user15", topUsersPage1.get(0).getUsername());
+    assertEquals("user6", topUsersPage1.get(9).getUsername());
+
+    assertEquals(5, topUsersPage2.size());
+    assertEquals("user5", topUsersPage2.get(0).getUsername());
+    assertEquals("user1", topUsersPage2.get(4).getUsername());
   }
 }

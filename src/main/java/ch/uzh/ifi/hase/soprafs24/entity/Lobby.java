@@ -21,7 +21,7 @@ public class Lobby implements Serializable {
   @Column(nullable = false)
   private String name;
 
-  @Column(nullable = false)
+  @Column(nullable = true)
   private LobbyType type;
 
   @Column()
