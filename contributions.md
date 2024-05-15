@@ -134,4 +134,7 @@
 | Kei Murakami | [#188](https://github.com/sopra-fs24-group-6/Server/issues/188) | Add multiple-rounds game process                                      |
 | Kei Murakami | [#189](https://github.com/sopra-fs24-group-6/Server/issues/189) | Add round field to vote entity and modify controller and service      |
 | Kei Murakami | [#190](https://github.com/sopra-fs24-group-6/Client/issues/190) | Add currentRound and maxRound so that client can use this information |
+| Joao Sacramento | [#124](https://github.com/sopra-fs24-group-6/Client/issues/124) | Generate/ find backgrounds to apply to the application             |
+| Joao Sacramento | [#125](https://github.com/sopra-fs24-group-6/Client/issues/125) | Apply backgrounds to the different views                           |
+| Joao Sacramento | [#126](https://github.com/sopra-fs24-group-6/Client/issues/126) | Adapt the style to the different background                        |
 
