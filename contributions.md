@@ -106,3 +106,17 @@
 | Kei Murakami | [#115](https://github.com/sopra-fs24-group-6/Client/issues/115) | Navigate to appropriate view when disconnecting                                              |
 | Kei Murakami | [#116](https://github.com/sopra-fs24-group-6/Client/issues/116) | Show pop-up when create/join/delete lobby and start game                                     |
 
+## Week 7
+
+| Name       | Issue                                                        | Description (optional)                                       |
+| ---------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Aiqi Shuai | [#122](https://github.com/sopra-fs24-group-6/Server/issues/122) | add avatar attribute                                         |
+| Aiqi Shuai | [#123](https://github.com/sopra-fs24-group-6/Server/issues/123) | find a way to initialize avatar for users who just register  |
+| Aiqi Shuai | [#124](https://github.com/sopra-fs24-group-6/Server/issues/124) | allowing updating the avatar and store them in the server    |
+| Aiqi Shuai | [#127](https://github.com/sopra-fs24-group-6/Server/issues/127) | Allow leaderboard to show players in different pages         |
+| Aiqi Shuai | [#58](https://github.com/sopra-fs24-group-6/Client/issues/58) | Display the avatar in the profile page                       |
+| Aiqi Shuai | [#59](https://github.com/sopra-fs24-group-6/Client/issues/59) | allow users to change the avatar                             |
+| Aiqi Shuai | [#60](https://github.com/sopra-fs24-group-6/Client/issues/60) | Display avatar in the leaderboard page (Along with special effect) |
+|            |                                                              |                                                              |
+|            |                                                              |                                                              |
+

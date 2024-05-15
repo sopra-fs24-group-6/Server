@@ -25,8 +25,6 @@ public class GameRecordService {
   public GameRecordService(@Qualifier("userRepository") UserRepository userRepository) {
     this.userRepository = userRepository;
   }
-
-
   
     public List<User> getTopUsers(int page) {
         // Retrieve all users from the repository
