@@ -14,5 +14,6 @@ public interface PlayerDTOMapper {
 
     @Mapping(source = "userId",target = "userId")
     @Mapping(source = "username",target = "username")
+    @Mapping(source = "avatarUrl",target = "avatarUrl")
     PlayerDTO convertEntityToPlayerDTO(Player player);
 }
