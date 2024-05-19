@@ -128,10 +128,9 @@ public class LobbyService {
 
     // set lobby type and isPrivate
     // if password is set, then PRIVATE, else PUBLIC
-    LobbyType type = determineLobbyType(newLobby.getPassword());
-    newLobby.setType(type);
-    newLobby.setIsPrivate(type == LobbyType.PRIVATE);
-
+    // LobbyType type = determineLobbyType(newLobby.getPassword());
+    // newLobby.setType(type);
+    // newLobby.setIsPrivate(type == LobbyType.PRIVATE);
 
     // set status
     newLobby.setStatus(LobbyStatus.OPEN);
@@ -172,8 +171,9 @@ public class LobbyService {
     targetLobby.setClueTimer(newLobby.getClueTimer());
     targetLobby.setDiscussionTimer(newLobby.getDiscussionTimer());
     targetLobby.setRounds(newLobby.getRounds());
-    LobbyType type = determineLobbyType(targetLobby.getPassword());
-    targetLobby.setType(type);
+    //LobbyType type = determineLobbyType(targetLobby.getPassword());
+    //targetLobby.setType(type);
+    targetLobby.setIsPrivate(newLobby.getIsPrivate());
 
     // update playerLimit
     // if new playerLimit < current playerCount, then throw except
@@ -395,9 +395,9 @@ public class LobbyService {
         HttpStatus.NOT_FOUND, "Player with id " + userId + " could not be found."));
   }
 
-  public LobbyType determineLobbyType (String password) {
-    return (password != null && !password.isEmpty()) ? LobbyType.PRIVATE : LobbyType.PUBLIC;
-  }
+//  public LobbyType determineLobbyType (String password) {
+//    return (password != null && !password.isEmpty()) ? LobbyType.PRIVATE : LobbyType.PUBLIC;
+//  }
 
   public List<Theme> findThemesByNames(List<String> themeNames) {
     List<Theme> themes = new ArrayList<>();

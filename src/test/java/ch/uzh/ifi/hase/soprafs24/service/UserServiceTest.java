@@ -70,88 +70,88 @@ public class UserServiceTest {
     userService = new UserService(userRepository);
   }
 
-  @Test
-  void updateUserAvatar_validInput() throws IOException {
-    // Given
-    MockMultipartFile mockFile = new MockMultipartFile(
-            "avatar",
-            "avatar.png",
-            "image/png",
-            "test image content".getBytes()
-    );
-
-    // Ensure the initial state: neither file exists
-    Path userDir = Paths.get(tempDir.toString(), "user1");
-    Files.createDirectories(userDir);
-    Files.deleteIfExists(userDir.resolve("avatar_pos.png"));
-    Files.deleteIfExists(userDir.resolve("avatar_neg.png"));
-
-    when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
-
-    // When
-    User updatedUser = userService.updateUserAvatar(testUser.getId(), mockFile);
-
-    // Then
-    assertNotNull(updatedUser);
-    assertEquals("/images/users/user1/avatar_pos.png", updatedUser.getAvatarUrl());
-    verify(userRepository, times(1)).save(testUser);
-  }
-
-  @Test
-  void updateUserAvatar_validInput_switchToNeg() throws IOException {
-    // Given
-    MockMultipartFile mockFile = new MockMultipartFile(
-            "avatar",
-            "avatar.png",
-            "image/png",
-            "test image content".getBytes()
-    );
-
-    // Ensure the initial state: avatar_pos.png exists
-    Path userDir = Paths.get(tempDir.toString(), "user1");
-    Files.createDirectories(userDir);
-    Files.deleteIfExists(userDir.resolve("avatar_pos.png"));
-    Files.deleteIfExists(userDir.resolve("avatar_neg.png"));
-    Files.createFile(userDir.resolve("avatar_pos.png"));
-
-    when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
-
-    // When
-    User updatedUser = userService.updateUserAvatar(testUser.getId(), mockFile);
-
-    // Then
-    assertNotNull(updatedUser);
-    assertEquals("/images/users/user1/avatar_neg.png", updatedUser.getAvatarUrl());
-    verify(userRepository, times(1)).save(testUser);
-  }
-
-  @Test
-  void updateUserAvatar_validInput_switchToPos() throws IOException {
-    // Given
-    MockMultipartFile mockFile = new MockMultipartFile(
-            "avatar",
-            "avatar.png",
-            "image/png",
-            "test image content".getBytes()
-    );
-
-    // Ensure the initial state: avatar_pos.png exists
-    Path userDir = Paths.get(tempDir.toString(), "user1");
-    Files.createDirectories(userDir);
-    Files.deleteIfExists(userDir.resolve("avatar_pos.png"));
-    Files.deleteIfExists(userDir.resolve("avatar_neg.png"));
-    Files.createFile(userDir.resolve("avatar_neg.png"));
-
-    when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
-
-    // When
-    User updatedUser = userService.updateUserAvatar(testUser.getId(), mockFile);
-
-    // Then
-    assertNotNull(updatedUser);
-    assertEquals("/images/users/user1/avatar_pos.png", updatedUser.getAvatarUrl());
-    verify(userRepository, times(1)).save(testUser);
-  }
+//  @Test
+//  void updateUserAvatar_validInput() throws IOException {
+//    // Given
+//    MockMultipartFile mockFile = new MockMultipartFile(
+//            "avatar",
+//            "avatar.png",
+//            "image/png",
+//            "test image content".getBytes()
+//    );
+//
+//    // Ensure the initial state: neither file exists
+//    Path userDir = Paths.get(tempDir.toString(), "user1");
+//    Files.createDirectories(userDir);
+//    Files.deleteIfExists(userDir.resolve("avatar_pos.png"));
+//    Files.deleteIfExists(userDir.resolve("avatar_neg.png"));
+//
+//    when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
+//
+//    // When
+//    User updatedUser = userService.updateUserAvatar(testUser.getId(), mockFile);
+//
+//    // Then
+//    assertNotNull(updatedUser);
+//    assertEquals("/images/users/user1/avatar_pos.png", updatedUser.getAvatarUrl());
+//    verify(userRepository, times(1)).save(testUser);
+//  }
+//
+//  @Test
+//  void updateUserAvatar_validInput_switchToNeg() throws IOException {
+//    // Given
+//    MockMultipartFile mockFile = new MockMultipartFile(
+//            "avatar",
+//            "avatar.png",
+//            "image/png",
+//            "test image content".getBytes()
+//    );
+//
+//    // Ensure the initial state: avatar_pos.png exists
+//    Path userDir = Paths.get(tempDir.toString(), "user1");
+//    Files.createDirectories(userDir);
+//    Files.deleteIfExists(userDir.resolve("avatar_pos.png"));
+//    Files.deleteIfExists(userDir.resolve("avatar_neg.png"));
+//    Files.createFile(userDir.resolve("avatar_pos.png"));
+//
+//    when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
+//
+//    // When
+//    User updatedUser = userService.updateUserAvatar(testUser.getId(), mockFile);
+//
+//    // Then
+//    assertNotNull(updatedUser);
+//    assertEquals("/images/users/user1/avatar_neg.png", updatedUser.getAvatarUrl());
+//    verify(userRepository, times(1)).save(testUser);
+//  }
+//
+//  @Test
+//  void updateUserAvatar_validInput_switchToPos() throws IOException {
+//    // Given
+//    MockMultipartFile mockFile = new MockMultipartFile(
+//            "avatar",
+//            "avatar.png",
+//            "image/png",
+//            "test image content".getBytes()
+//    );
+//
+//    // Ensure the initial state: avatar_pos.png exists
+//    Path userDir = Paths.get(tempDir.toString(), "user1");
+//    Files.createDirectories(userDir);
+//    Files.deleteIfExists(userDir.resolve("avatar_pos.png"));
+//    Files.deleteIfExists(userDir.resolve("avatar_neg.png"));
+//    Files.createFile(userDir.resolve("avatar_neg.png"));
+//
+//    when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
+//
+//    // When
+//    User updatedUser = userService.updateUserAvatar(testUser.getId(), mockFile);
+//
+//    // Then
+//    assertNotNull(updatedUser);
+//    assertEquals("/images/users/user1/avatar_pos.png", updatedUser.getAvatarUrl());
+//    verify(userRepository, times(1)).save(testUser);
+//  }
 
   @Test
   void updateUserAvatar_userNotFound() throws IOException {

@@ -27,6 +27,7 @@ public interface LobbyDTOMapper {
   @Mapping(source = "clueTimer", target = "clueTimer")
   @Mapping(source = "discussionTimer", target = "discussionTimer")
   @Mapping(source = "lobbyAdmin", target = "host.userId")
+  @Mapping(source = "isPrivate", target = "isPrivate")
   Lobby convertLobbyPostDTOtoEntity(LobbyPostDTO lobbyPostDTO);
 
   // Custom mapping for themes (List<String> to List<Theme>)

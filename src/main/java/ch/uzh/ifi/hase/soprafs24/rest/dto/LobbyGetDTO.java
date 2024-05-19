@@ -9,8 +9,6 @@ public class LobbyGetDTO extends LobbyBaseDTO {
 
   private String lobbyAdmin;
 
-  private Boolean isPrivate;
-
   private List<PlayerDTO> players;
 
   private String status;
@@ -32,14 +30,6 @@ public class LobbyGetDTO extends LobbyBaseDTO {
 
   public void setLobbyAdmin(String lobbyAdmin) {
     this.lobbyAdmin = lobbyAdmin;
-  }
-
-  public Boolean getIsPrivate() {
-    return isPrivate;
-  }
-
-  public void setIsPrivate(Boolean aPrivate) {
-    isPrivate = aPrivate;
   }
 
   public List<PlayerDTO> getPlayers() {
