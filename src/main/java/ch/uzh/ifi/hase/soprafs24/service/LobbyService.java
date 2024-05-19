@@ -423,6 +423,7 @@ public class LobbyService {
       newPlayer.setUserId(user.getId());
       newPlayer.setUsername(user.getUsername());
       newPlayer.setLanguage(user.getLanguage());
+      newPlayer.setAvatarUrl(user.getAvatarUrl());
       newPlayer.setHost(isHost);
 
       return newPlayer;

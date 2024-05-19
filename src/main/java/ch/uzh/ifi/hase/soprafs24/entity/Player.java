@@ -36,6 +36,16 @@ public class Player implements Serializable {
   @JoinColumn(name = "lobby_id")
   private Lobby lobby;
 
+  @Column(nullable = true)
+  private String avatarUrl;
+
+  public String getAvatarUrl() {
+    return avatarUrl;
+  }
+
+  public void setAvatarUrl(String avatarUrl) {
+    this.avatarUrl = avatarUrl;
+  }
 
     // For testing purposes
     @Override
