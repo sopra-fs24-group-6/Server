@@ -99,8 +99,13 @@ public class GameService {
     // notify all players that the game has been started
     notifyGameEvents(game, "startRound");
 
-    // start assign phase
-    startAssignPhase(game);
+    // if first round, start assign phase soon
+    // after the second round, interval -> start assign phase
+    if (game.getCurrentRound() == 1) {
+      startAssignPhase(game);
+    } else {
+      timerService.startIntervalTimer(game, 3, () -> startAssignPhase(game));
+    }
   }
 
   public void startAssignPhase(Game game) {
