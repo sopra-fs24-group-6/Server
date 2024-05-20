@@ -18,7 +18,6 @@ import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-
 @Service
 @Transactional
 public class GameService {
@@ -35,13 +34,13 @@ public class GameService {
 
   @Autowired
   public GameService(SimpMessagingTemplate messagingTemplate,
-                     TimerService timerService,
-                     LobbyService lobbyService,
-                     VoteService voteService,
-                     TranslationService translationService,
-                     @Qualifier("wordPairRepository") WordPairRepository wordPairRepository,
-                     @Qualifier("playerRepository") PlayerRepository playerRepository,
-                     @Qualifier("userRepository") UserRepository userRepository) {
+      TimerService timerService,
+      LobbyService lobbyService,
+      VoteService voteService,
+      TranslationService translationService,
+      @Qualifier("wordPairRepository") WordPairRepository wordPairRepository,
+      @Qualifier("playerRepository") PlayerRepository playerRepository,
+      @Qualifier("userRepository") UserRepository userRepository) {
     this.messagingTemplate = messagingTemplate;
     this.timerService = timerService;
     this.lobbyService = lobbyService;
@@ -145,16 +144,18 @@ public class GameService {
     // select theme randomly
     List<String> gameThemes = game.getThemeNames();
     String randomTheme = gameThemes.stream()
-      .skip(random.nextInt(gameThemes.size())) // Skip a random number of elements
-      .findFirst() // This always succeeds unless the list is empty
-      .orElseThrow(() -> new NoSuchElementException("No themes available in the lobby")); // Throw if the list is empty
+        .skip(random.nextInt(gameThemes.size())) // Skip a random number of elements
+        .findFirst() // This always succeeds unless the list is empty
+        .orElseThrow(() -> new NoSuchElementException("No themes available in the lobby")); // Throw if the list is
+                                                                                            // empty
 
     // Done: assign word randomly
     List<WordPair> wordPairList = wordPairRepository.findByTheme_Name(randomTheme);
     WordPair randomWordPair = wordPairList.stream()
-      .skip(random.nextInt(wordPairList.size())) // Skip a random number of elements
-      .findFirst() // This always succeeds unless the list is empty
-      .orElseThrow(() -> new NoSuchElementException("No word pairs available in the theme")); // Throw if the list is empty
+        .skip(random.nextInt(wordPairList.size())) // Skip a random number of elements
+        .findFirst() // This always succeeds unless the list is empty
+        .orElseThrow(() -> new NoSuchElementException("No word pairs available in the theme")); // Throw if the list is
+                                                                                                // empty
     boolean assignFirstAsWolf = random.nextBoolean();
     String wolf_word = assignFirstAsWolf ? randomWordPair.getFirstWord() : randomWordPair.getSecondWord();
     String villager_word = assignFirstAsWolf ? randomWordPair.getSecondWord() : randomWordPair.getFirstWord();
@@ -162,7 +163,7 @@ public class GameService {
     // Done: notify assigned word to each player "/queue/{userId}/wordAssignment"
     List<Player> players = game.getPlayers();
     if (players == null || players.isEmpty()) {
-        throw new IllegalStateException("No players available");
+      throw new IllegalStateException("No players available");
     }
     // Select a random player to be the wolf
     int wolfIndex = random.nextInt(players.size());
@@ -174,10 +175,12 @@ public class GameService {
         Player updatedPlayer = playerRepository.save(villager);
         playerRepository.flush();
         WordNotification villagerNotification = new WordNotification();
-        //For cost concern, this function is commented
-//                 String Translated_text = translationService.translateText("your assigned word is: " + villager_word, villager.getLanguage());
-//                 villagerNotification.setWord(Translated_text);
+        // For cost concern, this function is commented
+        // String Translated_text = translationService.translateText("your assigned word
+        // is: " + villager_word, villager.getLanguage());
+        // villagerNotification.setWord(Translated_text);
         villagerNotification.setWord(villager_word);
+        villagerNotification.setisWolf(false);
         String destination = "/queue/" + villager.getUserId() + "/wordAssignment";
         messagingTemplate.convertAndSend(destination, villagerNotification);
       } else {
@@ -187,10 +190,12 @@ public class GameService {
         Player updatedPlayer = playerRepository.save(wolf);
         playerRepository.flush();
         WordNotification wolfNotification = new WordNotification();
-        //For cost concern, this function is commented
-//                 String wolfanouncement = translationService.translateText("Your role is wolf.",wolf.getLanguage());
-//                 wolfNotification.setWord(wolfanouncement);
-        wolfNotification.setWord(null);
+        // For cost concern, this function is commented
+        // String wolfanouncement = translationService.translateText("Your role is
+        // wolf.",wolf.getLanguage());
+        // wolfNotification.setWord(wolfanouncement);
+        wolfNotification.setWord(villager_word);
+        wolfNotification.setisWolf(true);
         String destination = "/queue/" + wolf.getUserId() + "/wordAssignment";
         messagingTemplate.convertAndSend(destination, wolfNotification);
       }
@@ -234,45 +239,44 @@ public class GameService {
     messagingTemplate.convertAndSend("/topic/" + game.getLobbyId() + "/players", playerDTOS);
   }
 
-
-    public void notifyResults(Long lobbyId, Result result) {
-        // winnerRole
-        String winnerRole = result.getWinnerRole().name();
-        // winners
-        List<PlayerDTO> winners = new ArrayList<>();
-        List<Player> winnerPlayers = result.getWinnerPlayers();
-        for (Player player : winnerPlayers) {
-            PlayerDTO playerDTO = new PlayerDTO();
-            playerDTO.setUserId(player.getUserId());
-            playerDTO.setUsername(player.getUsername());
-            winners.add(playerDTO);
-            // update user records
-            User user = userRepository.findById(player.getUserId())
-                    .orElseThrow(() -> new NoSuchElementException("No user found with ID: " + player.getUserId()));
-            user.addWins();
-            user.updateWeightedWinLossRatio();
-            userRepository.save(user); // Save the updated user record
-            // testing purposes
-            System.out.println(user);
-        }
-        // losers
-        List<PlayerDTO> losers = new ArrayList<>();
-        List<Player> loserPlayers = result.getLoserPlayers();
-        for (Player player : loserPlayers) {
-            PlayerDTO playerDTO = new PlayerDTO();
-            playerDTO.setUserId(player.getUserId());
-            playerDTO.setUsername(player.getUsername());
-            losers.add(playerDTO);
-            // update user records
-            User user = userRepository.findById(player.getUserId())
-                    .orElseThrow(() -> new NoSuchElementException("No user found with ID: " + player.getUserId()));
-            user.addLosses();
-            user.updateWeightedWinLossRatio();
-            userRepository.save(user); // Save the updated user record
-            // testing purposes
-            System.out.println(user);
-        }
-        userRepository.flush(); // Flush changes to the database
+  public void notifyResults(Long lobbyId, Result result) {
+    // winnerRole
+    String winnerRole = result.getWinnerRole().name();
+    // winners
+    List<PlayerDTO> winners = new ArrayList<>();
+    List<Player> winnerPlayers = result.getWinnerPlayers();
+    for (Player player : winnerPlayers) {
+      PlayerDTO playerDTO = new PlayerDTO();
+      playerDTO.setUserId(player.getUserId());
+      playerDTO.setUsername(player.getUsername());
+      winners.add(playerDTO);
+      // update user records
+      User user = userRepository.findById(player.getUserId())
+          .orElseThrow(() -> new NoSuchElementException("No user found with ID: " + player.getUserId()));
+      user.addWins();
+      user.updateWeightedWinLossRatio();
+      userRepository.save(user); // Save the updated user record
+      // testing purposes
+      System.out.println(user);
+    }
+    // losers
+    List<PlayerDTO> losers = new ArrayList<>();
+    List<Player> loserPlayers = result.getLoserPlayers();
+    for (Player player : loserPlayers) {
+      PlayerDTO playerDTO = new PlayerDTO();
+      playerDTO.setUserId(player.getUserId());
+      playerDTO.setUsername(player.getUsername());
+      losers.add(playerDTO);
+      // update user records
+      User user = userRepository.findById(player.getUserId())
+          .orElseThrow(() -> new NoSuchElementException("No user found with ID: " + player.getUserId()));
+      user.addLosses();
+      user.updateWeightedWinLossRatio();
+      userRepository.save(user); // Save the updated user record
+      // testing purposes
+      System.out.println(user);
+    }
+    userRepository.flush(); // Flush changes to the database
     // set variables to resultNotification
     ResultNotification resultNotification = new ResultNotification();
     resultNotification.setWinnerRole(winnerRole);
