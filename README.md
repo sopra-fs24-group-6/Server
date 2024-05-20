@@ -338,5 +338,23 @@ We want new developers to enable voice messages to be delivered among players. T
 
 
 
+## 7.  License
 
+Our project is based on the existing project: [sopra-fs24-template-server](https://github.com/HASEL-UZH/sopra-fs24-template-server). As such, we continue to use the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
+The Apache License 2.0 is a permissive license that allows users to use, modify, and distribute the software under the following conditions:
+
+- **Preservation of copyright and license notices**: The original copyright notice and the license must be retained in any distributed copy of the software.
+- **Contribution of patent rights**: Contributors provide an express grant of patent rights to users.
+- Permissions:
+  - **Commercial use**: You can use the software for commercial purposes.
+  - **Modification**: You can modify the software as you see fit.
+  - **Distribution**: You can distribute the original or modified versions of the software.
+  - **Patent use**: You can use any patents that cover the software.
+  - **Private use**: You can use the software for private purposes.
+- Limitations:
+  - **Trademark use**: The license does not grant rights to use the trademarks of the contributors.
+  - **Liability**: The software is provided "as-is" without warranties or guarantees, and the authors are not liable for any damages.
+  - **Warranty**: The license explicitly disclaims any warranties.
+
+For more details, please refer to the full [Apache License 2.0 text](https://www.apache.org/licenses/LICENSE-2.0).
