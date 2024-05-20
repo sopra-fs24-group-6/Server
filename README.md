@@ -119,15 +119,19 @@ Download your IDE of choice (e.g., [IntelliJ](https://www.jetbrains.com/idea/dow
 
 #### IntelliJ
 
+
+
 If you consider to use IntelliJ as your IDE of choice, you can make use of your free educational license [here](https://www.jetbrains.com/community/education/#students).
 
-1. File -> Open... -> SoPra server template
+1. File -> Open... -> sopra-fs24-group-6/Server
 2. Accept to import the project as a `gradle project`
 3. To build right click the `build.gradle` file and choose `Run Build`
 
 
 
 #### VS Code
+
+
 
 The following extensions can help you get started more easily:
 
@@ -152,6 +156,8 @@ You can use the local Gradle Wrapper to build the application.
 
 More Information about [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html) and [Gradle](https://gradle.org/docs/).
 
+
+
 #### Build
 
 
@@ -173,6 +179,8 @@ More Information about [Gradle Wrapper](https://docs.gradle.org/current/userguid
 
 
 You can verify that the server is running by visiting `localhost:8080` in your browser.
+
+
 
 #### Test
 
