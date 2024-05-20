@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SessionManager {
     private final ConcurrentHashMap<String, Long> sessionMap = new ConcurrentHashMap<>();
 
+    
     public void addSession(String sessionId, Long userId) {
         sessionMap.put(sessionId, userId);
     }
