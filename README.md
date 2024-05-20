@@ -357,4 +357,8 @@ The Apache License 2.0 is a permissive license that allows users to use, modify,
   - **Liability**: The software is provided "as-is" without warranties or guarantees, and the authors are not liable for any damages.
   - **Warranty**: The license explicitly disclaims any warranties.
 
+### Use of Third-Party Services
+
+This project uses the Google Cloud Translation API to provide translation services. The use of the Google Cloud Translation API is governed by Google's Terms of Service and Privacy Policy. Users of this project must comply with these terms when using the translation features.
+
 For more details, please refer to the full [Apache License 2.0 text](https://www.apache.org/licenses/LICENSE-2.0).
