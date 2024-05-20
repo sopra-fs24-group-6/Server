@@ -1,6 +1,10 @@
 # SoPra Group06 Server
 
+
+
 ## 1. Introduction
+
+
 
 * The project's goal is to create an online multiplayer social deduction game that supports players speaking different languages play together. 
 * Our main motivation is  to facilitate fun and engaging communication among players from diverse cultural backgrounds. 
@@ -8,6 +12,8 @@
 
 
 ## 2. Technologies
+
+
 
 * Spring
 * H2 Database
@@ -17,6 +23,8 @@
 
 
 ## 3. High-level components
+
+
 
 ### (1) User
 
