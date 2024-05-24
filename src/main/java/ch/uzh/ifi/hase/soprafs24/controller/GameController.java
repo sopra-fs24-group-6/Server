@@ -21,6 +21,7 @@ public class GameController {
     this.lobbyService = lobbyService;
     this.gameService = gameService;
   }
+  
 
   @MessageMapping("/startGame")
   public void startGame(@Payload GameStartMessage message) {
